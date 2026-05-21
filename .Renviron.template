@@ -1,0 +1,6 @@
+# Copy this file to .Renviron (which is gitignored) and fill in your real keys.
+
+ACADEMIC_INSIGHTS_API_KEY=your-academic-insights-key-here
+
+# College Scorecard key - used in the future Outcomes module
+SCORECARD_API_KEY=your-scorecard-key-here
