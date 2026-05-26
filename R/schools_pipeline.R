@@ -41,6 +41,7 @@ SCHOOLS_CONFIG <- list(
   ai_base    = "https://ai.usnews.com/api/v1/client_api",
   ai_dataset = "undergraduate",
   ai_key     = Sys.getenv("ACADEMIC_INSIGHTS_API_KEY"),
+  scorecard_key = Sys.getenv("SCORECARD_API_KEY"),
   ranked_classes = c("national-universities", "national-liberal-arts-colleges"),
   labels_year = 2024,
   carnegie_file = .data_path("2025-Public-Data-File.xlsx"),
@@ -125,6 +126,65 @@ ai_get <- function(cfg, path, query = list()) {
     resp_body_json(simplifyVector = TRUE)
 }
 
+# Year-naming conventions:
+#   IPEDS uses fall-year (HD2024 = fall 2024 collection = academic year 2024-25)
+#   Academic Insights publishes data with a 2-year lag relative to IPEDS year.
+#   Empirical verification (Holy Cross applicants, metric_id 1, across 7 years):
+#     AI year 2022 = IPEDS year 2020 (both = 2020-21 academic year)
+#     AI year 2024 = IPEDS year 2022 (both = 2022-23 academic year)
+#     AI year 2026 = IPEDS year 2024 (both = 2024-25 academic year)
+#   So AI year Y refers to the same academic year as IPEDS year Y - 2.
+# Our facts tables use IPEDS-naming throughout. These two helpers translate
+# between the conventions when we read from or write to AI:
+#   ipeds_to_ai_year(2024) -> 2026  (ask AI for the right year when our IPEDS code says 2024)
+#   ai_to_ipeds_year(2026) -> 2024  (convert an AI-returned year to facts-table year)
+ipeds_to_ai_year <- function(y) as.integer(y) + 2L
+ai_to_ipeds_year <- function(y) as.integer(y) - 2L
+
+# =============================================================================
+# 2b. College Scorecard helper - paged fetch
+# =============================================================================
+# Scorecard API:
+#   base:   https://api.data.gov/ed/collegescorecard/v1/schools
+#   key:    SCORECARD_API_KEY (api_key query parameter)
+#   paging: per_page up to 100; iterate page index 0, 1, ...
+#   fields: comma-separated list of dotted field paths, e.g.
+#           "id,school.name,school.accreditor"
+# Returns the concatenated "results" arrays as a tibble.
+scorecard_get <- function(cfg, fields, query = list(), per_page = 100) {
+  if (cfg$scorecard_key == "")
+    stop("SCORECARD_API_KEY not set in environment.")
+  
+  base <- "https://api.data.gov/ed/collegescorecard/v1/schools"
+  out  <- list()
+  page <- 0L
+  repeat {
+    q <- c(list(api_key = cfg$scorecard_key,
+                fields  = paste(fields, collapse = ","),
+                per_page = per_page,
+                page = page),
+           query)
+    resp <- request(base) %>%
+      req_url_query(!!!q) %>%
+      req_user_agent("hc-peer-pipeline") %>%
+      req_throttle(rate = 60 / 60) %>%
+      req_retry(max_tries = 5) %>%
+      req_perform() %>%
+      resp_body_json(simplifyVector = TRUE)
+    res <- resp$results
+    if (is.null(res) || length(res) == 0) break
+    out[[length(out) + 1]] <- as_tibble(res)
+    total <- resp$metadata$total %||% 0
+    page  <- page + 1L
+    if (page * per_page >= total) break
+  }
+  if (!length(out)) return(tibble())
+  bind_rows(out)
+}
+
+# small null-coalesce
+`%||%` <- function(a, b) if (is.null(a)) b else a
+
 # =============================================================================
 # 3. US News classification (Academic Insights, by state)
 # =============================================================================
@@ -153,6 +213,49 @@ build_classification <- function(cfg) {
 }
 
 # =============================================================================
+# 3b. College Scorecard - accreditor (institutional attribute)
+# =============================================================================
+# Pulls each school's accreditor name from the latest Scorecard release.
+# Used as a filter/scope field on schools.csv, not as a clustering variable.
+# Returns tibble(unitid, accreditor) or tibble() on failure.
+build_accreditor <- function(cfg) {
+  if (cfg$scorecard_key == "") {
+    warning("SCORECARD_API_KEY not set; skipping accreditor pull.")
+    return(tibble(unitid = integer(), accreditor = character()))
+  }
+  message("Pulling accreditor from College Scorecard ...")
+  fields <- c("id", "school.accreditor")
+  # Filter to Title-IV-participating SECTOR 1/2 (public/private NFP 4-year)
+  # to stay within the universe and avoid pulling the entire Scorecard catalog.
+  raw <- tryCatch(
+    scorecard_get(cfg, fields, query = list(
+      `school.degrees_awarded.predominant__range` = "3..4",
+      `school.ownership` = "1,2"
+    )),
+    error = function(e) {
+      warning(sprintf("Scorecard pull failed: %s", conditionMessage(e)))
+      tibble()
+    })
+  if (!nrow(raw) || !"id" %in% names(raw)) {
+    warning("Scorecard accreditor pull returned nothing usable")
+    return(tibble(unitid = integer(), accreditor = character()))
+  }
+  acc_col <- if ("school.accreditor" %in% names(raw)) "school.accreditor" else
+    grep("accreditor", names(raw), value = TRUE)[1]
+  if (is.na(acc_col)) {
+    warning("Scorecard response missing accreditor field")
+    return(tibble(unitid = integer(), accreditor = character()))
+  }
+  out <- raw %>%
+    transmute(unitid = as.integer(id),
+              accreditor = as.character(.data[[acc_col]])) %>%
+    filter(!is.na(unitid)) %>%
+    distinct(unitid, .keep_all = TRUE)
+  message(sprintf("  pulled accreditor for %d institutions", nrow(out)))
+  out
+}
+
+# =============================================================================
 # 4. Carnegie 2025 Public Data File - data + value labels
 # =============================================================================
 build_carnegie <- function(cfg) {
@@ -171,6 +274,13 @@ build_carnegie <- function(cfg) {
     "research2025", "research2025name",
     "setting2025", "highest_degree_2025", "basic2021",
     "ic2025size", "ic2025alf", "apm", "gpm",
+    # academic concentration (one-time Carnegie snapshot; documented as an
+    # admissions-relevant institutional attribute)
+    "apm_max_cip2percent", "apm_max_cip2_name",
+    # earnings_ratio: CCIHE's SAEC computation of earnings vs expected
+    # earnings given demographics. Outcomes-relevant; kept here as a
+    # one-time snapshot. source = ccihe in outcomes_variables.csv.
+    "earnings_ratio",
     "pbi", "annhsi", "aanapisi", "hsi", "nasnti", "womenonly",
     "rpu", "cce", "lpp"
   )
@@ -333,6 +443,11 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
     schools <- schools %>% left_join(carnegie$data, by = "unitid")
   }
   
+  accreditor <- build_accreditor(cfg)
+  if (nrow(accreditor)) {
+    schools <- schools %>% left_join(accreditor, by = "unitid")
+  }
+  
   ipeds_labels <- build_ipeds_value_labels(cfg)
   all_labels <- bind_rows(ipeds_labels, carnegie$labels) %>%
     distinct(table_name, variable, code, .keep_all = TRUE)
@@ -344,10 +459,11 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
     schools <- attach_label(schools, f, toupper(f), all_labels)
   }
   
-  message(sprintf("  %d distinct schools; %d in ranked universe; %d with Carnegie ic2025",
+  message(sprintf("  %d distinct schools; %d in ranked universe; %d with Carnegie ic2025; %d with accreditor",
                   nrow(schools),
                   sum(schools$in_ranked_universe, na.rm = TRUE),
-                  if ("ic2025" %in% names(schools)) sum(!is.na(schools$ic2025)) else 0))
+                  if ("ic2025" %in% names(schools)) sum(!is.na(schools$ic2025)) else 0,
+                  if ("accreditor" %in% names(schools)) sum(!is.na(schools$accreditor)) else 0))
   
   write.csv(schools, .out_path("schools.csv"), row.names = FALSE)
   message(sprintf("Wrote %s", .out_path("schools.csv")))
@@ -359,6 +475,6 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
 #   setwd("path/to/hc-peer")
 #   Sys.setenv(ACADEMIC_INSIGHTS_API_KEY = "...")
 #   source("R/schools_pipeline.R")
-#   schools <- build_schools()
+  schools <- build_schools()
 # Produces output/schools.csv and output/value_labels.csv.
 # -----------------------------------------------------------------------------

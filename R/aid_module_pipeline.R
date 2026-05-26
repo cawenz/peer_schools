@@ -16,7 +16,6 @@ suppressPackageStartupMessages({
 })
 
 # Source shared schools/IPEDS helpers
-source("R/schools_pipeline.R")
 
 # ---- CONFIG ---------------------------------------------------------------
 AID_CONFIG <- list(
@@ -64,14 +63,15 @@ newest_netprice <- function(df, base) {
 # 2. The 8 IPEDS aid metrics
 # =============================================================================
 build_ipeds_aid <- function(unitids_by_year, cfg) {
-  message("Pulling 8 IPEDS aid metrics ...")
+  message("Pulling 9 IPEDS aid metrics ...")
   out <- list()
   for (yr in cfg$collection_years) {
     uids <- unitids_by_year[[as.character(yr)]]
     
     direct <- c(pct_pell = "PGRNT_P", pct_any_grant = "AGRNT_P",
                 avg_inst_grant = "IGRNT_A", pct_federal_loan = "FLOAN_P",
-                avg_federal_loan = "FLOAN_A")
+                avg_federal_loan = "FLOAN_A",
+                pell_count = "UPGRNTN")
     for (nm in names(direct)) {
       d <- col_of("SFA_FT", yr, direct[[nm]]) %>% filter(unitid %in% uids)
       if (nrow(d)) out[[length(out)+1]] <-
@@ -131,20 +131,25 @@ search_ai_metrics <- function(cfg, contains = NULL) {
 build_cds_aid <- function(cfg) {
   ids <- unlist(cfg$ai_metric_ids); ids <- ids[!is.na(ids)]
   if (!length(ids)) { message("No CDS metric IDs set - skipping."); return(tibble()) }
-  message("Pulling 2 CDS metrics (paged by metric x year) ...")
-  grid <- expand.grid(metric_id = ids, year = cfg$collection_years)
-  facts <- pmap_dfr(grid, function(metric_id, year) {
+  message("Pulling 2 CDS metrics (paged by metric x year, IPEDS->AI year mapping) ...")
+  # Iterate over our IPEDS-naming years but ask AI for each year's AI-equivalent.
+  grid <- expand.grid(metric_id = ids, ipeds_year = cfg$collection_years)
+  facts <- pmap_dfr(grid, function(metric_id, ipeds_year) {
+    ai_year <- ipeds_to_ai_year(ipeds_year)
     res <- ai_get(cfg, paste0("facts/", cfg$ai_dataset), query = list(
-      metric_ids = metric_id, years = year, all_data = "true"))
+      metric_ids = metric_id, years = ai_year, all_data = "true"))
     df <- as_tibble(res)
     n  <- nrow(df)
     if (n >= 5000)
-      warning(sprintf("metric %s / %d returned %d rows - likely TRUNCATED",
-                      metric_id, year, n))
-    message(sprintf("  metric %s / %d: %d rows", metric_id, year, n))
+      warning(sprintf("metric %s / AI %d (IPEDS %d) returned %d rows - likely TRUNCATED",
+                      metric_id, ai_year, ipeds_year, n))
+    message(sprintf("  metric %s / AI %d (IPEDS %d): %d rows",
+                    metric_id, ai_year, ipeds_year, n))
     if (!n) return(tibble())
-    df
+    df %>% mutate(year = ipeds_year)   # store under our IPEDS-convention year
   })
+  if (!nrow(facts) || !"school_ipeds_id" %in% names(facts))
+    return(tibble())
   id_map <- tibble(metric_id = unlist(cfg$ai_metric_ids),
                    metric    = names(cfg$ai_metric_ids))
   facts %>%
@@ -159,25 +164,22 @@ build_cds_aid <- function(cfg) {
 # =============================================================================
 build_aid_variables <- function() {
   tribble(
-    ~metric,                       ~display_name,                                            ~source,         ~ipeds_table_or_formula,                                ~format,       ~coverage_note,
-    "avg_net_price_aided",         "Average net price - all aided students",                 "ipeds",         "SFA_NP.NPIST# (newest vintage)",                       "currency",    NA_character_,
-    "avg_net_price_income_0_30k",  "Average net price - lowest income band ($0-30k)",        "ipeds",         "SFA_NP.NPIS41# (newest vintage)",                      "currency",    NA_character_,
-    "pct_pell",                    "Percent receiving Pell grants",                          "ipeds",         "SFA_FT.PGRNT_P",                                       "percentage",  NA_character_,
-    "pct_any_grant",               "Percent receiving any grant or scholarship aid",         "ipeds",         "SFA_FT.AGRNT_P",                                       "percentage",  NA_character_,
-    "avg_inst_grant",              "Average institutional grant per recipient",              "ipeds",         "SFA_FT.IGRNT_A",                                       "currency",    NA_character_,
-    "inst_discount_rate",          "Institutional discount rate",                            "ipeds_derived", "SFA_FT.IGRNT_A / (TUITION2 + FEE2 or CHG1PY*)",        "ratio",       "In-state tuition used for public institutions",
-    "pct_federal_loan",            "Percent borrowing federal loans",                        "ipeds",         "SFA_FT.FLOAN_P",                                       "percentage",  NA_character_,
-    "avg_federal_loan",            "Average federal loan per borrower",                      "ipeds",         "SFA_FT.FLOAN_A",                                       "currency",    NA_character_,
-    "pct_need_met",                "Average percent of need met (freshmen)",                 "cds_ai",        "Academic Insights metric_id 374",                      "percentage",  "Survey respondents only (~45%)",
-    "pct_need_fully_met",          "Percent of students whose need was fully met (freshmen)","cds_ai",        "Academic Insights metric_id 366",                      "percentage",  "Survey respondents only (~45%)"
+    ~metric,                       ~display_name,                                            ~source,         ~ipeds_table_or_formula,                                ~use_type,     ~comparison_scope,  ~format,       ~neche_peer_set, ~neche_dashboard, ~coverage_note,
+    "avg_net_price_aided",         "Average net price - all aided students",                 "ipeds",         "SFA_NP.NPIST# (newest vintage)",                       "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
+    "avg_net_price_income_0_30k",  "Average net price - lowest income band ($0-30k)",        "ipeds",         "SFA_NP.NPIS41# (newest vintage)",                      "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
+    "pct_pell",                    "Percent receiving Pell grants (first-time full-time UG)","ipeds",         "SFA_FT.PGRNT_P",                                       "clustering",  "cross_category",   "percentage",  FALSE,           TRUE,             NA_character_,
+    "pell_count",                  "Number of all undergraduates awarded Pell grants",       "ipeds",         "SFA_FT.UPGRNTN",                                       "descriptive", "within_category",  "count",       TRUE,            TRUE,             "All-UG population; pct_pell measures first-time full-time only",
+    "pct_any_grant",               "Percent receiving any grant or scholarship aid",         "ipeds",         "SFA_FT.AGRNT_P",                                       "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,
+    "avg_inst_grant",              "Average institutional grant per recipient",              "ipeds",         "SFA_FT.IGRNT_A",                                       "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
+    "inst_discount_rate",          "Institutional discount rate",                            "ipeds_derived", "SFA_FT.IGRNT_A / (TUITION2 + FEE2 or CHG1PY*)",        "clustering",  "cross_category",   "ratio",       FALSE,           FALSE,            "In-state tuition used for public institutions",
+    "pct_federal_loan",            "Percent borrowing federal loans",                        "ipeds",         "SFA_FT.FLOAN_P",                                       "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,
+    "avg_federal_loan",            "Average federal loan per borrower",                      "ipeds",         "SFA_FT.FLOAN_A",                                       "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
+    "pct_need_met",                "Average percent of need met (freshmen)",                 "cds_ai",        "Academic Insights metric_id 374",                      "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            "Survey respondents only (~45%)",
+    "pct_need_fully_met",          "Percent of students whose need was fully met (freshmen)","cds_ai",        "Academic Insights metric_id 366",                      "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            "Survey respondents only (~45%)"
   ) %>%
-    mutate(category = "aid",
-           use_type = "clustering",
-           comparison_scope = "cross_category",
-           neche_peer_set = FALSE,
-           notes = NA_character_) %>%
+    mutate(category = "aid", notes = NA_character_) %>%
     select(metric, category, display_name, source, ipeds_table_or_formula,
-           use_type, comparison_scope, format, neche_peer_set,
+           use_type, comparison_scope, format, neche_peer_set, neche_dashboard,
            coverage_note, notes)
 }
 
@@ -185,13 +187,19 @@ build_aid_variables <- function() {
 # 5. COVERAGE REPORT
 # =============================================================================
 aid_coverage_report <- function(facts, schools) {
-  uni <- schools %>%
-    transmute(unitid, control_grp) %>%
-    tidyr::crossing(year = sort(unique(facts$year)))
+  # Each metric's target year set is inferred from the data itself: a metric's
+  # "universe" is schools x the years that metric actually populates. This
+  # treats single-snapshot variables (1 year) and multi-year variables (5
+  # years) on equal footing - both report coverage relative to their target
+  # year range rather than the full panel.
+  metric_year_pairs <- facts %>% distinct(metric, year)
+  
+  schools_min <- schools %>% transmute(unitid, control_grp)
+  uni <- metric_year_pairs %>% tidyr::crossing(schools_min)
   
   have <- facts %>% distinct(unitid, year, metric) %>% mutate(has_data = TRUE)
   
-  tidyr::crossing(uni, metric = sort(unique(facts$metric))) %>%
+  cov <- uni %>%
     left_join(have, by = c("unitid", "year", "metric")) %>%
     mutate(has_data = !is.na(has_data)) %>%
     group_by(metric, control_grp) %>%
@@ -200,6 +208,10 @@ aid_coverage_report <- function(facts, schools) {
               n_universe  = n(), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = control_grp,
                        values_from = c(pct_covered, n_with_data, n_universe))
+  
+  # n_years column makes single-snapshot variables visible at a glance
+  years_per_metric <- metric_year_pairs %>% count(metric, name = "n_years")
+  cov %>% left_join(years_per_metric, by = "metric") %>% arrange(metric)
 }
 
 # =============================================================================
@@ -242,8 +254,5 @@ run_aid_module <- function(cfg = AID_CONFIG) {
 
 # -----------------------------------------------------------------------------
 # Usage:
-#   setwd("path/to/hc-peer")
-#   Sys.setenv(ACADEMIC_INSIGHTS_API_KEY = "...")
-#   source("R/schools_pipeline.R");      build_schools()
-#   source("R/aid_module_pipeline.R");   res <- run_aid_module()
+ res_aid <- run_aid_module()
 # -----------------------------------------------------------------------------
