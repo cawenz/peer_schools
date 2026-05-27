@@ -374,6 +374,131 @@ attach_label <- function(df, code_col, variable, labels,
 }
 
 # =============================================================================
+# 5b. RELIGIOUS AFFILIATION DECODE
+# =============================================================================
+# IPEDS IC table's RELAFFIL field uses a numeric code. Codes verified against
+# the official IPEDS IC2023 codebook (RELAFFIL data dictionary).
+#
+# We return three columns:
+#   religious_affiliation_code  : raw IPEDS integer code
+#   religious_affiliation       : human-readable denomination label
+#   religious_tradition         : broader tradition rollup (Catholic /
+#                                 Protestant / Other Christian / Jewish /
+#                                 Other / NA)
+#
+# The tradition rollup is useful for clustering because the specific
+# denomination granularity (50+ codes) is rarely meaningful for institutional
+# comparison, while "Catholic vs Mainline Protestant vs Other Christian vs
+# Jewish vs Other" captures most of the variation institutions actually care
+# about.
+#
+# Tradition assignments follow standard categorical conventions:
+#   Catholic         : Roman Catholic only
+#   Protestant       : denominationally-specific Protestant traditions
+#                      (Lutheran, Methodist, Presbyterian, Baptist, etc.)
+#   Other Christian  : Eastern Orthodox, LDS, nondenominational/ecumenical,
+#                      multi-denominational
+#   Jewish           : Jewish
+#   Other            : Muslim, Buddhist, Unitarian Universalist, and the
+#                      catch-all "Other (none of the above)"
+#
+# Codes -1 ("Not reported") and -2 ("Not applicable") map to NA tradition.
+# Any code we don't recognize is labeled "Other religious" rather than NA,
+# so downstream filters don't silently drop rows.
+.RELAFFIL_LOOKUP <- tribble(
+  ~code, ~label,                                              ~tradition,
+  -1L,   "Not reported",                                      NA_character_,
+  -2L,   "Not applicable",                                    NA_character_,
+  22L,   "American Evangelical Lutheran Church",              "Protestant",
+  24L,   "African Methodist Episcopal Zion Church",           "Protestant",
+  27L,   "Assemblies of God Church",                          "Protestant",
+  28L,   "Brethren Church",                                   "Protestant",
+  30L,   "Roman Catholic",                                    "Catholic",
+  33L,   "Wisconsin Evangelical Lutheran Synod",              "Protestant",
+  34L,   "Christ and Missionary Alliance Church",             "Protestant",
+  35L,   "Christian Reformed Church",                         "Protestant",
+  36L,   "Evangelical Congregational Church",                 "Protestant",
+  37L,   "Evangelical Covenant Church of America",            "Protestant",
+  38L,   "Evangelical Free Church of America",                "Protestant",
+  39L,   "Evangelical Lutheran Church",                       "Protestant",
+  40L,   "International United Pentecostal Church",           "Protestant",
+  41L,   "Free Will Baptist Church",                          "Protestant",
+  42L,   "Interdenominational",                               "Other Christian",
+  43L,   "Mennonite Brethren Church",                         "Protestant",
+  44L,   "Moravian Church",                                   "Protestant",
+  45L,   "North American Baptist",                            "Protestant",
+  47L,   "Pentecostal Holiness Church",                       "Protestant",
+  48L,   "Christian Churches and Churches of Christ",         "Protestant",
+  49L,   "Reformed Church in America",                        "Protestant",
+  50L,   "Episcopal Church, Reformed",                        "Protestant",
+  51L,   "African Methodist Episcopal",                       "Protestant",
+  52L,   "American Baptist",                                  "Protestant",
+  53L,   "American Lutheran",                                 "Protestant",
+  54L,   "Baptist",                                           "Protestant",
+  55L,   "Christian Methodist Episcopal",                     "Protestant",
+  57L,   "Church of God",                                     "Protestant",
+  58L,   "Church of Brethren",                                "Protestant",
+  59L,   "Church of the Nazarene",                            "Protestant",
+  60L,   "Cumberland Presbyterian",                           "Protestant",
+  61L,   "Christian Church (Disciples of Christ)",            "Protestant",
+  64L,   "Free Methodist",                                    "Protestant",
+  65L,   "Friends",                                           "Protestant",
+  66L,   "Presbyterian Church (USA)",                         "Protestant",
+  67L,   "Lutheran Church in America",                        "Protestant",
+  68L,   "Lutheran Church - Missouri Synod",                  "Protestant",
+  69L,   "Mennonite Church",                                  "Protestant",
+  71L,   "United Methodist",                                  "Protestant",
+  73L,   "Protestant Episcopal",                              "Protestant",
+  74L,   "Churches of Christ",                                "Protestant",
+  75L,   "Southern Baptist",                                  "Protestant",
+  76L,   "United Church of Christ",                           "Protestant",
+  77L,   "Protestant, not specified",                         "Protestant",
+  78L,   "Multiple Protestant Denomination",                  "Protestant",
+  79L,   "Other Protestant",                                  "Protestant",
+  80L,   "Jewish",                                            "Jewish",
+  81L,   "Reformed Presbyterian Church",                      "Protestant",
+  84L,   "United Brethren Church",                            "Protestant",
+  87L,   "Missionary Church Inc",                             "Protestant",
+  88L,   "Undenominational",                                  "Other Christian",
+  89L,   "Wesleyan",                                          "Protestant",
+  91L,   "Greek Orthodox",                                    "Other Christian",
+  92L,   "Russian Orthodox",                                  "Other Christian",
+  93L,   "Unitarian Universalist",                            "Other",
+  94L,   "The Church of Jesus Christ of Latter-day Saints",   "Other Christian",
+  95L,   "Seventh Day Adventist",                             "Protestant",
+  97L,   "The Presbyterian Church in America",                "Protestant",
+  99L,   "Other (none of the above)",                         "Other",
+  100L,  "Original Free Will Baptist",                        "Protestant",
+  101L,  "Ecumenical Christian",                              "Other Christian",
+  102L,  "Evangelical Christian",                             "Other Christian",
+  103L,  "Presbyterian",                                      "Protestant",
+  104L,  "Virginia Baptist General Association",              "Protestant",
+  105L,  "General Baptist",                                   "Protestant",
+  106L,  "Muslim",                                            "Other",
+  107L,  "Plymouth Brethren",                                 "Protestant",
+  108L,  "Non-Denominational",                                "Other Christian",
+  109L,  "Buddhist/Buddhism",                                 "Other",
+  110L,  "Orthodox Christian",                                "Other Christian"
+)
+
+.relaffil_label <- function(code) {
+  out <- .RELAFFIL_LOOKUP$label[match(code, .RELAFFIL_LOOKUP$code)]
+  # Recognized but unmapped codes (e.g., new denomination in a future IPEDS
+  # release) become "Other religious" rather than NA, so they remain
+  # filterable instead of silently dropping.
+  ifelse(is.na(code), NA_character_,
+         ifelse(is.na(out) & code > 0, "Other religious", out))
+}
+
+.relaffil_tradition <- function(code) {
+  out <- .RELAFFIL_LOOKUP$tradition[match(code, .RELAFFIL_LOOKUP$code)]
+  # Codes that map to NA tradition stay NA. Both -1 ("Not reported") and
+  # -2 ("Not applicable") get NA tradition; the absence of a tradition is
+  # the correct semantic for those institutions.
+  out
+}
+
+# =============================================================================
 # 6. BUILD schools.csv
 # =============================================================================
 build_schools <- function(cfg = SCHOOLS_CONFIG) {
@@ -405,6 +530,24 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
       filter(sector %in% cfg$keep_sectors)
   })
   
+  # Religious affiliation pulled once from IC2023 (the field changes very
+  # slowly for institutions; using a single year and applying uniformly is
+  # a documented simplification, similar to how Carnegie classifications
+  # are applied). RELAFFIL lives in IC (Institutional Characteristics),
+  # not HD (Header). If IC2023 isn't loadable for any reason, religious
+  # affiliation columns will be all NA and the rest of the pipeline still
+  # runs.
+  relaffil_lookup <- {
+    ic23 <- tryCatch(get_table(2023, "IC2023"), error = function(e) NULL)
+    if (is.null(ic23) || !"RELAFFIL" %in% names(ic23)) {
+      message("  Note: IC2023 not available or missing RELAFFIL; religious affiliation will be NA")
+      tibble(unitid = integer(), relaffil = integer())
+    } else {
+      tibble(unitid = ic23$unitid,
+             relaffil = suppressWarnings(as.integer(ic23$RELAFFIL)))
+    }
+  }
+  
   schools <- all_hd %>%
     arrange(unitid, desc(year)) %>%
     group_by(unitid) %>%
@@ -430,7 +573,13 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
       sector == 1 ~ "public",
       sector == 2 ~ "private_nfp",
       TRUE        ~ "other"
-    ))
+    )) %>%
+    left_join(relaffil_lookup, by = "unitid") %>%
+    mutate(
+      religious_affiliation_code = relaffil,
+      religious_affiliation      = .relaffil_label(relaffil),
+      religious_tradition        = .relaffil_tradition(relaffil)
+    )
   
   classn <- build_classification(cfg)
   schools <- schools %>%
@@ -459,11 +608,13 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
     schools <- attach_label(schools, f, toupper(f), all_labels)
   }
   
-  message(sprintf("  %d distinct schools; %d in ranked universe; %d with Carnegie ic2025; %d with accreditor",
+  message(sprintf("  %d distinct schools; %d in ranked universe; %d with Carnegie ic2025; %d with accreditor; %d with religious affiliation",
                   nrow(schools),
                   sum(schools$in_ranked_universe, na.rm = TRUE),
                   if ("ic2025" %in% names(schools)) sum(!is.na(schools$ic2025)) else 0,
-                  if ("accreditor" %in% names(schools)) sum(!is.na(schools$accreditor)) else 0))
+                  if ("accreditor" %in% names(schools)) sum(!is.na(schools$accreditor)) else 0,
+                  sum(!is.na(schools$religious_tradition) &
+                        schools$religious_affiliation != "Not applicable", na.rm = TRUE)))
   
   write.csv(schools, .out_path("schools.csv"), row.names = FALSE)
   message(sprintf("Wrote %s", .out_path("schools.csv")))
@@ -474,7 +625,6 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
 # Usage:
 #   setwd("path/to/hc-peer")
 #   Sys.setenv(ACADEMIC_INSIGHTS_API_KEY = "...")
-#   source("R/schools_pipeline.R")
-  schools <- build_schools()
+   schools <- build_schools()
 # Produces output/schools.csv and output/value_labels.csv.
 # -----------------------------------------------------------------------------
