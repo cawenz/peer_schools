@@ -30,6 +30,16 @@ output/
 # Re-allow the Carnegie file
 !data/2025-Public-Data-File.xlsx
 
+# Re-allow the curated CSVs the Shiny app reads at startup (schools.csv,
+# the five {module}_facts.csv / {module}_variables.csv pairs, and
+# value_labels.csv). The clustvarsel .rds / .log research artifacts and
+# the local plotly preview directory stay ignored.
+!output/
+!output/*.csv
+output/*.rds
+output/*.log
+output/previews/
+
 # IPEDS source files that aren't the .Rda we ship
 data/*.accdb
 data/*.zip

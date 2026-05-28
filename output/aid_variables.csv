@@ -1,0 +1,12 @@
+"metric","category","display_name","source","ipeds_table_or_formula","use_type","comparison_scope","format","neche_peer_set","neche_dashboard","coverage_note","notes"
+"avg_net_price_aided","aid","Average net price - all aided students","ipeds","SFA_NP: NPIST# (public) coalesced with NPGRN# (private)","clustering","cross_category","currency",FALSE,FALSE,"Public institutions report under NPIST (in-state Title IV recipients); private nonprofits report under NPGRN (grant recipients). Definitions are very similar but not identical.",NA
+"avg_net_price_income_0_30k","aid","Average net price - lowest income band ($0-30k)","ipeds","SFA_NP: NPIS41# (public) coalesced with NPT41# (private)","clustering","cross_category","currency",FALSE,FALSE,"Public institutions report under NPIS41 (in-state); private nonprofits report under NPT41. Income band 1 (0-30k) in both.",NA
+"pct_pell","aid","Percent receiving Pell grants (first-time full-time UG)","ipeds","SFA_FT.PGRNT_P","clustering","cross_category","percentage",FALSE,TRUE,NA,NA
+"pell_count","aid","Number of all undergraduates awarded Pell grants","ipeds","SFA_FT.UPGRNTN","descriptive","within_category","count",TRUE,TRUE,"All-UG population; pct_pell measures first-time full-time only",NA
+"pct_any_grant","aid","Percent receiving any grant or scholarship aid","ipeds","SFA_FT.AGRNT_P","clustering","cross_category","percentage",FALSE,FALSE,NA,NA
+"avg_inst_grant","aid","Average institutional grant per recipient","ipeds","SFA_FT.IGRNT_A","clustering","cross_category","currency",FALSE,FALSE,NA,NA
+"inst_discount_rate","aid","Institutional discount rate","ipeds_derived","SFA_FT.IGRNT_A / (TUITION2 + FEE2 or CHG1PY*)","clustering","cross_category","ratio",FALSE,FALSE,"In-state tuition used for public institutions",NA
+"pct_federal_loan","aid","Percent borrowing federal loans","ipeds","SFA_FT.FLOAN_P","clustering","cross_category","percentage",FALSE,FALSE,NA,NA
+"avg_federal_loan","aid","Average federal loan per borrower","ipeds","SFA_FT.FLOAN_A","clustering","cross_category","currency",FALSE,FALSE,NA,NA
+"pct_need_met","aid","Average percent of need met (freshmen)","cds_ai","Academic Insights metric_id 374","clustering","cross_category","percentage",FALSE,FALSE,"Survey respondents only (~45%)",NA
+"pct_need_fully_met","aid","Percent of students whose need was fully met (freshmen)","cds_ai","Academic Insights metric_id 366","clustering","cross_category","percentage",FALSE,FALSE,"Survey respondents only (~45%)",NA

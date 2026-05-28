@@ -1,0 +1,23 @@
+"metric","category","display_name","source","ipeds_table_or_formula","use_type","comparison_scope","format","neche_peer_set","neche_dashboard","coverage_note","notes"
+"total_enrollment","enrollment","Total fall enrollment","ipeds","DRVEF.ENRTOT","clustering","cross_category","count",TRUE,TRUE,NA,NA
+"undergraduate_enrollment","enrollment","Undergraduate fall enrollment","ipeds","DRVEF.EFUG","clustering","cross_category","count",TRUE,TRUE,NA,NA
+"first_time_enrollment","enrollment","First-time degree-seeking UG enrollment","ipeds","DRVEF.EFUG1ST","clustering","cross_category","count",TRUE,TRUE,NA,NA
+"full_time_enrollment","enrollment","Full-time fall enrollment","ipeds","DRVEF.ENRFT","clustering","cross_category","count",TRUE,TRUE,NA,NA
+"pct_undergrad","enrollment","Undergraduate share of total enrollment","ipeds_derived","DRVEF.EFUG / ENRTOT","clustering","cross_category","percentage",FALSE,FALSE,NA,NA
+"pct_graduate","enrollment","Graduate share of total enrollment","ipeds_derived","100 - (DRVEF.EFUG / ENRTOT)","descriptive","cross_category","percentage",FALSE,FALSE,"Algebraic complement of pct_undergrad; tagged descriptive to avoid double-counting in clustering.",NA
+"pct_part_time","enrollment","Part-time share of total enrollment","ipeds_derived","DRVEF.ENRPT / ENRTOT","clustering","cross_category","percentage",FALSE,FALSE,NA,NA
+"pct_age_25plus","enrollment","Percent of undergraduates age 25-64","ipeds","DRVEF.DVEF15","clustering","cross_category","percentage",FALSE,FALSE,NA,NA
+"transfer_in_enrollment","enrollment","Transfer-in undergraduate enrollment","ipeds","DRVEF.EFUGTRN","clustering","within_category","count",FALSE,TRUE,NA,NA
+"pct_white","enrollment","Percent of enrollment that is White","ipeds","DRVEF.PCTENRWH","clustering","cross_category","percentage",FALSE,TRUE,"3-level trio component",NA
+"pct_international","enrollment","Percent of enrollment that is U.S. nonresident","ipeds","DRVEF.PCTENRNR","clustering","cross_category","percentage",FALSE,TRUE,"3-level trio component; visa status, not race",NA
+"pct_bipoc","enrollment","Percent of enrollment that is BIPOC","ipeds_derived","100 - PCTENRWH - PCTENRNR - PCTENRUN","clustering","cross_category","percentage",FALSE,FALSE,"3-level trio component; excludes race/ethnicity unknown",NA
+"pct_black","enrollment","Percent Black or African American","ipeds","DRVEF.PCTENRBK","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_hispanic","enrollment","Percent Hispanic or Latino","ipeds","DRVEF.PCTENRHS","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_asian","enrollment","Percent Asian","ipeds","DRVEF.PCTENRAS","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_nhpi","enrollment","Percent Native Hawaiian or Pacific Islander","ipeds","DRVEF.PCTENRNH","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_aian","enrollment","Percent American Indian or Alaska Native","ipeds","DRVEF.PCTENRAN","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_two_or_more","enrollment","Percent two or more races","ipeds","DRVEF.PCTENR2M","descriptive","cross_category","percentage",FALSE,TRUE,"Detailed breakdown; trio is clustering version",NA
+"pct_race_unknown","enrollment","Percent race/ethnicity unknown","ipeds","DRVEF.PCTENRUN","descriptive","cross_category","percentage",FALSE,TRUE,"Transparency variable; excluded from BIPOC computation",NA
+"residential_share","enrollment","Share of undergraduates living on campus","cds_ai","Academic Insights metric_id 74","clustering","cross_category","percentage",FALSE,FALSE,"Survey respondents only (~45%)",NA
+"pct_first_generation","enrollment","Percent first-generation undergraduates","scorecard","latest.student.share_firstgeneration (Scorecard)","clustering","cross_category","percentage",FALSE,FALSE,"Single 2024 snapshot; FAFSA-filer denominator (not all UG); ~58% project coverage. First-gen share is structurally stable enough for clustering but not for year-over-year trends.",NA
+"median_family_income","enrollment","Median family income (FAFSA filers)","scorecard","latest.student.demographics.median_family_income (Scorecard)","clustering","cross_category","currency",FALSE,FALSE,"Single 2024 snapshot; FAFSA-filer denominator only - higher-income non-filers are excluded, so value typically understates true student-body family income. Useful for clustering but not as an absolute income measure.",NA
