@@ -32,23 +32,31 @@
 # -----------------------------------------------------------------------------
 .CLASSIFICATION_FIELDS <- list(
   list(label = "US News classification",
-       fmt = function(row) .prettify_classification(row$usnews_classification)),
+       fmt   = function(row) .prettify_classification(row$usnews_classification),
+       match_key = function(row) row$usnews_classification),
   list(label = "Carnegie Institutional Classification (2025)",
-       fmt = function(row) row$ic2025_label),
+       fmt   = function(row) row$ic2025_label,
+       match_key = function(row) row$ic2025_label),
   list(label = "Carnegie Access & Earnings (SAEC 2025)",
-       fmt = function(row) row$saec2025_label),
+       fmt   = function(row) row$saec2025_label,
+       match_key = function(row) row$saec2025_label),
   list(label = "Carnegie Research Activity (2025)",
-       fmt = function(row) row$research2025_label),
+       fmt   = function(row) row$research2025_label,
+       match_key = function(row) row$research2025_label),
   list(label = "Carnegie Setting / Residential (2025)",
-       fmt = function(row) row$setting2025_label),
+       fmt   = function(row) row$setting2025_label,
+       match_key = function(row) row$setting2025_label),
   list(label = "Carnegie Highest Degree (2025)",
-       fmt = function(row) row$highest_degree_2025_label),
+       fmt   = function(row) row$highest_degree_2025_label,
+       match_key = function(row) row$highest_degree_2025_label),
   list(label = "Carnegie Basic (2021)",
-       fmt = function(row) row$basic2021_label),
+       fmt   = function(row) row$basic2021_label,
+       match_key = function(row) row$basic2021_label),
   list(label = "Carnegie Size (2025)",
-       fmt = function(row) row$ic2025size_label),
+       fmt   = function(row) row$ic2025size_label,
+       match_key = function(row) row$ic2025size_label),
   list(label = "Carnegie Academic Program Mix",
-       fmt = function(row) {
+       fmt   = function(row) {
          lbl <- row$apm_label
          if (is.na(lbl) || !nzchar(lbl)) return(NA_character_)
          dom <- row$apm_max_cip2_name
@@ -60,19 +68,26 @@
                           lbl, dom, 100 * as.numeric(pct))
          }
          lbl
-       }),
+       },
+       # Match on the APM category only — different dominant-CIP %s
+       # shouldn't break a match between two SF Arts and Sciences schools.
+       match_key = function(row) row$apm_label),
   list(label = "Sector / control",
-       fmt = function(row) .prettify_control(row$control_grp)),
+       fmt   = function(row) .prettify_control(row$control_grp),
+       match_key = function(row) row$control_grp),
   list(label = "Religious tradition / affiliation",
-       fmt = function(row) {
+       fmt   = function(row) {
          tr <- row$religious_tradition
          aff <- row$religious_affiliation
          if (is.na(tr) || !nzchar(tr)) return("(none)")
          if (!is.na(aff) && nzchar(aff) && aff != tr)
            sprintf("%s  (%s)", tr, aff) else tr
-       }),
+       },
+       # Match on the broad tradition (Catholic = Catholic regardless of
+       # specific affiliation differences).
+       match_key = function(row) row$religious_tradition),
   list(label = "Geographic region",
-       fmt = function(row) {
+       fmt   = function(row) {
          st <- row$stabbr
          if (is.na(st)) return(NA_character_)
          keys <- names(.REGIONS)[
@@ -81,13 +96,30 @@
          if (!length(keys))
            return(sprintf("%s (outside defined regions)", st))
          paste(.REGION_LABELS[keys], collapse = " · ")
+       },
+       # Region match uses set overlap: "Northeast + New England" and
+       # "Northeast + Mid-Atlantic" share Northeast, count as a match.
+       match_key = function(row) {
+         st <- row$stabbr
+         if (is.na(st)) return(character(0))
+         names(.REGIONS)[
+           vapply(.REGIONS, function(s) st %in% s, logical(1))
+         ]
        }),
-  list(label = "State / locale",
-       fmt = function(row) {
-         st <- .prettify_state(row$stabbr)
-         loc <- if ("locale_label" %in% names(row)) row$locale_label else NA
-         if (!is.na(loc) && nzchar(loc))
-           sprintf("%s — %s", st, loc) else st
+  list(label = "Locale (Carnegie / IPEDS)",
+       fmt   = function(row) {
+         if (!"locale_label" %in% names(row)) return(NA_character_)
+         row$locale_label
+       },
+       # Match on the broad locale category (City / Suburb / Town / Rural),
+       # ignoring the size sub-classification. Two Massachusetts cities of
+       # different size still count as the same locale type.
+       match_key = function(row) {
+         if (!"locale_label" %in% names(row)) return(NA_character_)
+         loc <- row$locale_label
+         if (is.null(loc) || length(loc) != 1 || is.na(loc) || !nzchar(loc))
+           return(NA_character_)
+         sub(":.*$", "", loc)
        })
 )
 .COMPARE_THEME_LABELS <- c(
@@ -101,40 +133,48 @@
   descriptive = "Descriptive"
 )
 
+compareSidebarUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    tags$h6("Comparison"),
+    tags$div(class = "text-muted small",
+             "Pick any two institutions. ",
+             "A peer search on the ",
+             tags$em("Peer Search"), " page is not required."),
+    tags$hr(),
+
+    selectizeInput(ns("anchor_compare"),
+                   label   = "Anchor",
+                   choices = NULL, multiple = FALSE,
+                   options = list(placeholder = "Type to search",
+                                   maxOptions  = 50)),
+    selectizeInput(ns("peer_compare"),
+                   label   = "Peer",
+                   choices = NULL, multiple = FALSE,
+                   options = list(placeholder = "Type to search",
+                                   maxOptions  = 50)),
+
+    checkboxInput(ns("limit_to_peer_group"),
+                  "Limit peer choices to current Peer Search results",
+                  value = TRUE),
+    helpText(tags$small(class = "text-muted",
+      "When checked, the peer dropdown is restricted to anchor + ",
+      "the peers returned by the most recent Peer Search. Uncheck to ",
+      "pick any institution.")
+    )
+  )
+}
+
 compareUI <- function(id) {
   ns <- NS(id)
   tagList(
     h4("Side-by-Side"),
     p(class = "section-intro",
       "Compare any two institutions across all variables. Click a row on the ",
-      tags$em("Peer Search"), " tab to load that institution here, or pick ",
-      "any pair directly below. When a peer search exists, the distance and ",
-      "rank shown reflect that search; otherwise the comparison is ad hoc."),
-
-    # Controls strip: anchor picker, peer picker, "limit" toggle
-    div(class = "compare-controls",
-        div(class = "compare-control",
-            tags$label("Anchor"),
-            selectizeInput(ns("anchor_compare"), label = NULL,
-                           choices = NULL, multiple = FALSE,
-                           options = list(
-                             placeholder = "Type to search institutions",
-                             maxOptions  = 50
-                           ))),
-        div(class = "compare-control",
-            tags$label("Peer"),
-            selectizeInput(ns("peer_compare"), label = NULL,
-                           choices = NULL, multiple = FALSE,
-                           options = list(
-                             placeholder = "Type to search institutions",
-                             maxOptions  = 50
-                           ))),
-        div(class = "compare-control compare-control-toggle",
-            checkboxInput(ns("limit_to_peer_group"),
-                          "Limit peer choices to current peer group",
-                          value = TRUE))
-    ),
-
+      tags$em("Peer Search"), " page to load that institution here, or pick ",
+      "any pair using the sidebar controls. When a peer search exists and ",
+      "the picked pair matches it, the distance and rank shown reflect that ",
+      "search; otherwise the comparison is ad hoc."),
     uiOutput(ns("compare_view"))
   )
 }
@@ -299,16 +339,12 @@ compareServer <- function(id, peer_selection, peer_result) {
     # Header card builder
     # -------------------------------------------------------------------------
     header_card <- function(a_row, p_row, dist) {
+      # School block is just the institution name now. Full classification
+      # detail lives in the "Institutional classifications & groupings"
+      # section directly below the header.
       school_block <- function(row) {
         tagList(
-          tags$div(class = "compare-school-name", row$instnm),
-          tags$div(class = "compare-school-meta",
-                   .prettify_classification(row$usnews_classification),
-                   tags$br(),
-                   .prettify_control(row$control_grp), " / ",
-                   .prettify_state(row$stabbr),
-                   if (!is.na(row$religious_affiliation))
-                     tagList(tags$br(), tags$em(row$religious_affiliation)))
+          tags$div(class = "compare-school-name", row$instnm)
         )
       }
 
@@ -357,16 +393,32 @@ compareServer <- function(id, peer_selection, peer_result) {
     # the same value.
     # -------------------------------------------------------------------------
     classification_section <- function(a_row, p_row) {
-      # Helper: is the value a real classification (not (n/a) or (none))?
-      is_real <- function(v) {
-        !is.na(v) && nzchar(v) && !grepl("^\\(", v)
+      # Helper: does a key vector contain any real (non-NA, non-empty) value?
+      has_real <- function(x) {
+        if (is.null(x) || !length(x)) return(FALSE)
+        any(!is.na(x) & nzchar(as.character(x)))
       }
 
-      rows <- lapply(.CLASSIFICATION_FIELDS, function(f) {
+      # First pass: compute match flags so the section header can summarize
+      # them. Then build the row HTML using the precomputed flags.
+      match_flags <- vapply(.CLASSIFICATION_FIELDS, function(f) {
+        a_key <- if (is.function(f$match_key)) f$match_key(a_row)
+                 else tryCatch(f$fmt(a_row), error = function(e) NA_character_)
+        p_key <- if (is.function(f$match_key)) f$match_key(p_row)
+                 else tryCatch(f$fmt(p_row), error = function(e) NA_character_)
+        has_real(a_key) && has_real(p_key) &&
+          length(intersect(as.character(a_key),
+                            as.character(p_key))) > 0
+      }, logical(1))
+
+      n_match <- sum(match_flags)
+      n_total <- length(match_flags)
+
+      rows <- lapply(seq_along(.CLASSIFICATION_FIELDS), function(i) {
+        f <- .CLASSIFICATION_FIELDS[[i]]
         a_val <- tryCatch(f$fmt(a_row), error = function(e) NA_character_)
         p_val <- tryCatch(f$fmt(p_row), error = function(e) NA_character_)
-        is_match <- is_real(a_val) && is_real(p_val) &&
-          identical(as.character(a_val), as.character(p_val))
+        is_match <- match_flags[i]
 
         tags$tr(
           class = if (is_match) "classification-row match"
@@ -381,8 +433,20 @@ compareServer <- function(id, peer_selection, peer_result) {
         )
       })
 
+      # Color the match-count tag based on coverage, so the eye gets a
+      # quick read: high overlap (>=75%) green, moderate (>=50%) brand
+      # purple, low (<50%) muted taupe.
+      pct_match <- n_match / n_total
+      tag_class <- if (pct_match >= 0.75) "ccount-tag ccount-high"
+                   else if (pct_match >= 0.5) "ccount-tag ccount-mid"
+                   else "ccount-tag ccount-low"
+
       tags$section(class = "classification-section",
-        tags$h5("Institutional classifications & groupings"),
+        tags$h5(
+          "Institutional classifications & groupings",
+          tags$span(class = tag_class,
+                    sprintf("%d of %d match", n_match, n_total))
+        ),
         p(class = "text-muted",
           tags$small(
             "Categorical classifications from IPEDS, US News, and the ",
@@ -726,11 +790,11 @@ compareServer <- function(id, peer_selection, peer_result) {
       # Empty / invalid states
       if (is.null(a_row)) {
         return(div(class = "note-box",
-                   "Pick an anchor institution above to start a comparison."))
+                   "Pick an anchor institution in the sidebar."))
       }
       if (is.null(p_row)) {
         return(div(class = "note-box",
-                   "Pick a peer institution above to compare against ",
+                   "Pick a peer institution in the sidebar to compare against ",
                    tags$strong(a_row$instnm), "."))
       }
       if (identical(a_row$unitid, p_row$unitid)) {
@@ -739,36 +803,48 @@ compareServer <- function(id, peer_selection, peer_result) {
                    "Pick a different peer."))
       }
 
-      cat_df  <- variable_catalog()
-      pool_df <- pool_slice()
-      dist    <- distance_info()
+      tryCatch({
+        cat_df  <- variable_catalog()
+        pool_df <- pool_slice()
+        dist    <- distance_info()
 
-      theme_order <- c(.COMPARE_THEME_ORDER, "descriptive")
-      sections <- lapply(theme_order, function(th) {
-        vars_df <- cat_df[cat_df$theme == th, , drop = FALSE]
-        if (!nrow(vars_df)) return(NULL)
-        vars_df <- vars_df[order(vars_df$use_type != "clustering",
-                                 vars_df$display_name), ]
-        theme_section(th, vars_df, a_row, p_row, pool_df)
+        theme_order <- c(.COMPARE_THEME_ORDER, "descriptive")
+        sections <- lapply(theme_order, function(th) {
+          vars_df <- cat_df[cat_df$theme == th, , drop = FALSE]
+          if (!nrow(vars_df)) return(NULL)
+          vars_df <- vars_df[order(vars_df$use_type != "clustering",
+                                   vars_df$display_name), ]
+          theme_section(th, vars_df, a_row, p_row, pool_df)
+        })
+
+        legend <- tags$div(class = "compare-legend",
+          tags$span(class = "legend-dot legend-anchor"), " Anchor",
+          tags$span(class = "legend-spacer"),
+          tags$span(class = "legend-dot legend-peer"), " Peer",
+          tags$span(class = "legend-spacer"),
+          tags$small(class = "text-muted",
+            if (!is.null(peer_result()))
+              "Pool position bars cover the 5th to 95th percentile range of the current search's candidate pool."
+            else
+              "Pool position bars cover the 5th to 95th percentile range of the ranked universe (no search has been run)."))
+
+        tagList(
+          header_card(a_row, p_row, dist),
+          legend,
+          classification_section(a_row, p_row),
+          sections
+        )
+      }, error = function(e) {
+        # Surface unexpected errors as a visible message instead of
+        # silently returning NULL (which makes the page look blank).
+        message(sprintf("[compare] render error: %s", conditionMessage(e)))
+        div(class = "note-box",
+            tags$strong("Comparison render error: "),
+            conditionMessage(e),
+            tags$br(),
+            tags$small(class = "text-muted",
+              "The R console has a more detailed message."))
       })
-
-      legend <- tags$div(class = "compare-legend",
-        tags$span(class = "legend-dot legend-anchor"), " Anchor",
-        tags$span(class = "legend-spacer"),
-        tags$span(class = "legend-dot legend-peer"), " Peer",
-        tags$span(class = "legend-spacer"),
-        tags$small(class = "text-muted",
-          if (!is.null(peer_result()))
-            "Pool position bars cover the 5th to 95th percentile range of the current search's candidate pool."
-          else
-            "Pool position bars cover the 5th to 95th percentile range of the ranked universe (no search has been run)."))
-
-      tagList(
-        header_card(a_row, p_row, dist),
-        legend,
-        classification_section(a_row, p_row),
-        sections
-      )
     })
   })
 }

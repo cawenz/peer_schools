@@ -687,8 +687,28 @@ a {
     padding-bottom: 0.5rem;
     margin-bottom: 0.5rem;
     color: #602D89;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
   p { margin-bottom: 0.75rem; }
+}
+
+.ccount-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-radius: 999px;
+  white-space: nowrap;
+  margin-left: auto;        /* push to the right inside the flex header */
+
+  &.ccount-high { background: #2e7d32; color: #FFFFFF; }      /* green */
+  &.ccount-mid  { background: #602D89; color: #FFFFFF; }      /* brand purple */
+  &.ccount-low  { background: #AC9E94; color: #FFFFFF; }      /* taupe */
 }
 
 .classification-table {
@@ -728,6 +748,260 @@ a {
     font-weight: 600;
     font-size: 1.1rem;
     white-space: nowrap;
+  }
+}
+
+/* ---------- Cohort Builder ---------- */
+.cohort-budget {
+  padding: 0.6rem 0.85rem;
+  background: rgba(96, 45, 137, 0.05);
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+}
+.cohort-budget-row { font-size: 0.9rem; margin-bottom: 0.15rem; }
+.cohort-budget-row strong { color: #251230; }
+.cohort-budget-drop  { color: #b53737; }
+.cohort-budget-maybe { color: #AC9E94; }
+.cohort-budget-add   { color: #2e7d32; }
+.cohort-budget-over  { color: #b53737; font-weight: 600; }
+
+.cohort-anchor-banner {
+  padding: 0.5rem 0.85rem;
+  margin-bottom: 1rem;
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  strong { color: #602D89; }
+}
+
+.cohort-section {
+  margin-bottom: 2rem;
+  h5 {
+    border-bottom: 2px solid #602D89;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    color: #602D89;
+  }
+}
+
+.cohort-view-controls {
+  display: grid;
+  grid-template-columns: minmax(300px, 1fr);
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  .cohort-view-control label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Compact 5-column cohort table: Action / School / State / US News / Carnegie IC.
+ * No horizontal scroll, no sticky columns — the inspector below the table
+ * handles deep dives on individual variables. */
+.cohort-table.cohort-table-compact {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+
+  thead th {
+    text-align: left;
+    color: #251230;
+    font-weight: 600;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 2px solid #AC9E94;
+    background: #FAF6F5;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+  .cohort-action-th { width: 150px; min-width: 150px; }
+  .cohort-name-th   { width: auto; }
+  .cohort-state-th  { width: 70px;  text-align: center; }
+  .cohort-ctx-th    { width: 22%; }
+
+  tbody tr {
+    border-bottom: 1px solid #F4EDEC;
+    &:hover td { background-color: rgba(96, 45, 137, 0.05) !important; }
+  }
+  td {
+    padding: 0.5rem 0.6rem;
+    vertical-align: middle;
+    background: #FFFFFF;
+  }
+  .cohort-action-cell { width: 150px; }
+  .cohort-state       { text-align: center; width: 70px; color: #251230; }
+  .cohort-ctx         { color: #251230; font-size: 0.85rem; }
+  .cohort-name {
+    font-weight: 500;
+    color: #251230;
+  }
+
+  /* Per-action row tinting */
+  tr.cohort-action-anchor       td { background-color: rgba(96, 45, 137, 0.08); }
+  tr.cohort-action-anchor       td { font-weight: 600; }
+  tr.cohort-action-keep         td { background-color: rgba(46, 125, 50, 0.05); }
+  tr.cohort-action-remove       td { background-color: rgba(181, 55, 55, 0.07); }
+  tr.cohort-action-remove td    { text-decoration: line-through; opacity: 0.75; }
+  tr.cohort-action-remove .cohort-action-cell,
+  tr.cohort-action-remove .cohort-action-cell *
+                                { text-decoration: none; opacity: 1; }
+  tr.cohort-action-maybe        td { background-color: rgba(172, 158, 148, 0.12); }
+  tr.cohort-action-proposed     td { background-color: rgba(96, 45, 137, 0.06); }
+  tr.cohort-action-possible     td { background-color: rgba(157, 123, 183, 0.08); }
+}
+
+/* ---------- Cohort: Variable inspector + Export sections ---------- */
+.cohort-section-divider {
+  border: none;
+  border-top: 1px solid #AC9E94;
+  margin: 2rem 0 1.25rem 0;
+}
+
+.cohort-inspector-controls {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+}
+
+.cohort-inspector-control-row {
+  margin-bottom: 0.75rem;
+  &:last-child { margin-bottom: 0; }
+}
+
+.cohort-pool-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cohort-pool-control label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #251230;
+  margin-bottom: 0.2rem;
+}
+
+.cohort-pool-description {
+  padding: 0.4rem 0.6rem;
+  background: #F4EDEC;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  strong { color: #602D89; }
+}
+
+/* Action badge after each school name. Encodes both origin and action:
+ *   Keep/Maybe/Remove = original cohort
+ *   Proposed          = addition committed to the cohort
+ *   Possible          = addition still being brainstormed
+ *   Anchor            = the anchor school itself
+ */
+.cohort-action-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 1px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 10px;
+  vertical-align: middle;
+  border: 1px solid transparent;
+}
+.cohort-badge-keep     { background: #e6f0e7; color: #2e7d32; border-color: #b9d6bc; }
+.cohort-badge-maybe    { background: #F4EDEC; color: #6e6360; border-color: #d8cfca; }
+.cohort-badge-remove   { background: #fbe7e7; color: #b53737; border-color: #f0c3c3; }
+.cohort-badge-proposed { background: #602D89; color: #FFFFFF; border-color: #602D89; }
+.cohort-badge-possible { background: #efe6f5; color: #602D89; border-color: #c9b3da; }
+.cohort-badge-anchor   { background: #251230; color: #FFFFFF; border-color: #251230; }
+
+.cohort-name-text {
+  vertical-align: middle;
+}
+
+/* Read-only Anchor pill in the Action cell — distinct from the editable
+ * dropdown so users see at a glance that this row isn't editable. */
+.cohort-anchor-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  background: #602D89;
+  color: #FFFFFF;
+  border: 1px solid #602D89;
+  min-width: 120px;
+  text-align: center;
+}
+
+/* Inspector body now stacks plot → stats → table vertically, matching the
+ * Side-by-Side modal. The stats list reuses the shared .distribution-stats
+ * class so the look matches the modal exactly. */
+
+.cohort-action-widget {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cohort-action-select {
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border: 1px solid #AC9E94;
+  border-radius: 4px;
+  background: #FFFFFF;
+  color: #251230;
+  cursor: pointer;
+  flex: 1 1 auto;
+  min-width: 0;
+  &:focus {
+    outline: none;
+    border-color: #602D89;
+    box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
+  }
+}
+
+/* Small × button that deletes an addition row outright. Only renders on
+ * addition rows (file's Possible Add rows or sidebar-added schools). */
+.cohort-remove-btn {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: #b53737;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: rgba(181, 55, 55, 0.12);
+    border-color: #f0c3c3;
+  }
+  &:focus {
+    outline: none;
+    border-color: #b53737;
+    box-shadow: 0 0 0 2px rgba(181, 55, 55, 0.2);
   }
 }
 

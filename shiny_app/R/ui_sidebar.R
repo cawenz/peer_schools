@@ -69,7 +69,7 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
-sidebarUI <- function(id) {
+peerSearchSidebarUI <- function(id) {
   ns <- NS(id)
   tagList(
     # ---------------- Anchor ----------------
@@ -182,7 +182,7 @@ sidebarUI <- function(id) {
 # -----------------------------------------------------------------------------
 # Server
 # -----------------------------------------------------------------------------
-sidebarServer <- function(id, restore_signal = NULL) {
+peerSearchSidebarServer <- function(id, restore_signal = NULL) {
   moduleServer(id, function(input, output, session) {
 
     # --- Populate dynamic choices on startup from .SCHOOLS in global.R ---

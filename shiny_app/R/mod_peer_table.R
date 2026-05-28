@@ -41,11 +41,16 @@ peerTableServer <- function(id, sidebar_state) {
     ns <- session$ns
 
     # -------------------------------------------------------------------------
-    # Run trigger. eventReactive only invalidates when the Run button
-    # increments. Reading state() inside is wrapped in isolate() so later
-    # sidebar changes do not retrigger compute_peers().
+    # Peer-result state. Stored as a reactiveVal (rather than an
+    # eventReactive) so that downstream consumers (Side-by-Side's
+    # peer_choices, pool_slice, distance_info, etc.) get a clean NULL
+    # before the user has run any search. eventReactive with ignoreInit
+    # raises a silent reactive error when called before its first trigger,
+    # which would propagate up and make Side-by-Side render nothing.
     # -------------------------------------------------------------------------
-    peer_result <- eventReactive(sidebar_state$run_trigger(), {
+    peer_result <- reactiveVal(NULL)
+
+    observeEvent(sidebar_state$run_trigger(), {
       st <- isolate(sidebar_state$state())
       req(st$anchor_unitid)
 
@@ -76,10 +81,8 @@ peerTableServer <- function(id, sidebar_state) {
             }
           )
 
-          # Snapshot the pool unitids that compute_peers used. The
-          # filter logic mirrors compute_peers() in peer_pipeline.R so
-          # the snapshot matches what the methodology saw, including
-          # the anchor add-back when filters exclude it.
+          # Snapshot the pool unitids and filter dict the search actually
+          # used so Side-by-Side can describe and slice that pool.
           if (!is.null(res)) {
             pool_df <- .SCHOOLS
             for (col in names(st$candidate_pool)) {
@@ -92,14 +95,12 @@ peerTableServer <- function(id, sidebar_state) {
               )
             }
             res$pool_unitids <- pool_df$unitid
-            # Also stash the raw filter dict so the Side-by-Side modal
-            # can describe the pool (filters applied + resulting size).
-            res$pool_filter <- st$candidate_pool
+            res$pool_filter  <- st$candidate_pool
           }
-          res
+          peer_result(res)
         }
       )
-    }, ignoreInit = TRUE, ignoreNULL = FALSE)
+    }, ignoreInit = TRUE, ignoreNULL = TRUE)
 
     # -------------------------------------------------------------------------
     # Header: stats grid before results, empty-state message before first Run.

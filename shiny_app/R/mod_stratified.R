@@ -149,67 +149,87 @@
 # -----------------------------------------------------------------------------
 # UI
 # -----------------------------------------------------------------------------
-stratifiedUI <- function(id) {
+stratifiedSidebarUI <- function(id) {
   ns <- NS(id)
   dim_choices <- setNames(names(.STRATIFY_DIMS),
                           vapply(.STRATIFY_DIMS, `[[`, character(1), "label"))
 
   tagList(
+    tags$h6("Stratified search"),
+    tags$hr(),
+
+    selectizeInput(ns("anchor_strat"),
+                   label = "Anchor school",
+                   choices = NULL, multiple = FALSE,
+                   options = list(placeholder = "Type to search",
+                                   maxOptions  = 50)),
+
+    selectInput(ns("stratify_by"),
+                label = "Stratify by",
+                choices = dim_choices,
+                selected = "usnews_classification"),
+
+    selectInput(ns("stratify_by_2"),
+                label = tagList("Then by ",
+                                tags$small(class = "text-muted",
+                                           "(optional)")),
+                choices = c("(None)" = "__none__", dim_choices),
+                selected = "__none__"),
+
+    sliderInput(ns("k_per"), "Peers per stratum",
+                min = 1, max = 10, value = 3, step = 1, ticks = FALSE),
+
+    checkboxInput(ns("ranked_only"), "Ranked universe only", value = TRUE),
+
+    tags$hr(),
+    accordion(
+      open = FALSE,
+      accordion_panel(
+        "Theme weights",
+        p(class = "text-muted",
+          tags$small("Weights apply to every per-stratum compute_peers call. ",
+                     "Default is balanced (all = 1.0).")),
+        div(class = "d-flex flex-wrap gap-1 mb-2",
+            actionButton(ns("preset_balanced"),       "Balanced",
+                         class = "btn btn-sm btn-outline-secondary"),
+            actionButton(ns("preset_outcomes_heavy"), "Outcomes-heavy",
+                         class = "btn btn-sm btn-outline-secondary"),
+            actionButton(ns("preset_resources_heavy"),"Resources-heavy",
+                         class = "btn btn-sm btn-outline-secondary"),
+            actionButton(ns("preset_mission_similar"),"Mission-similar",
+                         class = "btn btn-sm btn-outline-secondary")
+        ),
+        lapply(.THEMES, function(th) {
+          sliderInput(ns(paste0("weight_", th)),
+                      label = stringr::str_to_title(th),
+                      min = 0, max = 3, value = 1.0, step = 0.25,
+                      ticks = FALSE)
+        })
+      ),
+      accordion_panel(
+        "Advanced",
+        checkboxInput(ns("mahalanobis"),
+                      "Use Mahalanobis distance instead of Euclidean",
+                      value = FALSE)
+      )
+    ),
+
+    tags$hr(),
+    actionButton(ns("run_stratified"), "Run stratified search",
+                 icon = icon("play"),
+                 class = "btn btn-primary btn-lg w-100")
+  )
+}
+
+stratifiedUI <- function(id) {
+  ns <- NS(id)
+  tagList(
     h4("Stratified Peers"),
     p(class = "section-intro",
       "Run a separate peer search inside each value of a chosen ",
       "stratification dimension. Useful for seeing the closest peer in ",
-      "each institutional category at once. Theme weights, distance ",
-      "metric, and the ranked-universe filter come from the main sidebar; ",
-      "the anchor and stratification settings live here."),
-
-    # Per-tab anchor picker
-    div(class = "stratified-anchor",
-        tags$label("Anchor school"),
-        selectizeInput(ns("anchor_strat"), label = NULL,
-                       choices = NULL, multiple = FALSE,
-                       options = list(
-                         placeholder = "Type to search",
-                         maxOptions  = 50
-                       ))),
-
-    div(class = "stratified-controls",
-        div(class = "stratified-control",
-            tags$label("Stratify by"),
-            selectInput(ns("stratify_by"), label = NULL,
-                        choices = dim_choices,
-                        selected = "usnews_classification")),
-        div(class = "stratified-control",
-            tags$label(tagList("Then by ",
-                               tags$small(class = "text-muted",
-                                          "(optional second dim)"))),
-            selectInput(ns("stratify_by_2"), label = NULL,
-                        choices = c("(None)" = "__none__", dim_choices),
-                        selected = "__none__")),
-        div(class = "stratified-control",
-            tags$label("Peers per stratum"),
-            sliderInput(ns("k_per"), label = NULL,
-                        min = 1, max = 10, value = 3, step = 1,
-                        ticks = FALSE)),
-        div(class = "stratified-control",
-            actionButton(ns("run_stratified"), "Run stratified search",
-                         icon = icon("play"),
-                         class = "btn btn-primary"))
-    ),
-
-    div(class = "stratified-filter-mode",
-        checkboxInput(ns("apply_sidebar_filters"),
-                      label = tags$span(
-                        "Apply sidebar pool filters ",
-                        tags$small(class = "text-muted",
-                          tags$em(
-                            "(when off, stratification ignores sidebar ",
-                            "filters on classification, sector, state, ",
-                            "and religious tradition so more strata are ",
-                            "searchable; ranked-universe-only is honored)"
-                          ))),
-                      value = FALSE)),
-
+      "each institutional category at once. Set the anchor and ",
+      "stratification dimensions in the sidebar."),
     uiOutput(ns("stratified_view"))
   )
 }
@@ -217,11 +237,11 @@ stratifiedUI <- function(id) {
 # -----------------------------------------------------------------------------
 # Server
 # -----------------------------------------------------------------------------
-stratifiedServer <- function(id, sidebar_state) {
+stratifiedServer <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # ---- Anchor picker: initialize from sidebar; let user override ----
+    # ---- Anchor picker ----
     anchor_choices_all <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
@@ -231,21 +251,36 @@ stratifiedServer <- function(id, sidebar_state) {
                          choices  = anchor_choices_all,
                          selected = .DEFAULT_ANCHOR_UNITID,
                          server   = TRUE)
-    observeEvent(sidebar_state$state(), {
-      st <- sidebar_state$state()
-      if (!is.null(st$anchor_unitid))
-        updateSelectizeInput(session, "anchor_strat",
-                             selected = st$anchor_unitid)
-    }, ignoreInit = TRUE)
+
+    # ---- Theme weight presets ----
+    .THEME_PRESETS_LOCAL <- list(
+      balanced = setNames(as.list(rep(1.0, length(.THEMES))), .THEMES),
+      outcomes_heavy = list(scale = 1, selectivity = 1, resources = 1,
+                            finance = 1, outcomes = 2.5, aid = 1,
+                            composition = 1),
+      resources_heavy = list(scale = 1, selectivity = 1, resources = 2,
+                             finance = 1.5, outcomes = 1, aid = 1,
+                             composition = 1),
+      mission_similar = list(scale = 1, selectivity = 1, resources = 1,
+                             finance = 1, outcomes = 1, aid = 1,
+                             composition = 2)
+    )
+    apply_preset <- function(p) {
+      v <- .THEME_PRESETS_LOCAL[[p]]
+      for (th in names(v))
+        updateSliderInput(session, paste0("weight_", th), value = v[[th]])
+    }
+    observeEvent(input$preset_balanced,        apply_preset("balanced"))
+    observeEvent(input$preset_outcomes_heavy,  apply_preset("outcomes_heavy"))
+    observeEvent(input$preset_resources_heavy, apply_preset("resources_heavy"))
+    observeEvent(input$preset_mission_similar, apply_preset("mission_similar"))
 
     # -------------------------------------------------------------------------
     # Run the stratified search
     # -------------------------------------------------------------------------
     strata_result <- eventReactive(input$run_stratified, {
-      st <- isolate(sidebar_state$state())
       anchor_uid <- suppressWarnings(as.integer(input$anchor_strat))
-      if (is.na(anchor_uid)) anchor_uid <- st$anchor_unitid
-      req(anchor_uid)
+      req(!is.na(anchor_uid))
 
       dim_key  <- input$stratify_by
       dim      <- .STRATIFY_DIMS[[dim_key]]
@@ -257,13 +292,14 @@ stratifiedServer <- function(id, sidebar_state) {
         dim2 <- .STRATIFY_DIMS[[dim2_key]]
       }
       k_per <- input$k_per
-      apply_pool_filters <- isTRUE(input$apply_sidebar_filters)
 
-      base_filter <- if (apply_pool_filters) {
-        st$candidate_pool
-      } else {
-        list(in_ranked_universe = isTRUE(st$candidate_pool$in_ranked_universe))
-      }
+      # All page-local settings (no shared sidebar)
+      theme_weights <- setNames(
+        lapply(.THEMES, function(th) input[[paste0("weight_", th)]]),
+        .THEMES)
+      distance_metric <- if (isTRUE(input$mahalanobis))
+                           "mahalanobis" else "euclidean"
+      base_filter <- list(in_ranked_universe = isTRUE(input$ranked_only))
 
       # Build the list of {sv} or {sv, sv2} tuples to run.
       values1 <- dim$values()
@@ -309,8 +345,8 @@ stratifiedServer <- function(id, sidebar_state) {
             compute_peers_cached(
               anchor_unitid   = anchor_uid,
               candidate_pool  = sf,
-              theme_weights   = st$theme_weights,
-              distance_metric = st$distance_metric,
+              theme_weights   = theme_weights,
+              distance_metric = distance_metric,
               k               = k_per
             ),
             error = function(e) NULL
@@ -330,7 +366,6 @@ stratifiedServer <- function(id, sidebar_state) {
           results  = results,
           anchor   = anchor_uid,
           run_at   = Sys.time(),
-          apply_pool_filters = apply_pool_filters,
           base_filter = base_filter
         )
       })
@@ -453,10 +488,8 @@ stratifiedServer <- function(id, sidebar_state) {
       }
 
       anchor_name <- .SCHOOLS$instnm[match(sr$anchor, .SCHOOLS$unitid)]
-      mode_label <- if (isTRUE(sr$apply_pool_filters))
-                       "sidebar pool filters applied"
-                    else
-                       "wide view (only ranked-universe filter applied)"
+      ranked_label <- if (isTRUE(sr$base_filter$in_ranked_universe))
+                         "ranked universe" else "full universe"
       dim_summary <- if (is.null(sr$dim2)) sr$dim$label
                      else sprintf("%s  x  %s", sr$dim$label, sr$dim2$label)
 
@@ -469,7 +502,7 @@ stratifiedServer <- function(id, sidebar_state) {
                 length(results), sr$k_per),
         tags$span(class = "ssc-sep", "|"),
         tags$small(class = "text-muted",
-                   sprintf(" Filter mode: %s", mode_label))
+                   sprintf(" Universe: %s", ranked_label))
       )
 
       legend <- div(class = "stratified-legend",
