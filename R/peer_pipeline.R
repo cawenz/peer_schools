@@ -67,7 +67,7 @@ THEME_VARS <- list(
   selectivity = c(
     "acceptance_rate", "yield_rate", "application_volume",
     "pct_submitting_sat", "pct_submitting_act", "pct_top10_hs",
-    "ed_acceptance_rate", "ed_share_of_applications", "yield_gap_men_women"
+    "ed_acceptance_rate", "ed_share_of_applications", "yield_men_vs_women"
   ),
   resources = c(
     "student_faculty_ratio", "tenure_track_share", "avg_ft_faculty_salary",
@@ -86,9 +86,9 @@ THEME_VARS <- list(
     "earnings_ratio", "doctoral_degrees_awarded", "grad_rate_men_vs_women"
   ),
   aid = c(
-    "avg_net_price", "avg_net_price_income_0_30k", "pct_pell", "pell_count",
-    "pct_grant_aid", "avg_inst_grant", "inst_discount_rate",
-    "pct_borrowing", "avg_fed_loan", "pct_need_met", "pct_need_fully_met"
+    "avg_net_price_aided", "avg_net_price_income_0_30k", "pct_pell", "pell_count",
+    "pct_any_grant", "avg_inst_grant", "inst_discount_rate",
+    "pct_federal_loan", "avg_federal_loan", "pct_need_met", "pct_need_fully_met"
   ),
   composition = c(
     "pct_undergrad", "pct_part_time", "pct_age_25plus",
@@ -504,6 +504,19 @@ compute_peers <- function(
   }
   
   # -- 12. Build result --
+  # First, capture the full pool-distance distribution before truncating
+  # to top-K. The Shiny app uses this for cross-search comparable metrics
+  # (relative_distance = d / median, percentile_rank = where d sits in the
+  # distribution). Excludes the anchor itself and any NA distances.
+  pool_distances <- distances
+  names(pool_distances) <- rownames(data_mat)
+  pool_distances <- pool_distances[
+    names(pool_distances) != as.character(anchor_unitid) &
+      is.finite(pool_distances)
+  ]
+  pool_median_distance <- if (length(pool_distances)) median(pool_distances)
+                           else NA_real_
+
   result <- tibble(
     unitid = as.integer(rownames(data_mat)),
     distance = distances
@@ -520,7 +533,7 @@ compute_peers <- function(
     ) %>%
     select(rank, unitid, instnm, sector, usnews_classification, stabbr,
            control_grp, religious_affiliation, distance)
-  
+
   meta <- list(
     anchor_unitid    = anchor_unitid,
     anchor_name      = anchor_row$instnm,
@@ -532,7 +545,10 @@ compute_peers <- function(
     variables_used   = vars_final,
     variables_dropped_coverage = vars_dropped_cov,
     variables_dropped_anchor_na = vars_anchor_na,
-    weights = weights
+    weights = weights,
+    # Comparable-distance support (see Shiny app's stratified peers tab):
+    pool_distances        = pool_distances,
+    pool_median_distance  = pool_median_distance
   )
   
   list(peers = result, meta = meta)
@@ -565,8 +581,8 @@ print_peers <- function(res) {
 # -----------------------------------------------------------------------------
 # Usage:
 #   source("R/peers_pipeline.R")
-  res <- compute_peers()
-  print_peers(res)
+#   res <- compute_peers()
+#   print_peers(res)
 #
 #   # Adjust theme weights (boost outcomes + finance)
 #   res2 <- compute_peers(theme_weights = list(outcomes = 2.0, finance = 2.0))
@@ -597,15 +613,15 @@ print_peers <- function(res) {
 #   intersect(euc$peers$unitid, mah$peers$unitid)  # shared peers across methods
 #
 #   # Filter to Catholic institutions only (uses religious_affiliation field)
-  res_cath <- compute_peers(
-    candidate_pool = list(
-      in_ranked_universe = TRUE,
-      religious_tradition = "Catholic"
-    )
-  )
+#   res_cath <- compute_peers(
+#     candidate_pool = list(
+#       in_ranked_universe = TRUE,
+#       religious_tradition = "Catholic"
+#     )
+#   )
 
 #   # Up-weight Composition to make religious-tradition match more impactful
-#   res_comp <- compute_peers(theme_weights = list(composition = 2.0))
+   res_comp <- compute_peers(theme_weights = list(composition = 2.0))
 #
 #   # Diagnostics
 #   res$meta$variables_dropped_coverage   # variables below 70% in pool

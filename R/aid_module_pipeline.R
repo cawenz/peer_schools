@@ -80,16 +80,37 @@ build_ipeds_aid <- function(unitids_by_year, cfg) {
     
     np <- get_table(yr, tbl_for("SFA_NP", yr))
     if (!is.null(np)) {
-      v_all <- newest_netprice(np, "NPIST")
-      v_low <- newest_netprice(np, "NPIS41")
-      if (!is.na(v_all)) out[[length(out)+1]] <-
-        np %>% transmute(unitid, value = suppressWarnings(as.numeric(.data[[v_all]]))) %>%
-        filter(unitid %in% uids) %>%
-        mutate(year = yr, metric = "avg_net_price_aided", var_type = "raw")
-      if (!is.na(v_low)) out[[length(out)+1]] <-
-        np %>% transmute(unitid, value = suppressWarnings(as.numeric(.data[[v_low]]))) %>%
-        filter(unitid %in% uids) %>%
-        mutate(year = yr, metric = "avg_net_price_income_0_30k", var_type = "raw")
+      # IPEDS Net Price columns are sector-specific. Public 4-yr schools
+      # report under NPIST / NPIS41 (in-state Title IV recipients);
+      # private nonprofits report under NPGRN / NPT41 (grant recipients,
+      # no in-state distinction). We pull both column families and
+      # coalesce per row so each institution picks up the column its
+      # sector actually populates. Definitions differ slightly across
+      # sectors (Title IV vs grant-recipient cohort); the documented
+      # caveat lives in aid_variables.csv's coverage_note.
+      v_pub_all <- newest_netprice(np, "NPIST")
+      v_pri_all <- newest_netprice(np, "NPGRN")
+      v_pub_low <- newest_netprice(np, "NPIS41")
+      v_pri_low <- newest_netprice(np, "NPT41")
+
+      pull_coalesced <- function(np, col_pub, col_pri, metric_name) {
+        if (is.na(col_pub) && is.na(col_pri)) return(NULL)
+        np %>%
+          mutate(
+            .pub = if (!is.na(col_pub))
+              suppressWarnings(as.numeric(.data[[col_pub]])) else NA_real_,
+            .pri = if (!is.na(col_pri))
+              suppressWarnings(as.numeric(.data[[col_pri]])) else NA_real_
+          ) %>%
+          transmute(unitid, value = coalesce(.pub, .pri)) %>%
+          filter(unitid %in% uids, !is.na(value)) %>%
+          mutate(year = yr, metric = metric_name, var_type = "raw")
+      }
+
+      d <- pull_coalesced(np, v_pub_all, v_pri_all, "avg_net_price_aided")
+      if (!is.null(d) && nrow(d)) out[[length(out)+1]] <- d
+      d <- pull_coalesced(np, v_pub_low, v_pri_low, "avg_net_price_income_0_30k")
+      if (!is.null(d) && nrow(d)) out[[length(out)+1]] <- d
     }
   }
   raw <- bind_rows(out)
@@ -165,8 +186,8 @@ build_cds_aid <- function(cfg) {
 build_aid_variables <- function() {
   tribble(
     ~metric,                       ~display_name,                                            ~source,         ~ipeds_table_or_formula,                                ~use_type,     ~comparison_scope,  ~format,       ~neche_peer_set, ~neche_dashboard, ~coverage_note,
-    "avg_net_price_aided",         "Average net price - all aided students",                 "ipeds",         "SFA_NP.NPIST# (newest vintage)",                       "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
-    "avg_net_price_income_0_30k",  "Average net price - lowest income band ($0-30k)",        "ipeds",         "SFA_NP.NPIS41# (newest vintage)",                      "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            NA_character_,
+    "avg_net_price_aided",         "Average net price - all aided students",                 "ipeds",         "SFA_NP: NPIST# (public) coalesced with NPGRN# (private)", "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            "Public institutions report under NPIST (in-state Title IV recipients); private nonprofits report under NPGRN (grant recipients). Definitions are very similar but not identical.",
+    "avg_net_price_income_0_30k",  "Average net price - lowest income band ($0-30k)",        "ipeds",         "SFA_NP: NPIS41# (public) coalesced with NPT41# (private)", "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            "Public institutions report under NPIS41 (in-state); private nonprofits report under NPT41. Income band 1 (0-30k) in both.",
     "pct_pell",                    "Percent receiving Pell grants (first-time full-time UG)","ipeds",         "SFA_FT.PGRNT_P",                                       "clustering",  "cross_category",   "percentage",  FALSE,           TRUE,             NA_character_,
     "pell_count",                  "Number of all undergraduates awarded Pell grants",       "ipeds",         "SFA_FT.UPGRNTN",                                       "descriptive", "within_category",  "count",       TRUE,            TRUE,             "All-UG population; pct_pell measures first-time full-time only",
     "pct_any_grant",               "Percent receiving any grant or scholarship aid",         "ipeds",         "SFA_FT.AGRNT_P",                                       "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,

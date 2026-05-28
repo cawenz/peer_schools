@@ -1,0 +1,11 @@
+/* Peer Schools Explorer — custom styles. Add overrides here as the UI fills out. */
+
+.text-muted {
+  color: #6c757d;
+}
+
+.alert-secondary {
+  background-color: #f8f9fa;
+  border-color: #d3d4d5;
+  color: #41464b;
+}

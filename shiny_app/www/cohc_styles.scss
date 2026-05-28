@@ -1,0 +1,926 @@
+/* cohc_styles.scss
+ * Holy Cross brand styling for the Peer Schools Shiny app.
+ * Loaded by cohc_bslib() via sass::sass_file().
+ *
+ * Logo-related rules have been removed per app spec (no logo).
+ */
+
+/* ---------- Base Typography ---------- */
+body {
+  font-family: 'Manrope', sans-serif;
+  line-height: 1.6;
+  color: #000000;
+  background-color: #FFFFFF;
+  font-size: 16px;
+}
+
+/* ---------- Navbar / page header ---------- */
+/* The title is anchored to the top-left of the navbar with no left padding
+ * on either the navbar wrapper or its container. Bootstrap's defaults add
+ * ~1.5rem of left padding via .container-fluid; we override that here. */
+.navbar {
+  background-color: #602D89 !important;
+  border-bottom: 2px solid #251230;
+  min-height: 48px;
+  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.1);
+  padding: 0 !important;
+
+  > .container,
+  > .container-fluid {
+    align-items: center;
+    min-height: 48px;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none;
+  }
+}
+
+.navbar-brand {
+  color: #FFFFFF !important;
+  font-weight: 600;
+  line-height: 1;
+  margin: 0 !important;
+  padding: 0.5rem 0.75rem !important;  /* tight top-left anchoring */
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  letter-spacing: -0.25px;
+}
+
+.navbar-nav {
+  margin-left: 2rem;
+
+  .nav-link {
+    color: #FFFFFF !important;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    font-size: 0.76rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    &:hover {
+      color: #F4EDEC !important;
+      border-bottom-color: #F4EDEC;
+    }
+
+    &.active {
+      color: #F4EDEC !important;
+      border-bottom-color: #F4EDEC;
+    }
+  }
+}
+
+/* ---------- Typography Hierarchy ---------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Gelasio', Georgia, serif;
+  color: #251230;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  border-bottom: 3px solid #602D89;
+  padding-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.875rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #602D89;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+h5, h6 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #251230;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+a {
+  color: #602D89;
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    color: #251230;
+    text-decoration: underline;
+  }
+}
+
+/* ---------- Cards ---------- */
+.card {
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.05);
+  margin-bottom: 1.5rem;
+  background-color: #FFFFFF;
+
+  .card-header {
+    background-color: #F4EDEC;
+    border-bottom: 1px solid #AC9E94;
+    color: #251230;
+    font-weight: 600;
+    font-family: 'Gelasio', Georgia, serif;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  background-color: #602D89;
+  border-color: #602D89;
+  color: #FFFFFF;
+  font-weight: 500;
+
+  &:hover, &:focus, &:active {
+    background-color: #251230 !important;
+    border-color: #251230 !important;
+    color: #FFFFFF !important;
+  }
+}
+
+.btn-secondary {
+  background-color: #AC9E94;
+  border-color: #AC9E94;
+  color: #FFFFFF;
+
+  &:hover {
+    background-color: #251230;
+    border-color: #251230;
+    color: #FFFFFF;
+  }
+}
+
+/* ---------- Sidebar (bslib) ---------- */
+.bslib-sidebar-layout > .sidebar {
+  background-color: #F4EDEC;
+  border-right: 1px solid #AC9E94;
+
+  .sidebar-content {
+    padding: 1.25rem 1rem;
+  }
+}
+
+/* Section dividers inside the sidebar */
+.sidebar hr {
+  border-top: 1px solid #AC9E94;
+  margin: 1.25rem 0;
+  opacity: 0.6;
+}
+
+/* ---------- Stat cards (helper component, used in diagnostics later) ---------- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 6px;
+  padding: 1.25rem;
+  text-align: left;
+
+  .stat-value {
+    font-family: 'Gelasio', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #602D89;
+    line-height: 1.1;
+  }
+
+  .stat-title {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #251230;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-subtitle {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+}
+
+/* ---------- Peer results table wrapper ---------- */
+.peer-results-table {
+  margin-bottom: 1.5rem;
+  /* DT's auto-width plus our scrollable card body can render odd cropping
+   * if we don't normalize overflow. Let the table size itself naturally. */
+  overflow-x: auto;
+}
+
+/* ---------- Side-by-Side comparison ---------- */
+.compare-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+
+  .compare-control {
+    label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #251230;
+      margin-bottom: 0.25rem;
+    }
+  }
+  .compare-control-toggle {
+    .checkbox, .form-check {
+      margin-bottom: 0;
+    }
+    label {
+      font-size: 0.85rem;
+      color: #251230;
+      cursor: pointer;
+    }
+  }
+}
+
+.compare-distance-na {
+  color: #AC9E94 !important;  /* taupe instead of brand purple */
+  font-size: 2rem !important;
+  letter-spacing: -2px;
+}
+
+.compare-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  background: #F4EDEC;
+  border: 1px solid #AC9E94;
+  border-radius: 8px;
+
+  .compare-anchor, .compare-peer {
+    .compare-role {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #251230;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .compare-school-name {
+      font-family: 'Gelasio', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #602D89;
+      line-height: 1.2;
+      margin-bottom: 0.25rem;
+    }
+    .compare-school-meta {
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.4;
+    }
+  }
+  .compare-peer { text-align: right; }
+
+  .compare-distance {
+    text-align: center;
+    padding: 0 1.5rem;
+    .compare-distance-value {
+      font-family: 'Gelasio', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #602D89;
+      line-height: 1;
+    }
+    .compare-distance-label {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.25rem;
+    }
+    .compare-rank-label {
+      font-size: 0.85rem;
+      color: #251230;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+  }
+}
+
+.compare-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #444;
+  margin-bottom: 1.25rem;
+
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    vertical-align: middle;
+    &.legend-anchor { background: #602D89; }
+    &.legend-peer   { background: #AC9E94; }
+  }
+  .legend-spacer { width: 1.5rem; }
+}
+
+.compare-section {
+  margin-bottom: 2rem;
+
+  h5 {
+    border-bottom: 1px solid #AC9E94;
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+  .compare-section-count {
+    font-weight: 400;
+    color: #666;
+    font-family: 'Manrope', sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+}
+
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead th {
+    text-align: left;
+    color: #251230;
+    font-weight: 600;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid #AC9E94;
+    background: transparent;
+
+    &.th-value   { text-align: right; }
+    &.th-dist    { text-align: center; width: 160px; }
+    &.th-years   { text-align: left;   width: 110px; }
+    &.th-inspect { width: 34px; }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #F4EDEC;
+    &:last-child { border-bottom: none; }
+    &.clustering-var { background: rgba(96, 45, 137, 0.04); }
+    &:hover { background: rgba(96, 45, 137, 0.08); }
+  }
+
+  td {
+    padding: 0.35rem 0.6rem;
+    vertical-align: middle;
+  }
+  .var-name  { width: 30%; }
+  .var-years {
+    width: 110px;
+    font-size: 0.8rem;
+    color: #666;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .var-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .var-anchor { color: #602D89; font-weight: 500; }
+  .var-peer   { color: #251230; }
+  .var-diff {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #666;
+    white-space: nowrap;
+  }
+  .var-dist {
+    text-align: center;
+    width: 160px;
+    .dist-empty {
+      font-size: 0.75rem;
+      color: #999;
+      font-style: italic;
+    }
+  }
+  .var-inspect {
+    width: 34px;
+    text-align: center;
+  }
+}
+
+.inspect-icon {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 1rem;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  color: #602D89;
+  &:hover, &:focus {
+    opacity: 1;
+    transform: scale(1.15);
+    text-decoration: none;
+  }
+}
+
+/* ---------- Distribution modal ---------- */
+.distribution-modal-body {
+  .modal-subtitle { color: #666; font-weight: 400; }
+}
+
+.pool-description {
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 0.75rem;
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #251230;
+  em {
+    color: #555;
+    font-style: italic;
+  }
+}
+
+.distribution-stats {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content 1fr;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+  margin: 0.75rem 0 0 0;
+  padding: 0.75rem 1rem;
+  background: #F4EDEC;
+  border-radius: 6px;
+  font-size: 0.9rem;
+
+  dt {
+    font-weight: 600;
+    color: #251230;
+    margin: 0;
+  }
+  dd {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+    color: #251230;
+  }
+}
+
+/* ---------- Stratified Peers tab ---------- */
+.stratified-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+
+  .stratified-control label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.stratified-anchor {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0.75rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  label {
+    display: block;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.stratum-card-anchor {
+  border-left-width: 6px !important;
+  box-shadow: 0 3px 10px rgba(96, 45, 137, 0.18) !important;
+}
+
+.anchor-badge {
+  display: inline-block;
+  margin-left: 0.75rem;
+  padding: 2px 8px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #FFFFFF;
+  background: #602D89;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.stratum-table tbody tr.anchor-row {
+  background: rgba(96, 45, 137, 0.08);
+  font-weight: 500;
+  td { border-bottom: 2px solid #602D89; }
+}
+
+.stratum-info {
+  display: inline-block;
+  margin-left: 0.4rem;
+  color: #602D89;
+  cursor: help;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  &:hover { color: #251230; }
+}
+
+.stratified-filter-mode {
+  margin: -0.5rem 0 1rem 0;
+  padding: 0.5rem 0.85rem;
+  background: rgba(96, 45, 137, 0.04);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  .checkbox, .form-check { margin: 0; }
+}
+
+.stratified-summary {
+  font-size: 0.95rem;
+  color: #251230;
+  margin-bottom: 0.5rem;
+}
+
+.stratified-legend {
+  margin-bottom: 1.25rem;
+  padding: 0.6rem 0.85rem;
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #251230;
+  line-height: 1.5;
+
+  b { color: #602D89; }
+}
+
+.stratum-card {
+  border: 1px solid #AC9E94;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  background: #FFFFFF;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.75rem;          /* clear vertical separation */
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.07);
+}
+
+.stratum-header {
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px solid #602D89;
+}
+
+.stratum-label {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #602D89;
+  line-height: 1.25;
+}
+
+.stratum-meta {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.stratum-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  /* Note: deliberately NOT using table-layout: fixed.  Combined with
+     overflow:hidden on the parent, it was collapsing table heights to
+     zero in some browsers.  Use min-width on the School column instead
+     to keep numeric columns from getting squeezed. */
+
+  thead th {
+    text-align: left;
+    color: #251230;
+    font-weight: 600;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #AC9E94;
+    cursor: help;
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid #F4EDEC;
+    &:last-child { border-bottom: none; }
+    &:hover { background: rgba(96, 45, 137, 0.05); }
+  }
+  td {
+    padding: 0.45rem 0.6rem;
+    vertical-align: middle;
+  }
+  /* Numeric columns stay tight on a single line; School wraps if needed. */
+  .sp-rank    { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; width: 1%; }
+  .sp-school  { font-weight: 500; line-height: 1.35; }
+  .sp-state   { text-align: center; white-space: nowrap; width: 1%; }
+  .sp-dist    { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; width: 1%; }
+  .sp-reldist { text-align: right; font-variant-numeric: tabular-nums; color: #602D89; white-space: nowrap; width: 1%; }
+  .sp-pct     { text-align: right; font-variant-numeric: tabular-nums; color: #602D89; white-space: nowrap; width: 1%; }
+}
+
+/* ---------- Classifications & groupings panel (Side-by-Side) ---------- */
+.classification-section {
+  margin-bottom: 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #AC9E94;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  background: #FFFFFF;
+
+  h5 {
+    border-bottom: 2px solid #602D89;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: #602D89;
+  }
+  p { margin-bottom: 0.75rem; }
+}
+
+.classification-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead th {
+    text-align: left;
+    color: #251230;
+    font-weight: 600;
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid #AC9E94;
+    background: transparent;
+    white-space: nowrap;
+
+    &.th-match { text-align: center; width: 70px; }
+  }
+  tbody tr {
+    border-bottom: 1px solid #F4EDEC;
+    &:last-child { border-bottom: none; }
+    &.match { background: rgba(96, 45, 137, 0.05); }
+    &:hover { background: rgba(96, 45, 137, 0.10); }
+  }
+  td {
+    padding: 0.45rem 0.6rem;
+    vertical-align: top;
+  }
+  .cf-label   { width: 30%; font-weight: 500; color: #251230; }
+  .cf-value   { color: #251230; line-height: 1.35; }
+  .cf-anchor  { color: #602D89; }
+  .cf-peer    { color: #251230; }
+  .cf-match {
+    text-align: center;
+    width: 70px;
+    color: #602D89;
+    font-weight: 600;
+    font-size: 1.1rem;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Saved Searches cards ---------- */
+.saved-search-card {
+  border: 1px solid #AC9E94;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  background: #FFFFFF;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.05);
+
+  .ssc-header {
+    border-bottom: 1px solid #F4EDEC;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .ssc-label {
+    font-family: 'Gelasio', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #251230;
+    line-height: 1.3;
+  }
+  .ssc-meta {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 0.25rem;
+  }
+  .ssc-sep { margin: 0 0.35rem; color: #AC9E94; }
+
+  .ssc-body {
+    margin-bottom: 0.85rem;
+  }
+  .ssc-row {
+    font-size: 0.88rem;
+    color: #251230;
+    margin-bottom: 0.2rem;
+    line-height: 1.4;
+  }
+  .ssc-label-tag {
+    display: inline-block;
+    width: 70px;
+    font-weight: 600;
+    color: #602D89;
+  }
+
+  .ssc-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    .btn { font-size: 0.85rem; }
+    .btn-outline-danger {
+      color: #b53737;
+      border-color: #b53737;
+      background: transparent;
+      &:hover {
+        background: #b53737;
+        color: #FFFFFF;
+      }
+    }
+  }
+}
+
+/* ---------- Section divider between the peer table and diagnostics ---------- */
+.peer-section-divider {
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  border-top: 2px solid #AC9E94;
+  opacity: 0.5;
+}
+
+/* ---------- Highlights, notes, callouts ---------- */
+.highlight {
+  background: #fff3cd;
+  padding: 2px 6px;
+  font-weight: 600;
+  border-radius: 3px;
+}
+
+.emphasis {
+  font-weight: 600;
+  color: #602D89;
+}
+
+.note-box, .alert-warning, .alert-secondary {
+  background: #F4EDEC;
+  border: 1px solid #AC9E94;
+  padding: 1rem;
+  margin: 1.25rem 0;
+  font-size: 0.95rem;
+  color: #666;
+  border-radius: 6px;
+
+  strong {
+    color: #251230;
+  }
+}
+
+.section-intro {
+  font-size: 1.05rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* ---------- Layout ---------- */
+.container-fluid {
+  padding: 1.5rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+ul, ol {
+  margin-left: 1.5rem;
+  margin-top: 0.75rem;
+  color: #444;
+
+  li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+}
+
+/* ---------- Form controls ---------- */
+.form-control, .form-select {
+  border: 1px solid #AC9E94;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+
+  &:focus {
+    border-color: #602D89;
+    box-shadow: 0 0 0 0.2rem rgba(96, 45, 137, 0.25);
+  }
+}
+
+/* Sliders */
+.irs--shiny .irs-bar,
+.irs--shiny .irs-from,
+.irs--shiny .irs-to,
+.irs--shiny .irs-single {
+  background-color: #602D89;
+  border-color: #602D89;
+}
+.irs--shiny .irs-handle > i:first-child {
+  background-color: #602D89;
+}
+
+/* Compact form labels in the sidebar */
+.sidebar .form-label,
+.sidebar label {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: #251230;
+  margin-bottom: 0.25rem;
+}
+
+/* "Same as anchor" inline checkbox tightening */
+.sidebar .checkbox {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1.5rem 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Print ---------- */
+@media print {
+  .navbar { display: none; }
+  body { background: white; }
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}

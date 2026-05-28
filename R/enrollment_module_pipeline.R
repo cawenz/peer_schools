@@ -146,11 +146,20 @@ build_ipeds_enrollment <- function(unitids_by_year, cfg) {
     ug  <- drvef_col(yr, "EFUG")  %>% rename(efug  = value)
     tot <- drvef_col(yr, "ENRTOT") %>% rename(enrtot = value)
     if (nrow(ug) && nrow(tot)) {
-      out[[length(out)+1]] <- ug %>% inner_join(tot, by = "unitid") %>%
-        filter(unitid %in% uids) %>%
+      ug_join <- ug %>% inner_join(tot, by = "unitid") %>%
+        filter(unitid %in% uids)
+      out[[length(out)+1]] <- ug_join %>%
         transmute(unitid, value = 100 * efug / enrtot) %>%
         filter(is.finite(value)) %>%
         mutate(year = yr, metric = "pct_undergrad", var_type = "computed")
+      # Complement: pct_graduate. Algebraic complement of pct_undergrad,
+      # exposed as its own variable so codebook readers and the side-by-side
+      # view can pick it up directly without needing to invert in their
+      # heads. Tagged descriptive (would double-count signal if clustered).
+      out[[length(out)+1]] <- ug_join %>%
+        transmute(unitid, value = 100 * (enrtot - efug) / enrtot) %>%
+        filter(is.finite(value)) %>%
+        mutate(year = yr, metric = "pct_graduate", var_type = "computed")
     }
     
     # Computed: pct_part_time = ENRPT / ENRTOT
@@ -295,6 +304,7 @@ build_enr_variables <- function(cfg) {
     "full_time_enrollment",      "Full-time fall enrollment",                            "ipeds",         "DRVEF.ENRFT",                                          "clustering",  "cross_category",   "count",       TRUE,            TRUE,             NA_character_,
     # Other IPEDS clustering
     "pct_undergrad",             "Undergraduate share of total enrollment",              "ipeds_derived", "DRVEF.EFUG / ENRTOT",                                  "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,
+    "pct_graduate",              "Graduate share of total enrollment",                   "ipeds_derived", "100 - (DRVEF.EFUG / ENRTOT)",                          "descriptive", "cross_category",   "percentage",  FALSE,           FALSE,            "Algebraic complement of pct_undergrad; tagged descriptive to avoid double-counting in clustering.",
     "pct_part_time",             "Part-time share of total enrollment",                  "ipeds_derived", "DRVEF.ENRPT / ENRTOT",                                 "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,
     "pct_age_25plus",            "Percent of undergraduates age 25-64",                  "ipeds",         "DRVEF.DVEF15",                                         "clustering",  "cross_category",   "percentage",  FALSE,           FALSE,            NA_character_,
     "transfer_in_enrollment",    "Transfer-in undergraduate enrollment",                 "ipeds",         "DRVEF.EFUGTRN",                                        "clustering",  "within_category",  "count",       FALSE,           TRUE,             NA_character_,

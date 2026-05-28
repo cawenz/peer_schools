@@ -294,6 +294,78 @@ build_carnegie_outcomes <- function(schools, cfg) {
 }
 
 # =============================================================================
+# 4b. Program counts from Completions
+#
+# Counts distinct CIP codes where the institution awarded ≥1 degree in
+# the most recent panel year, separated by award level. Two granularities:
+#   - CIP6 (6-digit) = count of "programs" in the IPEDS-classification sense
+#   - CIP2 (2-digit) = count of broad academic families (e.g., Engineering,
+#                       Biological Sciences, Business as a whole)
+#
+# Note: counts "programs that produced at least one graduate in the panel
+# year", which slightly under-counts programs that exist but had zero
+# completions that year. Acceptable for an IR-style summary; the
+# coverage_note flags it.
+#
+# Single snapshot under the latest panel year (per the methodology choice
+# for similar snapshot-style variables in this module).
+# =============================================================================
+build_program_counts <- function(unitids_by_year, cfg) {
+  latest_year <- max(cfg$collection_years)
+  uids <- unitids_by_year[[as.character(latest_year)]]
+
+  ca <- get_table(latest_year, paste0("C", latest_year, "_A"))
+  if (is.null(ca)) {
+    message("  C", latest_year, "_A not available; skipping program counts.")
+    return(tibble())
+  }
+  message(sprintf("Counting distinct CIPs from C%d_A (%d rows) ...",
+                  latest_year, nrow(ca)))
+
+  ca_pri <- ca %>%
+    filter(suppressWarnings(as.integer(MAJORNUM)) == 1L,
+           !is.na(CIPCODE),
+           CIPCODE != "99",
+           CIPCODE != "99.0000",
+           suppressWarnings(as.integer(CTOTALT)) > 0)
+
+  ca_ug   <- ca_pri %>%
+    filter(suppressWarnings(as.integer(AWLEVEL)) == 5L)
+  ca_grad <- ca_pri %>%
+    filter(suppressWarnings(as.integer(AWLEVEL)) %in% c(7L, 17L, 18L, 19L))
+
+  count_programs <- function(df) {
+    if (!nrow(df)) return(tibble(unitid = integer(),
+                                  n_cip6 = integer(), n_cip2 = integer()))
+    df %>%
+      group_by(unitid) %>%
+      summarise(n_cip6 = n_distinct(CIPCODE),
+                n_cip2 = n_distinct(substr(as.character(CIPCODE), 1, 2)),
+                .groups = "drop") %>%
+      mutate(unitid = as.integer(unitid))
+  }
+
+  ug_counts   <- count_programs(ca_ug)   %>% filter(unitid %in% uids)
+  grad_counts <- count_programs(ca_grad) %>% filter(unitid %in% uids)
+
+  rows <- list()
+  push <- function(df, metric_name, col) {
+    if (nrow(df))
+      rows[[length(rows)+1]] <<- df %>%
+        transmute(unitid, value = .data[[col]]) %>%
+        filter(is.finite(value)) %>%
+        mutate(year = latest_year, metric = metric_name,
+               var_type = "computed")
+  }
+  push(ug_counts,   "n_undergrad_programs",       "n_cip6")
+  push(ug_counts,   "n_undergrad_cip2_families",  "n_cip2")
+  push(grad_counts, "n_grad_programs",            "n_cip6")
+  push(grad_counts, "n_grad_cip2_families",       "n_cip2")
+
+  bind_rows(rows)
+}
+
+# =============================================================================
 # 5. out_variables.csv
 # =============================================================================
 build_out_variables <- function(cfg) {
@@ -313,6 +385,11 @@ build_out_variables <- function(cfg) {
     # IPEDS exploratory + NECHE
     "grad_rate_men_vs_women",   "Grad rate gap, women minus men (6-year), pp",          "ipeds_derived", "DRVGR.GBA6RTW - GBA6RTM",                                        "exploratory", "within_category",  "percentage",  FALSE,           FALSE,            "Exploratory only",
     "doctoral_degrees_awarded", "Research/scholarship doctorates awarded",              "ipeds",         "DRVC.DOCDEGRS",                                                  "descriptive", "within_category",  "count",       TRUE,            TRUE,             "NECHE peer-set member. Excludes professional-practice doctorates (DOCDEGPP).",
+    # Program counts from Completions (single snapshot, latest panel year)
+    "n_undergrad_programs",     "Number of distinct undergraduate programs (CIP6, primary major)", "ipeds_derived", "C{yr}_A: distinct CIPCODE where AWLEVEL=5, MAJORNUM=1, CTOTALT>0", "descriptive", "within_category", "count", FALSE, FALSE, "Counts CIP codes that produced at least one bachelor's graduate in the latest panel year. Slightly under-counts programs that exist but had zero completions.",
+    "n_undergrad_cip2_families","Number of distinct undergraduate CIP2 families",       "ipeds_derived", "C{yr}_A: distinct CIPCODE first-2 where AWLEVEL=5, MAJORNUM=1",  "descriptive", "within_category", "count", FALSE, FALSE, "Broader grouping than n_undergrad_programs; each CIP2 is a major academic family (e.g., 11 = Computer Science, 14 = Engineering, 26 = Biology).",
+    "n_grad_programs",          "Number of distinct graduate programs (CIP6, primary major)",     "ipeds_derived", "C{yr}_A: distinct CIPCODE where AWLEVEL in {7,17,18,19}, MAJORNUM=1, CTOTALT>0", "descriptive", "within_category", "count", FALSE, FALSE, "Includes Master's, research doctorates, professional-practice doctorates, and other doctorates. Counts programs that produced at least one graduate in the latest panel year.",
+    "n_grad_cip2_families",     "Number of distinct graduate CIP2 families",            "ipeds_derived", "C{yr}_A: distinct CIPCODE first-2 where AWLEVEL in {7,17,18,19}, MAJORNUM=1", "descriptive", "within_category", "count", FALSE, FALSE, "Broader grouping than n_grad_programs.",
     # Scorecard
     "median_earnings_10yr",     "Median earnings 10 yrs after entry",                   "scorecard",     "earnings.10_yrs_after_entry.median (latest)",                    "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            "Latest available Scorecard cohort; long lag from current year",
     "median_earnings_6yr",      "Median earnings 6 yrs after entry",                    "scorecard",     "earnings.6_yrs_after_entry.median (latest)",                     "clustering",  "cross_category",   "currency",    FALSE,           FALSE,            "Latest available Scorecard cohort",
@@ -384,8 +461,10 @@ run_outcomes_module <- function(cfg = OUTCOMES_CONFIG) {
   scorecard_out <- build_scorecard_outcomes(cfg)
   cds_out       <- build_cds_outcomes(cfg)
   carnegie_out  <- build_carnegie_outcomes(schools, cfg)
-  
-  out_facts <- bind_rows(ipeds_out, scorecard_out, cds_out, carnegie_out) %>%
+  programs_out  <- build_program_counts(unitids_by_year, cfg)
+
+  out_facts <- bind_rows(ipeds_out, scorecard_out, cds_out,
+                         carnegie_out, programs_out) %>%
     semi_join(schools, by = "unitid") %>%
     arrange(unitid, year, metric)
   
