@@ -40,6 +40,10 @@ output/*.rds
 output/*.log
 output/previews/
 
+# Re-allow the bundled CSVs the Shiny app loads at startup: the NECHE
+# cohort and the stratum-description lookup.
+!shiny_app/data/*.csv
+
 # IPEDS source files that aren't the .Rda we ship
 data/*.accdb
 data/*.zip

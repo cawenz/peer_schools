@@ -1,0 +1,46 @@
+Action,unitid,instnm
+Drop,100724,Alabama State University
+Drop,106342,Lyon College
+Keep,107080,Hendrix College
+Drop,107558,University of the Ozarks
+Drop,107877,Williams Baptist University
+Drop,112084,San Diego Christian College
+Keep,112260,Claremont McKenna College
+Drop,115755,California State Polytechnic University-Humboldt
+Maybe,120254,Occidental College
+Keep,121257,Pitzer College
+Keep,121345,Pomona College
+Keep,123165,Scripps College
+Maybe,124292,Thomas Aquinas College
+Drop,125727,Westmont College
+Maybe,125763,Whittier College
+Keep,126678,Colorado College
+Drop,127185,Fort Lewis College
+Drop,128780,Charter Oak State College
+Keep,128902,Connecticut College
+Keep,129215,Eastern Connecticut State University
+Maybe,129774,Mitchell College
+Keep,130590,Trinity College
+Keep,130697,Wesleyan University
+Drop,132602,Bethune-Cookman University
+Us,166124,College of the Holy Cross
+Possible Add,129242,Fairfield
+Possible Add,191241,Fordham
+Possible Add,217402,Providence
+Possible Add,164465,Amherst
+Possible Add,198385,Davidson
+Possible Add,233374,Univ of Richmond
+Possible Add,190099,Colgate
+Possible Add,211291,Bucknell
+Possible Add,173258,Carleton
+Possible Add,153384,Grinnell 
+Possible Add,115409,Harvey Mudd
+Possible Add,218070,Furman
+Possible Add,203535,Kenyon
+Possible Add,167288,Mass College of Liberal Arts
+Possible Add,168430,Worcester State
+Possible Add,165334,Clark 
+Possible Add,168421,WPI
+Possible Add,165699,Endicott
+Possible Add,164580,Babson
+Possible Add,164739,Bentley 
