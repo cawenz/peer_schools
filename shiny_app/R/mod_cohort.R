@@ -41,6 +41,23 @@
 .ADDITION_ACTIONS <- c("Possible", "Proposed")
 .COHORT_ACTIONS   <- c(.ORIGINAL_ACTIONS, .ADDITION_ACTIONS)
 
+# 11 headline metrics shown in the cohort overview dashboard. Order is the
+# rendered grid order. Each entry must exist in .VARIABLES$metric so the
+# format / display name come from the catalog.
+.DASHBOARD_METRICS <- c(
+  "acceptance_rate",
+  "sat_mid50",
+  "student_faculty_ratio",
+  "avg_ft_faculty_salary",
+  "herd_avg",
+  "endowment_per_fte",
+  "grad_rate_6yr",
+  "pct_pell",
+  "pct_bipoc",
+  "undergraduate_enrollment",
+  "n_undergrad_programs"
+)
+
 # Path to the default cohort CSV. Auto-loaded into the tab on session
 # start so the user doesn't have to re-upload every session. The file
 # upload widget still works as a runtime override.
@@ -336,6 +353,7 @@ cohortUI <- function(id) {
       "variable's distribution and per-school values."),
 
     uiOutput(ns("cohort_view")),
+    uiOutput(ns("cohort_dashboard")),
     uiOutput(ns("variable_inspector"))
   )
 }
@@ -468,6 +486,42 @@ cohortServer <- function(id) {
       )
     })
 
+    # ---- Row move handler ----
+    # Fired by the → / ← arrow buttons. payload$side is the SIDE the row
+    # was on when the user clicked — "in" means the user wants to move the
+    # row Out, "out" means move it back In.
+    #
+    # Origin rule (locked):
+    #   in/original  → Remove     (Keep/Maybe → Remove)
+    #   in/addition  → Possible   (Proposed   → Possible)
+    #   out/original → Maybe      (Remove     → Maybe; un-flag, undecided)
+    #   out/addition → Proposed   (Possible   → Proposed; commit)
+    observeEvent(input$row_move, {
+      payload <- input$row_move
+      if (is.null(payload) || is.null(payload$uid) || is.null(payload$side))
+        return()
+      df  <- cohort_state(); if (is.null(df)) return()
+      uid <- as.integer(payload$uid)
+      ix  <- which(df$unitid == uid)
+      if (!length(ix)) return()
+
+      origin <- as.character(df$origin[ix])
+      side   <- as.character(payload$side)
+
+      new_action <- if (identical(side, "in")) {
+        # Moving from In to Out
+        if (origin == "original") "Remove" else "Possible"
+      } else if (identical(side, "out")) {
+        # Moving from Out to In
+        if (origin == "original") "Maybe" else "Proposed"
+      } else {
+        return()  # unrecognized side payload
+      }
+
+      df$action[ix] <- new_action
+      cohort_state(df)
+    })
+
     # ---- Cohort table rendering ----
     # Wide matrix slice for the cohort. neche_dashboard variables in
     # column order, with anchor row prepended for reference.
@@ -484,82 +538,105 @@ cohortServer <- function(id) {
     # orientation. Numeric variables live in the inspector below.
 
     # Build a single compact row.
-    # Action widget depends on origin:
-    #   - "original": dropdown over Keep / Maybe / Remove
-    #   - "addition": dropdown over Possible / Proposed
-    #   - "anchor"  : read-only "Anchor" badge, no dropdown
-    .cohort_row <- function(row, wide_row, origin) {
+    #
+    # The row's controls depend on (side, origin):
+    #   anchor       : read-only "Anchor" pill. No arrow, no delete.
+    #   in/original  : Keep/Maybe dropdown   + → arrow (move out)
+    #   in/addition  : Proposed badge        + → arrow (move out) + × delete
+    #   out/original : Remove badge          + ← arrow (move in)
+    #   out/addition : Possible badge        + ← arrow (move in)  + × delete
+    .cohort_row <- function(row, wide_row, origin, side) {
       current_action <- as.character(row$action)
 
-      if (identical(origin, "anchor")) {
-        action_widget <- tags$span(
-          class = "cohort-anchor-pill",
-          title = "Anchor institution (your school)",
-          "Anchor"
-        )
+      # --- Status widget (left edge of action cell) ---
+      status_widget <- if (identical(origin, "anchor")) {
         current_action <- "Anchor"
-      } else {
-        choices <- switch(origin,
-                          original = .ORIGINAL_ACTIONS,
-                          addition = .ADDITION_ACTIONS,
-                          .COHORT_ACTIONS)
-        select_el <- tags$select(
-          class = "cohort-action-select",
+        tags$span(class = "cohort-anchor-pill",
+                  title = "Anchor institution (your school)",
+                  "Anchor")
+      } else if (identical(side, "in") && identical(origin, "original")) {
+        # Only place a true dropdown survives: in-side originals can be
+        # toggled between Keep and Maybe without sending the row out.
+        tags$select(
+          class = "cohort-action-select cohort-action-select-mini",
           `data-uid` = row$unitid,
           onchange = sprintf(
             "Shiny.setInputValue('%s', {uid: %d, action: this.value, t: Date.now()}, {priority: 'event'});",
             ns("action_change"), row$unitid),
-          lapply(choices, function(a) {
+          lapply(c("Keep", "Maybe"), function(a) {
             tags$option(value = a,
                         selected = if (identical(current_action, a))
                                       "selected" else NULL,
                         a)
           })
         )
-
-        # Addition rows get a small × button to delete the row entirely.
-        # Originals don't — Remove is the right action there; the row stays
-        # so the user can change their mind without losing it.
-        remove_btn <- if (identical(origin, "addition"))
-          tags$button(
-            class    = "cohort-remove-btn",
-            type     = "button",
-            title    = "Remove this school from the cohort list",
-            `aria-label` = sprintf("Remove %s", row$instnm),
-            onclick  = sprintf(
-              "Shiny.setInputValue('%s', {uid: %d, t: Date.now()}, {priority: 'event'});",
-              ns("row_remove"), row$unitid),
-            HTML("&times;")
-          ) else NULL
-
-        action_widget <- tags$div(class = "cohort-action-widget",
-                                   select_el, remove_btn)
+      } else {
+        # In/addition (Proposed) or Out side (Remove, Possible): static badge.
+        badge_slug <- tolower(gsub(" ", "-", current_action))
+        tags$span(
+          class = sprintf("cohort-action-badge cohort-badge-%s", badge_slug),
+          current_action
+        )
       }
+
+      # --- Move-arrow button (everything but anchor) ---
+      move_btn <- if (!identical(origin, "anchor")) {
+        arrow_label <- if (identical(side, "in")) "→" else "←"
+        arrow_title <- if (identical(side, "in"))
+                         "Move to Out / Considering"
+                       else
+                         "Move back to In Cohort"
+        tags$button(
+          class = sprintf("cohort-move-btn cohort-move-%s", side),
+          type  = "button",
+          title = arrow_title,
+          `aria-label` = sprintf("%s: %s", arrow_title, row$instnm),
+          onclick = sprintf(
+            "Shiny.setInputValue('%s', {uid: %d, side: '%s', t: Date.now()}, {priority: 'event'});",
+            ns("row_move"), row$unitid, side),
+          HTML(arrow_label)
+        )
+      } else NULL
+
+      # --- × delete (additions only) ---
+      remove_btn <- if (identical(origin, "addition")) {
+        tags$button(
+          class    = "cohort-remove-btn",
+          type     = "button",
+          title    = "Remove this school from the cohort list",
+          `aria-label` = sprintf("Remove %s", row$instnm),
+          onclick  = sprintf(
+            "Shiny.setInputValue('%s', {uid: %d, t: Date.now()}, {priority: 'event'});",
+            ns("row_remove"), row$unitid),
+          HTML("&times;")
+        )
+      } else NULL
 
       badge_slug   <- tolower(gsub(" ", "-", current_action))
       action_class <- sprintf("cohort-action-%s", badge_slug)
-      badge <- tags$span(
-        class = sprintf("cohort-action-badge cohort-badge-%s", badge_slug),
-        current_action
-      )
-
       usnews <- .prettify_classification(wide_row$usnews_classification)
-      ic2025 <- wide_row$ic2025_label
 
+      # Note: no secondary badge after the school name now — the row tint
+      # plus the status widget in the action cell already encode the state,
+      # and the two-column layout is tight enough that we don't need both.
       tags$tr(class = paste("cohort-row", action_class),
-        tags$td(class = "cohort-action-cell", action_widget),
+        tags$td(class = "cohort-action-cell",
+                tags$div(class = "cohort-action-widget",
+                  status_widget,
+                  if (identical(side, "in")) tagList(remove_btn, move_btn)
+                                              else tagList(move_btn,  remove_btn)
+                )),
         tags$td(class = "cohort-name",
-                tags$span(class = "cohort-name-text", row$instnm),
-                badge),
+                tags$span(class = "cohort-name-text", row$instnm)),
         tags$td(class = "cohort-state", row$stabbr),
         tags$td(class = "cohort-ctx",
-                if (is.na(usnews)) "—" else usnews),
-        tags$td(class = "cohort-ctx",
-                if (is.na(ic2025)) "—" else ic2025)
+                if (is.na(usnews)) "—" else usnews)
       )
     }
 
-    .cohort_table <- function(df_subset, wide_df, anchor_row_df = NULL) {
+    .cohort_table <- function(df_subset, wide_df, side,
+                              anchor_row_df = NULL) {
+      stopifnot(side %in% c("in", "out"))
       if (!nrow(df_subset) && is.null(anchor_row_df)) return(NULL)
 
       anchor_tr <- NULL
@@ -567,28 +644,422 @@ cohortServer <- function(id) {
         w_anchor <- wide_df[wide_df$unitid == anchor_row_df$unitid, ,
                              drop = FALSE]
         if (nrow(w_anchor))
-          anchor_tr <- .cohort_row(anchor_row_df, w_anchor, origin = "anchor")
+          anchor_tr <- .cohort_row(anchor_row_df, w_anchor,
+                                    origin = "anchor", side = side)
       }
 
       rows <- lapply(seq_len(nrow(df_subset)), function(i) {
         r <- df_subset[i, ]
         w <- wide_df[wide_df$unitid == r$unitid, , drop = FALSE]
         if (!nrow(w)) return(NULL)
-        .cohort_row(r, w, origin = as.character(r$origin))
+        .cohort_row(r, w, origin = as.character(r$origin), side = side)
       })
-      tags$table(class = "cohort-table cohort-table-compact",
+      tags$table(class = sprintf("cohort-table cohort-table-compact cohort-table-%s",
+                                  side),
         tags$thead(
           tags$tr(
-            tags$th(class = "cohort-action-th", "Action"),
-            tags$th(class = "cohort-name-th", "School"),
-            tags$th(class = "cohort-state-th", "State"),
-            tags$th(class = "cohort-ctx-th",   "US News classification"),
-            tags$th(class = "cohort-ctx-th",   "Carnegie IC (2025)")
+            tags$th(class = "cohort-action-th", "Status"),
+            tags$th(class = "cohort-name-th",   "School"),
+            tags$th(class = "cohort-state-th",  "State"),
+            tags$th(class = "cohort-ctx-th",    "US News classification")
           )
         ),
         tags$tbody(anchor_tr, rows)
       )
     }
+
+    # -------------------------------------------------------------------------
+    # Cohort overview dashboard — 11 stat cards above the variable inspector.
+    # Each card shows the anchor's value, the cohort's min/median/max, and a
+    # mini SVG strip with a universe density curve, a cohort range bar, and
+    # an anchor tick. Click a card to scroll to the inspector with that
+    # metric pre-selected.
+    # -------------------------------------------------------------------------
+
+    # The "in-cohort" set used by the dashboard cards: anchor + Keep +
+    # Maybe + Proposed. Mirrors the In column in the two-column table.
+    in_cohort_uids <- reactive({
+      df    <- cohort_state()
+      a_uid <- anchor_uid()
+      if (is.null(df)) return(integer())
+      uids <- df$unitid[df$action %in% c("Keep", "Maybe", "Proposed")]
+      unique(c(a_uid, uids))
+    })
+
+    # Universe baseline for the dashboard strips. We deliberately use the
+    # full ranked universe (not the inspector's filtered pool), so the
+    # cards always show the same baseline regardless of inspector state.
+    dashboard_universe <- reactive({
+      .SCHOOLS_WIDE[.SCHOOLS_WIDE$in_ranked_universe %in% TRUE, , drop = FALSE]
+    })
+
+    # Short, stakeholder-friendly source labels.
+    .SOURCE_LABELS <- c(
+      ipeds          = "IPEDS",
+      ipeds_derived  = "IPEDS",
+      ccihe          = "Carnegie 2025 Data File",
+      cds_ai         = "Common Data Set",
+      cds_ai_derived = "Common Data Set",
+      scorecard      = "College Scorecard"
+    )
+    # Sources whose raw value is itself a computed/derived number.
+    .COMPUTED_SOURCES <- c("ipeds_derived", "cds_ai_derived", "ccihe")
+
+    .simplify_source <- function(src) {
+      if (is.null(src) || is.na(src) || !nzchar(src))
+        return("Unknown source")
+      lbl <- .SOURCE_LABELS[[src]]
+      if (is.null(lbl)) src else lbl
+    }
+    .is_computed_source <- function(src) {
+      if (is.null(src) || is.na(src) || !nzchar(src)) return(FALSE)
+      src %in% .COMPUTED_SOURCES
+    }
+
+    # Color palette for the per-school rug ticks. Matches the action
+    # badges used elsewhere in the cohort tab.
+    .DASH_ACTION_COLORS <- c(
+      "Anchor"   = "#602D89",
+      "Keep"     = "#2e7d32",
+      "Maybe"    = "#AC9E94",
+      "Proposed" = "#9D7BB7"
+    )
+
+    # SVG strip: faint universe density curve at top, per-school rug ticks
+    # at bottom (colored by action), anchor as a tall purple line + dot
+    # spanning the whole strip. `rug_data` is a data.frame with $value and
+    # $action columns; if NULL or empty, no rug is drawn.
+    #
+    # Returns an HTML() string ready to drop into a tagList.
+    .dashboard_strip_svg <- function(universe_vals, anchor_val,
+                                      rug_data = NULL,
+                                      width = 280, height = 48) {
+      uv <- universe_vals[is.finite(universe_vals)]
+      if (length(uv) < 5)
+        return(tags$div(class = "dash-strip-empty",
+                         "Insufficient data"))
+
+      q <- stats::quantile(uv, c(0.01, 0.99), na.rm = TRUE)
+      uv_min <- as.numeric(q[1]); uv_max <- as.numeric(q[2])
+      rng <- uv_max - uv_min
+      if (rng <= 0)
+        return(tags$div(class = "dash-strip-empty", "No variation"))
+
+      # Vertical regions inside the strip:
+      #   density region: y = 4 .. (height - 14)
+      #   rug region:     y = (height - 10) .. (height - 2)
+      density_top    <- 4
+      density_bottom <- height - 14
+      rug_top        <- height - 10
+      rug_bottom     <- height - 2
+      density_h      <- density_bottom - density_top
+
+      dens <- stats::density(uv, from = uv_min, to = uv_max, n = 60)
+      max_dens <- max(dens$y); if (max_dens <= 0) max_dens <- 1
+      dens_y <- (dens$y / max_dens) * density_h
+
+      to_x <- function(v) {
+        ((pmin(pmax(v, uv_min), uv_max) - uv_min) / rng) * width
+      }
+
+      # Density polygon: top follows the curve, bottom flat at density_bottom.
+      poly_x <- c(to_x(dens$x),
+                   to_x(dens$x[length(dens$x)]),
+                   to_x(dens$x[1]))
+      poly_y <- c(density_bottom - dens_y,
+                   rep(density_bottom, 2))
+      pts <- paste(sprintf("%.1f,%.1f", poly_x, poly_y), collapse = " ")
+
+      # Per-school rug. Anchor tick is drawn separately, so exclude it
+      # here (otherwise the anchor's color would compete with the long
+      # vertical anchor line above the rug).
+      rug_str <- ""
+      if (!is.null(rug_data) && nrow(rug_data) > 0) {
+        rd <- rug_data[is.finite(rug_data$value) &
+                        rug_data$action != "Anchor", , drop = FALSE]
+        if (nrow(rd)) {
+          colors <- unname(.DASH_ACTION_COLORS[as.character(rd$action)])
+          colors[is.na(colors)] <- "#AC9E94"
+          rug_parts <- vapply(seq_len(nrow(rd)), function(i) {
+            x <- to_x(rd$value[i])
+            sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="%.1f" y2="%.1f" ',
+                            'stroke="%s" stroke-width="1.6" ',
+                            'stroke-opacity="0.85" stroke-linecap="round"/>'),
+                    x, x, rug_top, rug_bottom, colors[i])
+          }, character(1))
+          rug_str <- paste(rug_parts, collapse = "")
+        }
+      }
+
+      # Anchor: long vertical line spanning density region, with dot at top.
+      anchor_str <- if (is.finite(anchor_val)) {
+        ax <- to_x(anchor_val)
+        sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="2" y2="%.1f" ',
+                        'stroke="#602D89" stroke-width="2.5"/>',
+                        '<circle cx="%.1f" cy="2" r="3.5" fill="#602D89"/>'),
+                ax, ax, rug_bottom, ax)
+      } else ""
+
+      HTML(sprintf(
+        paste0('<svg class="dash-strip" width="%d" height="%d" ',
+                'viewBox="0 0 %d %d" preserveAspectRatio="none">',
+                '<polygon points="%s" fill="#F4EDEC" stroke="#AC9E94" ',
+                'stroke-width="0.5"/>',
+                '%s%s',
+                '</svg>'),
+        width, height, width, height, pts, rug_str, anchor_str
+      ))
+    }
+
+    # Build a tidy rug data.frame for a given metric: anchor row + every
+    # in-cohort row (Keep + Maybe + Proposed) with their action labels.
+    .build_rug_data <- function(metric) {
+      df    <- cohort_state()
+      a_uid <- anchor_uid()
+      if (is.null(df) || is.null(a_uid) ||
+          !metric %in% names(.SCHOOLS_WIDE)) {
+        return(data.frame(unitid = integer(), action = character(),
+                          value = numeric(), instnm = character(),
+                          stringsAsFactors = FALSE))
+      }
+      in_df <- df[df$action %in% c("Keep", "Maybe", "Proposed"),
+                   c("unitid", "action", "instnm")]
+      anchor_meta <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
+      anchor_row <- data.frame(
+        unitid = a_uid,
+        action = "Anchor",
+        instnm = if (nrow(anchor_meta)) anchor_meta$instnm[1] else "(anchor)",
+        stringsAsFactors = FALSE
+      )
+      all <- rbind(anchor_row, as.data.frame(in_df, stringsAsFactors = FALSE))
+      all$action <- as.character(all$action)
+      all$value <- .SCHOOLS_WIDE[[metric]][match(all$unitid,
+                                                  .SCHOOLS_WIDE$unitid)]
+      all
+    }
+
+    # Build one card.
+    .dashboard_card <- function(metric, anchor_val, rug_data,
+                                 universe_vals, display_name, fmt) {
+      cv  <- rug_data$value[rug_data$action != "Anchor" &
+                              is.finite(rug_data$value)]
+      n_c <- sum(rug_data$action != "Anchor")  # in-cohort minus anchor
+      n_r <- length(cv)
+
+      cohort_line <- if (n_r > 0) {
+        sprintf("Cohort: %s – %s   (median %s)",
+                .format_value(min(cv),           fmt),
+                .format_value(max(cv),           fmt),
+                .format_value(stats::median(cv), fmt))
+      } else "Cohort: no data"
+
+      strip <- .dashboard_strip_svg(universe_vals, anchor_val,
+                                     rug_data = rug_data)
+
+      tags$div(class = "dash-card",
+        `data-metric` = metric,
+        onclick = sprintf(
+          "Shiny.setInputValue('%s', {metric: '%s', t: Date.now()}, {priority: 'event'});",
+          ns("dash_card_click"), metric),
+        tags$div(class = "dash-card-title", display_name),
+        tags$div(class = "dash-card-anchor",
+          tags$span(class = "dash-card-anchor-label", "Anchor"),
+          tags$span(class = "dash-card-anchor-val",
+                     .format_value(anchor_val, fmt))
+        ),
+        strip,
+        tags$div(class = "dash-card-cohort", cohort_line),
+        tags$div(class = "dash-card-n",
+                  sprintf("%d of %d reporting", n_r, n_c))
+      )
+    }
+
+    output$cohort_dashboard <- renderUI({
+      df    <- cohort_state(); if (is.null(df)) return(NULL)
+      a_uid <- anchor_uid();   req(a_uid)
+      univ  <- dashboard_universe()
+
+      cards <- lapply(.DASHBOARD_METRICS, function(m) {
+        if (!m %in% names(.SCHOOLS_WIDE)) return(NULL)
+        meta <- .VARIABLES[match(m, .VARIABLES$metric), , drop = FALSE]
+        dn   <- if (nrow(meta) && !is.na(meta$display_name)) meta$display_name
+                else m
+        fmt  <- if (nrow(meta)) meta$format else NA
+
+        anchor_val    <- .SCHOOLS_WIDE[[m]][.SCHOOLS_WIDE$unitid == a_uid][1]
+        rug_data      <- .build_rug_data(m)
+        universe_vals <- univ[[m]]
+
+        .dashboard_card(m, anchor_val, rug_data, universe_vals,
+                         display_name = dn, fmt = fmt)
+      })
+
+      tagList(
+        tags$hr(class = "cohort-section-divider"),
+        h4("Cohort overview"),
+        p(class = "section-intro",
+          "At-a-glance view of how the in-cohort (Anchor + Keep + Maybe + ",
+          "Proposed) sits on 11 key metrics. The faint curve is the ",
+          "ranked universe distribution; each rug tick at the bottom is one ",
+          "in-cohort school colored by status; the tall purple line is the ",
+          "anchor. Click a card for the variable's description and a ",
+          "per-school value table."),
+        tags$div(class = "dash-grid", cards)
+      )
+    })
+
+    # ---- Dashboard card click → modal with description + rug + values ----
+    # The modal stays on-screen so the user doesn't lose the dashboard.
+    # Its footer has an "Open in inspector" button that jumps to the
+    # inspector (also updating the inspector's variable picker).
+    observeEvent(input$dash_card_click, {
+      payload <- input$dash_card_click
+      if (is.null(payload) || is.null(payload$metric)) return()
+      metric <- payload$metric
+      if (!metric %in% names(.SCHOOLS_WIDE)) return()
+
+      meta <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
+      dn   <- if (nrow(meta) && !is.na(meta$display_name)) meta$display_name
+              else metric
+      fmt  <- if (nrow(meta)) meta$format else NA
+
+      # Description: prefer notes, then coverage_note. The raw IPEDS
+      # formula is no longer a fallback — that detail lives on the
+      # Source chip, not in the description.
+      desc <- if (nrow(meta) && !is.na(meta$notes) && nzchar(meta$notes))
+                meta$notes
+              else if (nrow(meta) && !is.na(meta$coverage_note) &&
+                        nzchar(meta$coverage_note))
+                meta$coverage_note
+              else "No description recorded for this variable."
+
+      chips <- tagList()
+      if (nrow(meta)) {
+        src_label  <- .simplify_source(meta$source)
+        is_derived <- .is_computed_source(meta$source)
+
+        # Standard chips: Source, Category, Format, Years.
+        chip_specs <- list(
+          c("Source",   src_label),
+          c("Category", if (!is.na(meta$category)) meta$category else ""),
+          c("Format",   if (!is.na(meta$format))   meta$format   else ""),
+          c("Years",    .VAR_YEARS_LABEL[[metric]] %||% "")
+        )
+        chips <- tagList(
+          lapply(chip_specs, function(p) {
+            if (!nzchar(p[2])) return(NULL)
+            tags$span(class = "dash-modal-chip",
+                      tags$strong(p[1], ":"), " ", p[2])
+          }),
+          if (is_derived)
+            tags$span(class = "dash-modal-chip dash-modal-chip-computed",
+                      title = "This value is derived from one or more raw inputs.",
+                      "Computed")
+        )
+      }
+
+      a_uid    <- anchor_uid(); req(a_uid)
+      anchor_v <- .SCHOOLS_WIDE[[metric]][.SCHOOLS_WIDE$unitid == a_uid][1]
+      rug      <- .build_rug_data(metric)
+      univ     <- dashboard_universe()
+
+      # Larger strip in the modal: full container width up to 720px.
+      big_strip <- .dashboard_strip_svg(univ[[metric]], anchor_v,
+                                         rug_data = rug,
+                                         width = 720, height = 80)
+
+      # Universe percentile helper for the per-school table.
+      uv <- univ[[metric]]; uv <- uv[is.finite(uv)]
+      pct <- function(v) {
+        if (!is.finite(v) || !length(uv)) return(NA_real_)
+        100 * mean(uv < v)
+      }
+
+      tbl_rows <- rug
+      tbl_rows$state <- .SCHOOLS$stabbr[match(tbl_rows$unitid, .SCHOOLS$unitid)]
+      tbl_rows$value_fmt <- vapply(tbl_rows$value,
+                                    function(v) .format_value(v, fmt),
+                                    character(1))
+      tbl_rows$pct <- vapply(tbl_rows$value, pct, numeric(1))
+      tbl_rows$pct_fmt <- ifelse(is.na(tbl_rows$pct), "—",
+                                  sprintf("%.0f", tbl_rows$pct))
+
+      # Order: Anchor first, then by descending raw value.
+      anchor_ix    <- which(tbl_rows$action == "Anchor")
+      other_ix     <- setdiff(seq_len(nrow(tbl_rows)), anchor_ix)
+      other_order  <- other_ix[order(-tbl_rows$value[other_ix])]
+      tbl_rows     <- tbl_rows[c(anchor_ix, other_order), , drop = FALSE]
+
+      table_tag <- tags$table(class = "dash-modal-table",
+        tags$thead(tags$tr(
+          tags$th("Status"),
+          tags$th("School"),
+          tags$th(class = "dt-center", "State"),
+          tags$th(class = "dt-right",  "Value"),
+          tags$th(class = "dt-right",  "Pct.")
+        )),
+        tags$tbody(lapply(seq_len(nrow(tbl_rows)), function(i) {
+          a <- as.character(tbl_rows$action[i])
+          slug <- tolower(gsub(" ", "-", a))
+          tags$tr(
+            tags$td(tags$span(class = sprintf("cohort-action-badge cohort-badge-%s",
+                                                slug), a)),
+            tags$td(tbl_rows$instnm[i]),
+            tags$td(class = "dt-center", tbl_rows$state[i]),
+            tags$td(class = "dt-right", tbl_rows$value_fmt[i]),
+            tags$td(class = "dt-right", tbl_rows$pct_fmt[i])
+          )
+        }))
+      )
+
+      showModal(modalDialog(
+        title = tagList(
+          tags$div(class = "dash-modal-title", dn),
+          tags$div(class = "dash-modal-chips", chips)
+        ),
+        size = "l",
+        easyClose = TRUE,
+        fade = TRUE,
+        footer = tagList(
+          actionButton(ns("dash_modal_open_inspector"),
+                       "Open in inspector",
+                       icon = icon("chart-area"),
+                       class = "btn btn-outline-primary",
+                       `data-metric` = metric),
+          modalButton("Close")
+        ),
+        div(class = "dash-modal-body",
+          tags$p(class = "dash-modal-desc", desc),
+          tags$div(class = "dash-modal-strip-wrap", big_strip),
+          tags$div(class = "dash-modal-legend",
+            lapply(names(.DASH_ACTION_COLORS), function(a) {
+              tags$span(class = "dash-modal-legend-item",
+                tags$span(class = "dash-modal-legend-swatch",
+                          style = sprintf("background: %s;",
+                                           unname(.DASH_ACTION_COLORS[a]))),
+                a)
+            })
+          ),
+          tags$h6("Per-school values"),
+          table_tag
+        )
+      ))
+
+      # Stash the metric for the inspector hand-off button below.
+      session$userData$dash_modal_metric <- metric
+    })
+
+    # "Open in inspector" button inside the modal: pre-select the metric
+    # and scroll the inspector into view, then close the modal.
+    observeEvent(input$dash_modal_open_inspector, {
+      m <- session$userData$dash_modal_metric
+      if (is.null(m)) return()
+      updateSelectizeInput(session, "inspect_metric", selected = m)
+      removeModal()
+      shinyjs::runjs(sprintf(
+        "var el = document.getElementById('%s'); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});",
+        ns("variable_inspector")))
+    })
 
     # -------------------------------------------------------------------------
     # Variable inspector — pick one variable, see per-school values and a
@@ -834,8 +1305,8 @@ cohortServer <- function(id) {
           text = sprintf("<b>Anchor: %s (%s)</b>",
                           anchor_name, .format_value(a_val, fmt)),
           showarrow = FALSE,
-          bgcolor = "#602D89", bordercolor = "#602D89",
-          font = list(color = "#FFFFFF", size = 11),
+          bgcolor = "#251230", bordercolor = "#251230",
+          font = list(color = "#FFFFFF", size = 12),
           xshift = 4, yshift = 2
         )))
       }
@@ -853,6 +1324,12 @@ cohortServer <- function(id) {
           annotations = annots,
           plot_bgcolor  = "#FFFFFF",
           paper_bgcolor = "#FFFFFF",
+          # Force hover tooltips to a dark slate background with white text
+          # so contrast doesn't depend on the trace color (the per-action
+          # rug markers default to using the marker color as the tooltip
+          # bg, which leaves purple-on-purple unreadable).
+          hoverlabel = list(bgcolor = "#251230", bordercolor = "#251230",
+                             font = list(color = "#FFFFFF", size = 12)),
           margin = list(t = 40, r = 30, b = 80, l = 70)
         ) %>%
         config(
@@ -1126,42 +1603,56 @@ cohortServer <- function(id) {
                           levels = c("original", "addition", "anchor"))
         ) else NULL
 
-      # Partition by action: the main cohort list includes Keep/Maybe/Remove
-      # (originals) plus Proposed (additions committed). The Possible adds
-      # section holds uncommitted additions.
-      in_cohort  <- df[df$action %in% c("Keep", "Maybe", "Remove",
-                                         "Proposed"), ]
-      brainstorm <- df[df$action == "Possible", ]
-      # Sort: originals first (Keep, Maybe, Remove), then Proposed.
-      action_order <- c("Keep", "Maybe", "Remove", "Proposed")
-      in_cohort   <- in_cohort[order(match(as.character(in_cohort$action),
-                                            action_order),
+      # Partition by action.
+      #   IN  side (left column):  Anchor + Keep + Maybe + Proposed
+      #   OUT side (right column): Remove + Possible
+      # Within each side, sort by action (Keep/Maybe/Proposed for In;
+      # Remove/Possible for Out), then alphabetically by school name.
+      in_cohort  <- df[df$action %in% c("Keep", "Maybe", "Proposed"), ]
+      out_cohort <- df[df$action %in% c("Remove", "Possible"), ]
+
+      in_order  <- c("Keep", "Maybe", "Proposed")
+      out_order <- c("Remove", "Possible")
+      in_cohort  <- in_cohort[order(match(as.character(in_cohort$action),
+                                            in_order),
                                       in_cohort$instnm), ]
+      out_cohort <- out_cohort[order(match(as.character(out_cohort$action),
+                                             out_order),
+                                       out_cohort$instnm), ]
+
+      n_in  <- nrow(in_cohort) + 1L   # +1 for the anchor row
+      n_out <- nrow(out_cohort)
 
       tagList(
-        tags$section(class = "cohort-section",
-          tags$h5(sprintf("Current cohort (%d schools + anchor)",
-                          nrow(in_cohort))),
-          tags$p(class = "section-intro",
-            tags$small(
-              "Each row's badge shows its current status. Originals can ",
-              "be ", tags$strong("Keep"), " / ", tags$strong("Maybe"),
-              " / ", tags$strong("Remove"),
-              ". Additions committed via the ", tags$strong("Proposed"),
-              " badge also appear here.")),
-          .cohort_table(in_cohort, wide_df, anchor_row_df = anchor_row_df)
-        ),
-
-        if (nrow(brainstorm))
-          tags$section(class = "cohort-section",
-            tags$h5(sprintf("Possible adds (%d)", nrow(brainstorm))),
+        tags$div(class = "cohort-two-col",
+          tags$section(class = "cohort-section cohort-section-in",
+            tags$h5(sprintf("In Cohort (%d)", n_in)),
             tags$p(class = "section-intro",
-                   tags$small(
-                     "These schools aren't in the cohort yet. Switch the ",
-                     "dropdown to ", tags$strong("Proposed"),
-                     " to commit one and move it into the cohort above.")),
-            .cohort_table(brainstorm, wide_df)
-          ) else NULL
+              tags$small(
+                "Anchor + ", tags$strong("Keep"), " / ",
+                tags$strong("Maybe"), " / ", tags$strong("Proposed"), ". ",
+                "Click ", tags$span(class = "cohort-inline-arrow", "→"),
+                " on any row to move it Out.")),
+            .cohort_table(in_cohort, wide_df, side = "in",
+                          anchor_row_df = anchor_row_df)
+          ),
+
+          tags$section(class = "cohort-section cohort-section-out",
+            tags$h5(sprintf("Out / Considering (%d)", n_out)),
+            tags$p(class = "section-intro",
+              tags$small(
+                tags$strong("Remove"), " (originals flagged for replacement) ",
+                "and ", tags$strong("Possible"),
+                " (brainstormed additions not yet committed). ",
+                "Click ", tags$span(class = "cohort-inline-arrow", "←"),
+                " to move a row back In.")),
+            if (n_out > 0)
+              .cohort_table(out_cohort, wide_df, side = "out")
+            else
+              tags$div(class = "cohort-empty-col",
+                tags$em("Nothing marked for removal or being considered."))
+          )
+        )
       )
     })
 

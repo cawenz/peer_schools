@@ -182,14 +182,93 @@ a:hover {
   color: #FFFFFF;
 }
 
-/* ---------- Sidebar (bslib) ---------- */
+/* ---------- Sidebar (bslib) ----------
+ *
+ * Strategy: pin the whole layout (sidebar + main) to viewport height,
+ * then let each pane scroll independently. The previous attempt used
+ * `position: sticky` on the sidebar but bslib's flex container doesn't
+ * give sticky a workable parent, so the sidebar never knew when to
+ * scroll. This fixed-height + per-pane overflow approach is what bslib's
+ * `fillable_page` would do automatically, but we don't want to flip the
+ * whole app over to a fillable model just for the sidebar.
+ */
+.bslib-sidebar-layout {
+  height: calc(100vh - 56px);
+  /* 56px ~= navbar height */
+  overflow: hidden;
+}
+
 .bslib-sidebar-layout > .sidebar {
   background-color: #F4EDEC;
   border-right: 1px solid #AC9E94;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Visible scrollbar so users have something to grab. */
+  scrollbar-width: auto;
+  scrollbar-color: #AC9E94 #F4EDEC;
+}
+
+.bslib-sidebar-layout > .sidebar::-webkit-scrollbar {
+  width: 14px;
+}
+
+.bslib-sidebar-layout > .sidebar::-webkit-scrollbar-track {
+  background: #F4EDEC;
+  border-left: 1px solid #d8cfca;
+}
+
+.bslib-sidebar-layout > .sidebar::-webkit-scrollbar-thumb {
+  background: #AC9E94;
+  border-radius: 6px;
+  border: 2px solid #F4EDEC;
+  min-height: 40px;
+}
+
+.bslib-sidebar-layout > .sidebar::-webkit-scrollbar-thumb:hover {
+  background: #8d8079;
 }
 
 .bslib-sidebar-layout > .sidebar .sidebar-content {
   padding: 1.25rem 1rem;
+}
+
+/* THE ACTUAL FIX for the "scrollbar drags the sidebar" problem.
+ *
+ * bslib 0.7+ adds a `.bslib-sidebar-resize-handle` element that sits
+ * over the sidebar's right edge with `cursor: ew-resize`, and a `::before`
+ * pseudo with an even larger invisible hit area (~26px wide total) that
+ * sits at z-index above everything else. It steals every click in the
+ * scrollbar zone, so the user can never grab the scrollbar to scroll.
+ *
+ * We don't actually want drag-to-resize. Each tab's sidebar is a fixed
+ * 320-340px and the content is laid out for that width. Killing the
+ * handle entirely is the right call. */
+.bslib-sidebar-layout > .bslib-sidebar-resize-handle,
+.bslib-sidebar-layout > .bslib-sidebar-resize-handle::before {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Main content pane scrolls inside its own container too. */
+.bslib-sidebar-layout > .main {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Close the gap between the purple navbar and the content area. The
+ * page_navbar's tab-content adds default top padding; we already give
+ * each tab its own h4 with margin, so this padding is redundant. */
+.navbar + .container-fluid,
+.navbar + .container-fluid > .tab-content,
+.navbar + .container-fluid > .tab-content > .tab-pane {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.bslib-page-navbar > .container-fluid {
+  padding-top: 0;
 }
 
 /* Section dividers inside the sidebar */
@@ -999,6 +1078,9 @@ a:hover {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.9rem;
+  /* Action column needs to fit: status (dropdown OR badge) + arrow + ×.
+   * On the Out side there is no dropdown so the cell is a bit narrower;
+   * we size for the wider In-side case so both tables align. */
   /* Per-action row tinting */
 }
 
@@ -1014,8 +1096,8 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact .cohort-action-th {
-  width: 150px;
-  min-width: 150px;
+  width: 175px;
+  min-width: 175px;
 }
 
 .cohort-table.cohort-table-compact .cohort-name-th {
@@ -1023,12 +1105,12 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact .cohort-state-th {
-  width: 70px;
+  width: 50px;
   text-align: center;
 }
 
 .cohort-table.cohort-table-compact .cohort-ctx-th {
-  width: 22%;
+  width: 35%;
 }
 
 .cohort-table.cohort-table-compact tbody tr {
@@ -1046,12 +1128,12 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact .cohort-action-cell {
-  width: 150px;
+  width: 175px;
 }
 
 .cohort-table.cohort-table-compact .cohort-state {
   text-align: center;
-  width: 70px;
+  width: 50px;
   color: #251230;
 }
 
@@ -1237,6 +1319,228 @@ a:hover {
 /* Inspector body now stacks plot → stats → table vertically, matching the
  * Side-by-Side modal. The stats list reuses the shared .distribution-stats
  * class so the look matches the modal exactly. */
+/* ---------- Cohort overview dashboard ---------- */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.85rem;
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.dash-card {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  cursor: pointer;
+  transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
+}
+
+.dash-card:hover {
+  border-color: #602D89;
+  box-shadow: 0 2px 6px rgba(96, 45, 137, 0.15);
+  transform: translateY(-1px);
+}
+
+.dash-card:focus-within {
+  outline: 2px solid #602D89;
+  outline-offset: 2px;
+}
+
+.dash-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #251230;
+  line-height: 1.25;
+  margin-bottom: 0.4rem;
+  min-height: 2.5em;
+  /* keep card heights even across titles */
+}
+
+.dash-card-anchor {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+.dash-card-anchor-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #602D89;
+}
+
+.dash-card-anchor-val {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #251230;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-strip {
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.dash-strip-empty {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FAF6F5;
+  border: 1px dashed #d8cfca;
+  border-radius: 4px;
+  color: #6e6360;
+  font-size: 0.78rem;
+  font-style: italic;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+/* ---------- Dashboard card modal ---------- */
+.dash-modal-title {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #251230;
+  line-height: 1.2;
+}
+
+.dash-modal-chips {
+  margin-top: 0.4rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.dash-modal-chip {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #F4EDEC;
+  color: #251230;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.dash-modal-chip strong {
+  color: #602D89;
+  font-weight: 700;
+}
+
+/* Special-case chip for derived / computed variables: no key-value form,
+ * just a flag. Tinted purple to call attention to it. */
+.dash-modal-chip-computed {
+  background: #602D89;
+  color: #FFFFFF;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dash-modal-body {
+  padding: 0.5rem 0;
+}
+
+.dash-modal-desc {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #251230;
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.85rem;
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  border-radius: 4px;
+}
+
+.dash-modal-strip-wrap {
+  margin: 0.5rem 0 0.4rem 0;
+}
+
+.dash-modal-strip-wrap .dash-strip {
+  height: 80px;
+}
+
+.dash-modal-strip-wrap .dash-strip-empty {
+  height: 80px;
+}
+
+.dash-modal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  font-size: 0.78rem;
+  color: #251230;
+  margin-bottom: 1rem;
+}
+
+.dash-modal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.dash-modal-legend-swatch {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.dash-modal-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.88rem;
+}
+
+.dash-modal-table thead th {
+  text-align: left;
+  color: #251230;
+  font-weight: 600;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 2px solid #AC9E94;
+  background: #FAF6F5;
+  white-space: nowrap;
+}
+
+.dash-modal-table tbody tr:hover td {
+  background-color: rgba(96, 45, 137, 0.04);
+}
+
+.dash-modal-table td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid #F4EDEC;
+  vertical-align: middle;
+  color: #251230;
+}
+
+.dash-modal-table .dt-center {
+  text-align: center;
+}
+
+.dash-modal-table .dt-right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-card-cohort {
+  font-size: 0.8rem;
+  color: #251230;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-card-n {
+  font-size: 0.72rem;
+  color: #6e6360;
+  margin-top: 0.15rem;
+}
+
 .cohort-action-widget {
   display: flex;
   align-items: center;
@@ -1256,6 +1560,84 @@ a:hover {
 }
 
 .cohort-action-select:focus {
+  outline: none;
+  border-color: #602D89;
+  box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
+}
+
+/* Mini variant used in the two-column table — only needs to hold
+ * "Keep" / "Maybe", so it can be much narrower than the original. */
+.cohort-action-select-mini {
+  min-width: 70px;
+  max-width: 90px;
+  flex: 0 0 auto;
+}
+
+/* Two-column layout: In Cohort | Out / Considering. Stacks on narrower
+ * viewports so individual rows stay readable. */
+.cohort-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .cohort-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cohort-section-in h5 {
+  border-bottom-color: #2e7d32;
+  color: #2e7d32;
+}
+
+.cohort-section-out h5 {
+  border-bottom-color: #b53737;
+  color: #b53737;
+}
+
+.cohort-empty-col {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  color: #6e6360;
+  background: #FAF6F5;
+  border: 1px dashed #d8cfca;
+  border-radius: 6px;
+}
+
+.cohort-inline-arrow {
+  display: inline-block;
+  padding: 0 4px;
+  font-weight: 700;
+  color: #602D89;
+}
+
+/* Arrow button that moves a row across the In/Out partition. Sized
+ * to match the × delete button so the row controls align. */
+.cohort-move-btn {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: #602D89;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+
+.cohort-move-btn:hover {
+  background: rgba(96, 45, 137, 0.12);
+  border-color: #c9b3da;
+}
+
+.cohort-move-btn:focus {
   outline: none;
   border-color: #602D89;
   box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
