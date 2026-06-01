@@ -98,6 +98,13 @@ THEME_VARS <- list(
     # Religious affiliation match with anchor (binary 0/1). Added via
     # the candidates-side join in compute_peers; not in any facts CSV.
     "same_religious_tradition"
+  ),
+  # Athletics theme (EADA-derived). Default weight is 0 in compute_peers —
+  # existing peer searches behave identically until a user dials it up.
+  # Three orthogonal signals: intensity (athletes as % of UG), breadth
+  # (number of varsity sports), athletic culture (multi-sport ratio).
+  athletics = c(
+    "pct_athletes_overall", "total_varsity_sports", "multi_sport_ratio"
   )
 )
 
@@ -291,6 +298,11 @@ compute_peers <- function(
   # -- 2. Theme weights with defaults --
   all_themes <- names(THEME_VARS)
   theme_w <- setNames(rep(1.0, length(all_themes)), all_themes)
+  # Athletics is opt-in: starts at 0 weight so every existing peer search
+  # (which omits theme_weights or sets only academic themes) behaves
+  # identically to the pre-EADA pipeline. Users opt in by passing
+  # theme_weights = list(athletics = 1.0) or via the Peer Search slider.
+  if ("athletics" %in% all_themes) theme_w["athletics"] <- 0
   for (t in names(theme_weights)) {
     if (!t %in% all_themes) {
       warning(sprintf("Unknown theme '%s' ignored", t))

@@ -70,7 +70,25 @@ stopifnot(exists("compute_peers", mode = "function"),
   mutate(unitid = as.integer(unitid),
          in_ranked_universe = as.logical(in_ranked_universe))
 
-.MODULE_KEYS <- c("aid", "adm", "enr", "out", "fin")
+# Join EADA-derived categorical extras (athletics body / division /
+# conference / has_football / classification) if the file is present.
+# Produced by R/athletics_module_pipeline.R. Graceful fallback when the
+# file is missing — the app still works without athletics, the
+# athletics-* columns just don't appear in .SCHOOLS.
+.schools_ath_path <- file.path(.OUTPUT_DIR, "schools_athletics.csv")
+if (file.exists(.schools_ath_path)) {
+  .SCHOOLS_ATH <- read_csv(.schools_ath_path, show_col_types = FALSE) %>%
+    mutate(unitid = as.integer(unitid))
+  .SCHOOLS <- left_join(.SCHOOLS, .SCHOOLS_ATH, by = "unitid")
+  message(sprintf(
+    "[shiny global] joined schools_athletics: %d schools have athletics_body, %d have conference",
+    sum(!is.na(.SCHOOLS$athletics_body)),
+    sum(!is.na(.SCHOOLS$athletics_conference))))
+} else {
+  message("[shiny global] schools_athletics.csv not found; athletics columns absent.")
+}
+
+.MODULE_KEYS <- c("aid", "adm", "enr", "out", "fin", "ath")
 
 .load_module_pair <- function(mk) {
   facts <- read_csv(file.path(.OUTPUT_DIR, paste0(mk, "_facts.csv")),
