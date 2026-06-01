@@ -200,9 +200,13 @@ stratifiedSidebarUI <- function(id) {
                          class = "btn btn-sm btn-outline-secondary")
         ),
         lapply(.THEMES, function(th) {
+          # Athletics is opt-in (default 0); academic themes default to 1.
+          dv <- if (exists(".theme_default_weight", envir = globalenv()))
+                  .theme_default_weight(th)
+                else if (th == "athletics") 0 else 1.0
           sliderInput(ns(paste0("weight_", th)),
                       label = stringr::str_to_title(th),
-                      min = 0, max = 3, value = 1.0, step = 0.25,
+                      min = 0, max = 3, value = dv, step = 0.25,
                       ticks = FALSE)
         })
       ),
@@ -254,16 +258,20 @@ stratifiedServer <- function(id) {
 
     # ---- Theme weight presets ----
     .THEME_PRESETS_LOCAL <- list(
-      balanced = setNames(as.list(rep(1.0, length(.THEMES))), .THEMES),
+      # Balanced: every academic theme at 1.0, athletics at 0 (opt-in).
+      balanced = setNames(
+                   lapply(.THEMES, function(th)
+                            if (th == "athletics") 0 else 1.0),
+                   .THEMES),
       outcomes_heavy = list(scale = 1, selectivity = 1, resources = 1,
                             finance = 1, outcomes = 2.5, aid = 1,
-                            composition = 1),
+                            composition = 1, athletics = 0),
       resources_heavy = list(scale = 1, selectivity = 1, resources = 2,
                              finance = 1.5, outcomes = 1, aid = 1,
-                             composition = 1),
+                             composition = 1, athletics = 0),
       mission_similar = list(scale = 1, selectivity = 1, resources = 1,
                              finance = 1, outcomes = 1, aid = 1,
-                             composition = 2)
+                             composition = 2, athletics = 0)
     )
     apply_preset <- function(p) {
       v <- .THEME_PRESETS_LOCAL[[p]]

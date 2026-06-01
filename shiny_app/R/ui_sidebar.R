@@ -19,8 +19,13 @@
 # -----------------------------------------------------------------------------
 if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
   .THEMES <- c("scale", "selectivity", "resources", "finance",
-               "outcomes", "aid", "composition")
+               "outcomes", "aid", "composition", "athletics")
 }
+
+# Themes that default to 0 weight (opt-in). Sliders for these start at 0
+# and presets explicitly hold them at 0 unless overridden.
+.OPT_IN_THEMES <- c("athletics")
+.theme_default_weight <- function(th) if (th %in% .OPT_IN_THEMES) 0 else 1.0
 
 # -----------------------------------------------------------------------------
 # Geographic region groupings. Used to let users pick "Region: New England"
@@ -54,16 +59,20 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
 # Sliders default to 1.0; presets only override the listed themes.
 # -----------------------------------------------------------------------------
 .THEME_PRESETS <- list(
-  balanced       = setNames(as.list(rep(1.0, length(.THEMES))), .THEMES),
+  # Balanced: every academic theme at 1.0. Athletics stays at 0 by default
+  # to preserve the locked methodology — flip the slider explicitly to opt in.
+  balanced       = setNames(
+                     lapply(.THEMES, .theme_default_weight),
+                     .THEMES),
   outcomes_heavy = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
                         finance = 1.0, outcomes = 2.5, aid = 1.0,
-                        composition = 1.0),
+                        composition = 1.0, athletics = 0),
   resources_heavy = list(scale = 1.0, selectivity = 1.0, resources = 2.0,
                          finance = 1.5, outcomes = 1.0, aid = 1.0,
-                         composition = 1.0),
+                         composition = 1.0, athletics = 0),
   mission_similar = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
                          finance = 1.0, outcomes = 1.0, aid = 1.0,
-                         composition = 2.0)
+                         composition = 2.0, athletics = 0)
 )
 
 # -----------------------------------------------------------------------------
@@ -134,11 +143,14 @@ peerSearchSidebarUI <- function(id) {
                    class = "btn btn-sm btn-outline-secondary")
     ),
 
-    # 7 sliders, one per theme
+    # One slider per theme. Athletics defaults to 0 (opt-in) so existing
+    # peer searches behave identically until the user dials it up.
     lapply(.THEMES, function(th) {
       sliderInput(ns(paste0("weight_", th)),
                   label = stringr::str_to_title(th),
-                  min = 0, max = 3, value = 1.0, step = 0.25, ticks = FALSE)
+                  min = 0, max = 3,
+                  value = .theme_default_weight(th),
+                  step = 0.25, ticks = FALSE)
     }),
 
     tags$hr(),

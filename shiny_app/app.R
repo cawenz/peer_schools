@@ -63,6 +63,15 @@ ui <- page_navbar(
   ),
 
   nav_panel(
+    "Aspirant Peers",
+    # No sidebar — the essential controls (anchor + aspirational metrics +
+    # Run) live in a compact bar at the top of the page, and the
+    # secondary controls (pool filters, theme weights, output sizes) live
+    # behind a collapsed Advanced accordion.
+    aspirantUI("aspirant")
+  ),
+
+  nav_panel(
     "Cohort Builder",
     layout_sidebar(
       sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
@@ -94,6 +103,9 @@ server <- function(input, output, session) {
   compareServer("compare",
                 peer_selection = peer_table_state$selected_peer,
                 peer_result    = peer_table_state$result)
+
+  # Aspirant Peers page — wholly self-contained, no upstream state.
+  aspirantServer("aspirant")
 
   # Stratified Peers page (fully self-contained; no upstream state)
   stratifiedServer("stratified")

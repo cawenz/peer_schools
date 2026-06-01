@@ -8,6 +8,7 @@
 #         output/enr_facts.csv, enr_variables.csv
 #         output/out_facts.csv, out_variables.csv
 #         output/fin_facts.csv, fin_variables.csv
+#         output/ath_facts.csv, ath_variables.csv  (EADA athletics)
 #
 # Provides:
 #   compute_peers()  - core function for computing peer similarity
@@ -147,6 +148,61 @@ LOG_TRANSFORM_VARS <- c(
   "median_family_income"
 )
 
+# =============================================================================
+# Aspirant peer search — preferred-direction lookup
+# =============================================================================
+# Metrics that compute_aspirant_peers() understands as aspirational, plus
+# the direction the user wants to move on each. "higher" = candidate must
+# be ABOVE the anchor to count as aspirational; "lower" = candidate must
+# be BELOW the anchor (e.g., more selective acceptance rate).
+#
+# Edit this list to add, remove, or re-direction metrics. Anything not in
+# this dict cannot be selected as an aspirational metric in the app's UI.
+ASPIRANT_DIRECTIONS <- list(
+  # Selectivity
+  acceptance_rate     = "lower",     # more selective
+  yield_rate          = "higher",    # more sought-after
+  sat_mid50           = "higher",    # stronger entering class
+  # Outcomes
+  grad_rate_6yr        = "higher",
+  grad_rate_4yr        = "higher",
+  retention_rate       = "higher",
+  median_earnings_10yr = "higher",
+  loan_repayment_rate  = "higher",
+  # Resources
+  student_faculty_ratio = "lower",   # more intensive
+  avg_ft_faculty_salary = "higher",
+  instruction_per_fte   = "higher",
+  # Finance
+  endowment_per_fte     = "higher",
+  herd_avg              = "higher",
+  # Aid
+  pct_pell             = "higher",   # access (some IR shops aspire higher,
+                                     # some don't; toggle by removing
+                                     # this entry if it doesn't apply)
+  pct_need_met         = "higher"
+)
+
+# Display labels paired with the preferred-direction phrasing used by the
+# UI's "Aspire higher on" multi-select. Keys must match ASPIRANT_DIRECTIONS.
+ASPIRANT_LABELS <- list(
+  acceptance_rate       = "Acceptance rate (more selective)",
+  yield_rate            = "Yield rate (higher)",
+  sat_mid50             = "SAT mid-50% composite (higher)",
+  grad_rate_6yr         = "6-year graduation rate (higher)",
+  grad_rate_4yr         = "4-year graduation rate (higher)",
+  retention_rate        = "Retention rate (higher)",
+  median_earnings_10yr  = "Median earnings, 10-year (higher)",
+  loan_repayment_rate   = "Loan repayment rate (higher)",
+  student_faculty_ratio = "Student-faculty ratio (lower)",
+  avg_ft_faculty_salary = "Average FT faculty salary (higher)",
+  instruction_per_fte   = "Instruction $ per FTE (higher)",
+  endowment_per_fte     = "Endowment per FTE (higher)",
+  herd_avg              = "HERD R&D expenditures (higher)",
+  pct_pell              = "% Pell (higher)",
+  pct_need_met          = "% need met (higher)"
+)
+
 # Look up the theme for a variable name (NA if not assigned to any)
 .var_theme <- function(var_name) {
   for (theme in names(THEME_VARS)) {
@@ -196,7 +252,7 @@ LOG_TRANSFORM_VARS <- c(
 
 # Load all 5 modules, filter to clustering vars + detail race, aggregate, pivot
 .load_wide_facts <- function(output_dir = "output") {
-  module_keys <- c("aid", "adm", "enr", "out", "fin")
+  module_keys <- c("aid", "adm", "enr", "out", "fin", "ath")
   all_facts <- list(); all_vars <- list()
   
   for (mk in module_keys) {
@@ -460,15 +516,27 @@ compute_peers <- function(
   # -- 11. Weighted distance from anchor (Euclidean or Mahalanobis) --
   anchor_z <- as.numeric(data_mat[as.character(anchor_unitid), ])
   
+  # Active dimensions: variables with strictly-positive weight. Zero-weighted
+  # dimensions must NOT contribute to the distance — including them folds in
+  # 0 (positive*0=0) contributions that collapse a candidate's distance to 0
+  # whenever they have NA on the active dimensions, producing the
+  # "alphabetical with distance=0" bug when only one theme is weighted.
+  active_idx <- which(weights > 0)
+  if (!length(active_idx))
+    stop("All theme weights are 0 - no dimensions to compute distance on.")
+
   if (distance_metric == "euclidean") {
     # Weighted Euclidean: dim-wise weighting, then sqrt of sum of squares.
-    # Variables with NA in candidate are dropped from the comparison pairwise.
+    # Candidates with NA on ALL active dimensions get distance = NA and sort
+    # to the bottom of the ranking, rather than ranking first with 0.
+    anchor_active <- anchor_z[active_idx]
+    w_active      <- weights[active_idx]
     distances <- sapply(seq_len(nrow(data_mat)), function(i) {
       cand_z <- as.numeric(data_mat[i, ])
-      sq_diff <- (cand_z - anchor_z)^2 * weights
-      sq_diff <- sq_diff[!is.na(sq_diff)]
-      if (!length(sq_diff)) return(NA_real_)
-      sqrt(sum(sq_diff))
+      diffs  <- (cand_z[active_idx] - anchor_active)^2 * w_active
+      diffs  <- diffs[!is.na(diffs)]
+      if (!length(diffs)) return(NA_real_)
+      sqrt(sum(diffs))
     })
     
   } else {
@@ -490,12 +558,14 @@ compute_peers <- function(
     if (is.null(Sigma_inv)) {
       warning("Mahalanobis covariance is singular; falling back to weighted Euclidean.")
       distance_metric <- "euclidean (Mahalanobis fallback)"
+      anchor_active <- anchor_z[active_idx]
+      w_active      <- weights[active_idx]
       distances <- sapply(seq_len(nrow(data_mat)), function(i) {
         cand_z <- as.numeric(data_mat[i, ])
-        sq_diff <- (cand_z - anchor_z)^2 * weights
-        sq_diff <- sq_diff[!is.na(sq_diff)]
-        if (!length(sq_diff)) return(NA_real_)
-        sqrt(sum(sq_diff))
+        diffs  <- (cand_z[active_idx] - anchor_active)^2 * w_active
+        diffs  <- diffs[!is.na(diffs)]
+        if (!length(diffs)) return(NA_real_)
+        sqrt(sum(diffs))
       })
     } else {
       anchor_w <- Xw[as.character(anchor_unitid), ]
@@ -588,6 +658,159 @@ print_peers <- function(res) {
   cat("\nTop peers:\n")
   print(res$peers, n = nrow(res$peers))
   invisible(res)
+}
+
+# =============================================================================
+# Aspirant peer search — strict + near-miss
+# =============================================================================
+#
+# Wrap compute_peers() and apply a directional filter on user-chosen
+# aspirational metrics. "Strict" aspirants are candidates that beat the
+# anchor on every chosen metric (in the preferred direction). "Near-miss"
+# aspirants beat the anchor on all but one chosen metric.
+#
+# @param anchor_unitid Same as compute_peers().
+# @param candidate_pool Same.
+# @param theme_weights Same — typically the user has zeroed out the themes
+#   their aspirational metrics live in so that distance is computed over
+#   the CONTEXT themes only (size, sector, region etc.).
+# @param k Final number of strict aspirants to return.
+# @param aspirant_metrics Character vector of metric names. Each must be a
+#   key in ASPIRANT_DIRECTIONS or the function errors.
+# @param near_miss_k Number of near-miss candidates to keep (default 10).
+# @param ... Forwarded to compute_peers (distance_metric, coverage_threshold,
+#   etc.).
+#
+# @return A list with:
+#   strict_peers     tibble of K aspirant rows (compute_peers' peer schema
+#                    plus per-aspirational-metric anchor / candidate / gap)
+#   near_miss_peers  tibble (up to near_miss_k rows) of candidates that
+#                    failed on exactly one aspirational metric, plus a
+#                    `missed_metric` column naming which one
+#   aspirant_metrics Named list metric -> "higher" | "lower"
+#   anchor_values    Named numeric, the anchor's value on each metric
+#   meta             Pass-through from compute_peers()
+compute_aspirant_peers <- function(
+    anchor_unitid    = .DEFAULT_ANCHOR_UNITID %||% 166124L,
+    candidate_pool   = list(in_ranked_universe = TRUE),
+    theme_weights    = list(),
+    k                = 20L,
+    aspirant_metrics = character(0),
+    near_miss_k      = 10L,
+    output_dir       = "output",
+    ...
+) {
+  if (!length(aspirant_metrics))
+    stop("aspirant_metrics is empty. Pick at least one metric to aspire on.")
+
+  bad <- setdiff(aspirant_metrics, names(ASPIRANT_DIRECTIONS))
+  if (length(bad))
+    stop("Unknown aspirant metric(s): ", paste(bad, collapse = ", "),
+         ". Add to ASPIRANT_DIRECTIONS in R/peer_pipeline.R first.")
+
+  # We need enough room for the directional filter to leave a useful
+  # ranking. Pull 4x the requested K (capped at 200) from compute_peers,
+  # then filter, then truncate. If the user wants K=20 strict aspirants
+  # the underlying compute_peers will return 80 raw candidates.
+  raw_k <- min(200L, max(k * 4L, 50L))
+
+  res <- compute_peers(
+    anchor_unitid   = anchor_unitid,
+    candidate_pool  = candidate_pool,
+    theme_weights   = theme_weights,
+    k               = raw_k,
+    output_dir      = output_dir,
+    ...
+  )
+
+  # Pull the wide pool so we can read each candidate's value on each
+  # aspirational metric. compute_peers exposes the pool through
+  # pool_distances and pool_unitids; we re-read the wide matrix instead
+  # since we need the raw values, not z-scored.
+  loaded <- .load_wide_facts(output_dir)
+  schools <- .load_schools(file.path(output_dir, "schools.csv"))
+  wide_full <- schools %>%
+    select(unitid, instnm, stabbr) %>%
+    left_join(loaded$wide, by = "unitid")
+
+  anchor_row <- wide_full %>% filter(unitid == anchor_unitid)
+  if (!nrow(anchor_row))
+    stop(sprintf("Anchor unitid %d missing from wide matrix.", anchor_unitid))
+
+  anchor_values <- vapply(aspirant_metrics, function(m) {
+    if (!m %in% names(anchor_row)) return(NA_real_)
+    as.numeric(anchor_row[[m]][1])
+  }, numeric(1))
+
+  if (any(is.na(anchor_values))) {
+    miss <- aspirant_metrics[is.na(anchor_values)]
+    stop("Anchor has no value for aspirational metric(s): ",
+         paste(miss, collapse = ", "),
+         ". Pick different metrics or another anchor.")
+  }
+
+  # Per-row directional check: TRUE if candidate beats anchor on metric m.
+  better_than_anchor <- function(cand_val, anchor_val, direction) {
+    if (!is.finite(cand_val) || !is.finite(anchor_val)) return(NA)
+    if (direction == "higher") cand_val > anchor_val
+    else if (direction == "lower") cand_val < anchor_val
+    else NA
+  }
+
+  # Attach aspirational-metric values + per-metric "better" flags to the
+  # peer table.
+  augmented <- res$peers %>%
+    left_join(wide_full %>%
+                select(unitid, all_of(aspirant_metrics)),
+              by = "unitid")
+
+  # Build a per-row "beats" matrix.
+  beats <- vapply(aspirant_metrics, function(m) {
+    dir <- ASPIRANT_DIRECTIONS[[m]]
+    vapply(augmented[[m]], function(v) {
+      better_than_anchor(v, anchor_values[[m]], dir)
+    }, logical(1))
+  }, logical(nrow(augmented)))
+  if (!is.matrix(beats)) beats <- matrix(beats, ncol = length(aspirant_metrics))
+  colnames(beats) <- aspirant_metrics
+
+  # Strict: beats on ALL metrics (NA counts as fail). Near-miss: beats on
+  # all but exactly one metric.
+  beats_real      <- beats; beats_real[is.na(beats_real)] <- FALSE
+  beats_per_row   <- rowSums(beats_real)
+  n_metrics       <- length(aspirant_metrics)
+
+  strict_ix    <- which(beats_per_row == n_metrics)
+  near_miss_ix <- which(beats_per_row == (n_metrics - 1L) & n_metrics > 1L)
+
+  # For near-miss rows, identify which metric they missed.
+  missed_metric <- vapply(near_miss_ix, function(i) {
+    m_idx <- which(!beats_real[i, ])
+    if (length(m_idx) == 1L) aspirant_metrics[m_idx] else NA_character_
+  }, character(1))
+
+  # Truncate
+  strict_peers <- augmented[strict_ix, , drop = FALSE]
+  if (nrow(strict_peers) > k) strict_peers <- strict_peers[seq_len(k), ]
+  if (nrow(strict_peers)) strict_peers$rank <- seq_len(nrow(strict_peers))
+
+  near_miss_peers <- augmented[near_miss_ix, , drop = FALSE]
+  if (nrow(near_miss_peers)) {
+    near_miss_peers$missed_metric <- missed_metric
+    if (nrow(near_miss_peers) > near_miss_k)
+      near_miss_peers <- near_miss_peers[seq_len(near_miss_k), ]
+    near_miss_peers$rank <- seq_len(nrow(near_miss_peers))
+  }
+
+  list(
+    strict_peers     = strict_peers,
+    near_miss_peers  = near_miss_peers,
+    aspirant_metrics = setNames(
+      as.list(unlist(ASPIRANT_DIRECTIONS[aspirant_metrics])),
+      aspirant_metrics),
+    anchor_values    = anchor_values,
+    meta             = res$meta
+  )
 }
 
 # -----------------------------------------------------------------------------

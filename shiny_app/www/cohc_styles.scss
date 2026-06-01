@@ -1545,3 +1545,154 @@ ul, ol {
     border: 1px solid #ccc;
   }
 }
+
+/* ---------- Aspirant Peers ---------- */
+
+/* Directional arrows in the strict / near-miss tables. Up = candidate
+ * exceeds anchor in the preferred direction; down = below. */
+.asp-up   { color: #2e7d32; font-weight: 700; }
+.asp-down { color: #b53737; font-weight: 700; }
+
+/* Aspirational-metric column cells: monospace digits for alignment,
+ * slightly muted so the directional arrow pops. */
+.asp-metric-cell {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+/* Aspirational gap modal */
+.asp-modal-title {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #251230;
+  line-height: 1.2;
+}
+.asp-modal-subtitle {
+  font-size: 0.95rem;
+  color: #251230;
+  margin-top: 0.3rem;
+  font-weight: 400;
+}
+.asp-modal-body {
+  padding: 0.5rem 0;
+}
+
+/* One row per aspirational metric: label on top, anchor / arrow /
+ * candidate / delta laid out as a 4-column grid below. */
+.asp-gap-row {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 3px solid #602D89;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+.asp-gap-label {
+  font-weight: 600;
+  color: #602D89;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+.asp-gap-values {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  font-variant-numeric: tabular-nums;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr 30px 1fr;
+    .asp-gap-delta { grid-column: 1 / -1; text-align: center; }
+  }
+}
+.asp-gap-anchor, .asp-gap-cand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 1rem;
+  color: #251230;
+}
+.asp-gap-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6e6360;
+}
+.asp-gap-arrow {
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.asp-gap-delta {
+  color: #6e6360;
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+/* Aspirant top-of-page control bar (replaces the sidebar). */
+.asp-control-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(280px, 2fr) auto;
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+
+  label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    .asp-control-run { justify-self: stretch; }
+  }
+}
+.asp-control-run .btn { width: 100%; }
+
+/* Advanced accordion contents */
+.asp-advanced-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.asp-advanced-section h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #d8cfca;
+  padding-bottom: 0.3rem;
+}
+
+.asp-pool-row {
+  margin-bottom: 0.75rem;
+}
+
+/* Theme weight sliders in a compact 2-column grid inside the accordion. */
+.asp-weights-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 0.85rem;
+}
+.asp-weights-grid .form-group,
+.asp-weights-grid .shiny-input-container {
+  margin-bottom: 0.35rem;
+}

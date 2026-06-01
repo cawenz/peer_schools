@@ -178,7 +178,7 @@ if (file.exists(.schools_ath_path)) {
 # Small constants the UI will need
 # -----------------------------------------------------------------------------
 .THEMES <- c("scale", "selectivity", "resources", "finance",
-             "outcomes", "aid", "composition")
+             "outcomes", "aid", "composition", "athletics")
 
 .DEFAULT_ANCHOR_UNITID <- 166124L  # Holy Cross
 

@@ -120,6 +120,52 @@
          if (is.null(loc) || length(loc) != 1 || is.na(loc) || !nzchar(loc))
            return(NA_character_)
          sub(":.*$", "", loc)
+       }),
+  # ---- EADA athletics classifications ----
+  # Three rows, ordered most-to-least likely to register a match. Body
+  # (NCAA vs NAIA) matches frequently; division matches often within a
+  # sponsoring body; conference matches only for true conference rivals.
+  list(label = "Athletics sponsoring body",
+       fmt   = function(row) {
+         if (!"athletics_body" %in% names(row)) return(NA_character_)
+         b <- row$athletics_body
+         if (is.null(b) || length(b) != 1 || is.na(b) || !nzchar(b))
+           return(NA_character_)
+         b
+       },
+       match_key = function(row) {
+         if (!"athletics_body" %in% names(row)) return(NA_character_)
+         row$athletics_body
+       }),
+  list(label = "Athletics division",
+       fmt   = function(row) {
+         if (!"athletics_division" %in% names(row)) return(NA_character_)
+         d <- row$athletics_division
+         if (is.null(d) || length(d) != 1 || is.na(d) || !nzchar(d))
+           return(NA_character_)
+         # Pretty-print: "D1" -> "Division I", "NAIA" passes through.
+         switch(as.character(d),
+                D1 = "NCAA Division I",
+                D2 = "NCAA Division II",
+                D3 = "NCAA Division III",
+                NAIA = "NAIA",
+                d)
+       },
+       match_key = function(row) {
+         if (!"athletics_division" %in% names(row)) return(NA_character_)
+         row$athletics_division
+       }),
+  list(label = "Athletics conference",
+       fmt   = function(row) {
+         if (!"athletics_conference" %in% names(row)) return(NA_character_)
+         c <- row$athletics_conference
+         if (is.null(c) || length(c) != 1 || is.na(c) || !nzchar(c))
+           return(NA_character_)
+         c
+       },
+       match_key = function(row) {
+         if (!"athletics_conference" %in% names(row)) return(NA_character_)
+         row$athletics_conference
        })
 )
 .COMPARE_THEME_LABELS <- c(
