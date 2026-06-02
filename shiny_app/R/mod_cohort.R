@@ -908,47 +908,84 @@ cohortServer <- function(id) {
     # Remove / Proposed are deliberately excluded to keep the map focused
     # on "what's solidly in" vs "what's being considered".
     # -------------------------------------------------------------------------
+    # All statuses except Remove appear on the map. Color palette mirrors
+    # the per-action badges used elsewhere in the cohort tab so the map
+    # reads consistently with the cohort table and the dashboard.
     .MAP_ACTION_COLORS <- c(
-      Anchor   = "#251230",
-      Keep     = "#2e7d32",
-      Possible = "#9D7BB7"
+      Anchor   = "#251230",  # dark slate
+      Keep     = "#2e7d32",  # green
+      Maybe    = "#AC9E94",  # taupe
+      Proposed = "#602D89",  # purple (committed addition)
+      Possible = "#9D7BB7"   # light purple (brainstormed)
     )
 
-    # Whether the map section has anything worth showing.
-    .map_visible <- reactive({
-      df <- cohort_state(); if (is.null(df)) return(FALSE)
-      sum(df$action %in% c("Keep", "Possible")) > 0
-    })
+    # Statuses that appear on the map (everything except Remove).
+    .MAP_STATUSES <- c("Keep", "Maybe", "Proposed", "Possible")
 
+    # Header is conditionally rendered, but the map container itself
+    # stays visible in the DOM at all times. Hiding the container with
+    # shinyjs::hide() caused leaflet to compute 0x0 tile sizes and never
+    # recover when the container became visible again, which is why no
+    # markers were appearing after the first load.
     output$cohort_map_header <- renderUI({
-      if (!isTRUE(.map_visible())) return(NULL)
+      df <- cohort_state()
+      has_pts <- !is.null(df) &&
+                  sum(df$action %in% .MAP_STATUSES) > 0
+
+      # Hide the view toggle + category checkboxes when there's nothing
+      # to draw. When the cohort has data, we ALWAYS render the same
+      # controls regardless of which categories are present — empty
+      # categories just produce nothing on the map.
+      controls <- if (has_pts) tags$div(class = "cohort-map-controls",
+        tags$div(class = "cohort-map-control-block",
+          tags$div(class = "cohort-map-control-label", "View"),
+          radioButtons(ns("map_view"),
+                       label = NULL,
+                       choices = c("Points" = "points",
+                                    "Heatmap" = "heatmap"),
+                       selected = "points",
+                       inline = TRUE)
+        ),
+        tags$div(class = "cohort-map-control-block",
+          tags$div(class = "cohort-map-control-label", "Include"),
+          checkboxGroupInput(ns("map_cats"),
+                              label = NULL,
+                              choices = c("Anchor", "Keep", "Maybe",
+                                          "Proposed", "Possible"),
+                              selected = c("Anchor", "Keep", "Maybe",
+                                            "Proposed", "Possible"),
+                              inline = TRUE)
+        )
+      ) else NULL
+
       tagList(
         tags$hr(class = "cohort-section-divider"),
         h4("Geographic distribution"),
         p(class = "section-intro",
-          "Anchor school plus committed ", tags$strong("Keep"), " peers and ",
-          tags$strong("Possible"), " (brainstormed) candidates. Hover any ",
-          "marker for school details. Maybe / Proposed / Remove are ",
-          "intentionally hidden to keep the map focused on committed vs ",
-          "considered.")
+          if (has_pts) tagList(
+            "Anchor + every cohort school except ", tags$strong("Remove"),
+            ". Markers use the same color logic as the cohort table: ",
+            tags$strong("Keep"), " green, ", tags$strong("Maybe"),
+            " taupe, ", tags$strong("Proposed"), " purple, ",
+            tags$strong("Possible"), " light purple. ",
+            "Switch between point and heatmap views with the toggle ",
+            "below; the heatmap rebuilds from whichever categories ",
+            "are checked. Hover any marker for school details.")
+          else
+            "No cohort schools to plot yet."
+        ),
+        controls
       )
     })
 
-    # Use shinyjs to show/hide the static map container so the bound
-    # leafletOutput stays in the DOM while the wrapper styling reflects
-    # whether the section is currently in use.
-    observe({
-      visible <- isTRUE(.map_visible())
-      if (visible) shinyjs::show(selector = ".cohort-map-container")
-      else         shinyjs::hide(selector = ".cohort-map-container")
-    })
-
-    output$cohort_leaflet <- leaflet::renderLeaflet({
+    # Build the per-marker frame: anchor + every status except Remove.
+    # Pulled out as a reactive so renderLeaflet AND any future
+    # leafletProxy observer can share it without re-deriving twice.
+    map_points <- reactive({
       df    <- cohort_state(); req(df)
       a_uid <- anchor_uid();   req(a_uid)
 
-      # Anchor row + Keep + Possible.
-      keep_poss <- df[df$action %in% c("Keep", "Possible"), ]
+      in_map <- df[df$action %in% .MAP_STATUSES, ]
       anchor_meta <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
 
       anchor_df <- if (nrow(anchor_meta)) tibble::tibble(
@@ -960,24 +997,28 @@ cohortServer <- function(id) {
 
       all_rows <- dplyr::bind_rows(
         anchor_df,
-        keep_poss[, c("unitid", "instnm", "stabbr")] %>%
-          dplyr::mutate(action = as.character(keep_poss$action))
+        if (nrow(in_map))
+          tibble::tibble(
+            unitid = in_map$unitid,
+            instnm = in_map$instnm,
+            stabbr = in_map$stabbr,
+            action = as.character(in_map$action)
+          ) else NULL
       )
 
-      # Pull geo + classification context from .SCHOOLS.
       ctx_cols <- c("unitid", "longitud", "latitude",
                     "usnews_classification", "ic2025_label",
                     "control_grp", "instsize_label")
       ctx <- .SCHOOLS[, intersect(ctx_cols, names(.SCHOOLS)), drop = FALSE]
       pts <- dplyr::left_join(all_rows, ctx, by = "unitid")
       pts <- pts[is.finite(pts$longitud) & is.finite(pts$latitude), ]
-      req(nrow(pts) > 0)
+      if (!nrow(pts)) return(pts)
 
-      # Build per-marker popup HTML + tooltip label.
-      pts$color  <- unname(.MAP_ACTION_COLORS[pts$action])
-      pts$tip    <- sprintf("<strong>%s</strong><br><span style='color:#6e6360'>%s &middot; %s</span>",
-                             pts$instnm, pts$stabbr, pts$action)
-      pts$popup  <- vapply(seq_len(nrow(pts)), function(i) {
+      pts$color <- unname(.MAP_ACTION_COLORS[pts$action])
+      pts$tip   <- sprintf(
+        "<strong>%s</strong><br><span style='color:#6e6360'>%s &middot; %s</span>",
+        pts$instnm, pts$stabbr, pts$action)
+      pts$popup <- vapply(seq_len(nrow(pts)), function(i) {
         r <- pts[i, ]
         cls_u <- if (!is.na(r$usnews_classification))
                    .prettify_classification(r$usnews_classification) else NA
@@ -997,70 +1038,146 @@ cohortServer <- function(id) {
         )
         paste(parts, collapse = "<br>")
       }, character(1))
+      pts
+    })
 
-      # Anchor gets a distinct star marker; everything else is a colored
-      # circle. We use addAwesomeMarkers for the anchor only.
-      anchor_pts <- pts[pts$action == "Anchor", ]
-      other_pts  <- pts[pts$action != "Anchor", ]
+    # Track the user's last-known view so we can restore it after the
+    # cohort_state-driven re-render (which otherwise resets to fit).
+    .last_view <- reactiveVal(NULL)
+    observeEvent(input$cohort_leaflet_center, {
+      z <- input$cohort_leaflet_zoom
+      c <- input$cohort_leaflet_center
+      if (is.null(z) || is.null(c)) return()
+      .last_view(list(lng = c$lng, lat = c$lat, zoom = z))
+    })
 
-      m <- leaflet::leaflet(options = leaflet::leafletOptions(
-            zoomControl = TRUE, attributionControl = TRUE)) %>%
+    output$cohort_leaflet <- leaflet::renderLeaflet({
+      pts <- map_points()
+
+      m <- leaflet::leaflet(
+        options = leaflet::leafletOptions(zoomControl = TRUE,
+                                           attributionControl = TRUE)
+      ) %>%
         leaflet::addProviderTiles("CartoDB.Positron") %>%
-        leaflet::addCircleMarkers(
-          data  = other_pts,
-          lng   = ~longitud, lat = ~latitude,
-          color = ~color, fillColor = ~color,
-          radius = 7, weight = 2, opacity = 1, fillOpacity = 0.75,
-          label = lapply(other_pts$tip, htmltools::HTML),
-          popup = lapply(other_pts$popup, htmltools::HTML),
-          labelOptions = leaflet::labelOptions(
-            direction = "auto", offset = c(0, -10),
-            style = list("font-family" = "'Manrope', sans-serif",
-                          "font-size" = "12px")),
-          # Marker clustering: groups schools at identical or near-
-          # identical coordinates so all five Claremont colleges (or any
-          # other co-located pair) are visible. Click a numbered cluster
-          # to spiderfy it out into the individual schools; zooming in
-          # auto-expands. Coverage hover circle off to keep the visual
-          # clean against the light tile background.
-          clusterOptions = leaflet::markerClusterOptions(
-            showCoverageOnHover = FALSE,
-            zoomToBoundsOnClick = TRUE,
-            spiderfyOnMaxZoom   = TRUE,
-            disableClusteringAtZoom = 9
-          )
+        leaflet::addLegend(
+          position = "bottomright",
+          colors   = unname(.MAP_ACTION_COLORS),
+          labels   = names(.MAP_ACTION_COLORS),
+          opacity  = 0.85,
+          title    = "Status"
         )
 
-      if (nrow(anchor_pts)) {
-        m <- m %>% leaflet::addAwesomeMarkers(
-          data = anchor_pts,
-          lng = ~longitud, lat = ~latitude,
-          icon = leaflet::awesomeIcons(
-            icon = "star", library = "fa",
-            iconColor = "#FFFFFF", markerColor = "purple"),
-          label = lapply(anchor_pts$tip, htmltools::HTML),
-          popup = lapply(anchor_pts$popup, htmltools::HTML),
-          labelOptions = leaflet::labelOptions(
-            direction = "auto", offset = c(0, -16),
-            style = list("font-family" = "'Manrope', sans-serif",
-                          "font-size" = "12px"))
-        )
+      # No points yet? Just show a continental-US default.
+      if (!nrow(pts)) {
+        return(m %>% leaflet::setView(lng = -98.5, lat = 39.5, zoom = 4))
       }
 
-      # Fit bounds to all the points with a small buffer; if everything is
-      # in one state the auto-fit can over-zoom, so add a half-degree pad.
-      lng_rng <- range(pts$longitud, na.rm = TRUE)
-      lat_rng <- range(pts$latitude, na.rm = TRUE)
-      m %>% leaflet::fitBounds(
-        lng1 = lng_rng[1] - 0.5, lat1 = lat_rng[1] - 0.5,
-        lng2 = lng_rng[2] + 0.5, lat2 = lat_rng[2] + 0.5
-      ) %>% leaflet::addLegend(
-        position = "bottomright",
-        colors   = unname(.MAP_ACTION_COLORS),
-        labels   = names(.MAP_ACTION_COLORS),
-        opacity  = 0.85,
-        title    = "Status"
-      )
+      # --- Read the Shiny controls (with safe defaults during init) ---
+      view_mode <- input$map_view %||% "points"
+      checked   <- input$map_cats %||% c("Anchor", "Keep", "Maybe",
+                                           "Proposed", "Possible")
+
+      # Filter to only the checked categories.
+      pts_filt    <- pts[pts$action %in% checked, , drop = FALSE]
+      anchor_pts  <- pts_filt[pts_filt$action == "Anchor", ]
+      other_pts   <- pts_filt[pts_filt$action != "Anchor", ]
+
+      if (identical(view_mode, "heatmap")) {
+        # --- Heatmap view ---
+        # Density across the checked categories. Markers are deliberately
+        # NOT drawn so the heatmap reads as a single continuous surface.
+        # If only the anchor is checked there's nothing useful to plot;
+        # we draw the anchor marker for orientation but skip the heatmap.
+        if (nrow(other_pts) > 0) {
+          m <- m %>% leaflet.extras::addHeatmap(
+            data       = other_pts,
+            lng        = ~longitud, lat = ~latitude,
+            intensity  = 1,
+            radius     = 28,
+            blur       = 20,
+            minOpacity = 0.35,
+            max        = 1
+          )
+        }
+        # Keep the anchor visible in either view so the user always has
+        # a reference point.
+        if (nrow(anchor_pts)) {
+          m <- m %>% leaflet::addAwesomeMarkers(
+            data = anchor_pts,
+            lng = ~longitud, lat = ~latitude,
+            icon = leaflet::awesomeIcons(
+              icon = "star", library = "fa",
+              iconColor = "#FFFFFF", markerColor = "purple"),
+            label = lapply(anchor_pts$tip, htmltools::HTML),
+            popup = lapply(anchor_pts$popup, htmltools::HTML),
+            labelOptions = leaflet::labelOptions(
+              direction = "auto", offset = c(0, -16),
+              style = list("font-family" = "'Manrope', sans-serif",
+                            "font-size" = "12px"))
+          )
+        }
+      } else {
+        # --- Points view (default) ---
+        # One addCircleMarkers call per category, with cluster options
+        # set tight so only true co-locations group.
+        cluster_opts <- leaflet::markerClusterOptions(
+          showCoverageOnHover     = FALSE,
+          zoomToBoundsOnClick     = TRUE,
+          spiderfyOnMaxZoom       = TRUE,
+          disableClusteringAtZoom = 9,
+          maxClusterRadius        = 1
+        )
+
+        for (act in c("Keep", "Maybe", "Proposed", "Possible")) {
+          pts_act <- other_pts[other_pts$action == act, , drop = FALSE]
+          if (!nrow(pts_act)) next
+          m <- m %>% leaflet::addCircleMarkers(
+            data  = pts_act,
+            lng   = ~longitud, lat = ~latitude,
+            color = ~color, fillColor = ~color,
+            radius = 7, weight = 2, opacity = 1, fillOpacity = 0.75,
+            label = lapply(pts_act$tip, htmltools::HTML),
+            popup = lapply(pts_act$popup, htmltools::HTML),
+            labelOptions = leaflet::labelOptions(
+              direction = "auto", offset = c(0, -10),
+              style = list("font-family" = "'Manrope', sans-serif",
+                            "font-size" = "12px")),
+            clusterOptions = cluster_opts
+          )
+        }
+
+        if (nrow(anchor_pts)) {
+          m <- m %>% leaflet::addAwesomeMarkers(
+            data = anchor_pts,
+            lng = ~longitud, lat = ~latitude,
+            icon = leaflet::awesomeIcons(
+              icon = "star", library = "fa",
+              iconColor = "#FFFFFF", markerColor = "purple"),
+            label = lapply(anchor_pts$tip, htmltools::HTML),
+            popup = lapply(anchor_pts$popup, htmltools::HTML),
+            labelOptions = leaflet::labelOptions(
+              direction = "auto", offset = c(0, -16),
+              style = list("font-family" = "'Manrope', sans-serif",
+                            "font-size" = "12px"))
+          )
+        }
+      }
+
+      # Restore the user's last view if they've zoomed/panned, otherwise
+      # fit to the cohort's bounds. This makes edits to the cohort feel
+      # smooth: adding or removing a school refreshes markers without
+      # snapping the map back to the default fit.
+      lv <- isolate(.last_view())
+      if (!is.null(lv) && all(is.finite(c(lv$lng, lv$lat, lv$zoom)))) {
+        m %>% leaflet::setView(lng = lv$lng, lat = lv$lat, zoom = lv$zoom)
+      } else {
+        lng_rng <- range(pts$longitud, na.rm = TRUE)
+        lat_rng <- range(pts$latitude, na.rm = TRUE)
+        m %>% leaflet::fitBounds(
+          lng1 = lng_rng[1] - 0.5, lat1 = lat_rng[1] - 0.5,
+          lng2 = lng_rng[2] + 0.5, lat2 = lat_rng[2] + 0.5
+        )
+      }
     })
 
     output$cohort_dashboard <- renderUI({

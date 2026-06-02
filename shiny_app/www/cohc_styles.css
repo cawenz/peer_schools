@@ -2391,3 +2391,85 @@ ul li, ol li {
   border-radius: 8px;
   border: 1px solid #F4EDEC;
 }
+
+/* Cohort map layer control — branded checkboxes for showing/hiding each
+ * action category and toggling the heatmap. */
+.leaflet-control-layers {
+  font-family: 'Manrope', sans-serif;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-radius: 6px !important;
+  border: 1px solid #d8cfca !important;
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.12) !important;
+}
+
+.leaflet-control-layers label {
+  color: #251230;
+  font-weight: 500;
+  margin: 0.2rem 0;
+  font-size: 0.85rem;
+}
+
+.leaflet-control-layers input[type="checkbox"] {
+  accent-color: #602D89;
+  margin-right: 0.4rem;
+}
+
+.leaflet-control-layers .leaflet-control-layers-list {
+  padding: 0.35rem 0.5rem;
+}
+
+.leaflet-control-layers .leaflet-control-layers-separator {
+  border-top-color: #d8cfca;
+  margin: 0.4rem 0;
+}
+
+/* Cohort map control bar — sits above the leaflet container.
+ * View toggle on the left, category checkboxes on the right; stacks on
+ * narrow viewports. */
+.cohort-map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem 0;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+}
+
+.cohort-map-control-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  /* Override Shiny's default form-group bottom margin so the inputs
+   * sit tight against the label. */
+  /* Inline radio / checkbox rows: horizontal layout with tighter
+   * spacing and Manrope font. */
+}
+
+.cohort-map-control-block .form-group, .cohort-map-control-block .shiny-input-container {
+  margin-bottom: 0;
+}
+
+.cohort-map-control-block .radio-inline, .cohort-map-control-block .checkbox-inline {
+  margin-right: 0.85rem;
+  color: #251230;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.cohort-map-control-block input[type="radio"], .cohort-map-control-block input[type="checkbox"] {
+  accent-color: #602D89;
+  margin-right: 0.3rem;
+}
+
+.cohort-map-control-label {
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #602D89;
+}

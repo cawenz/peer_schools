@@ -15,6 +15,7 @@ suppressMessages({
   library(ggplot2)
   library(plotly)
   library(leaflet)
+  library(leaflet.extras)   # for addHeatmap
 })
 
 # -----------------------------------------------------------------------------
