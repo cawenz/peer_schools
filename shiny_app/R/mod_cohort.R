@@ -41,6 +41,16 @@
 .ADDITION_ACTIONS <- c("Possible", "Proposed")
 .COHORT_ACTIONS   <- c(.ORIGINAL_ACTIONS, .ADDITION_ACTIONS)
 
+# Target size for the in-cohort set, NOT counting the anchor. NECHE's
+# original peer list was 24 schools (10 Keep + 4 Maybe + 10 Drop), so
+# the natural completed cohort is 24. Edit here if a different
+# accreditor's expectation requires a different total.
+.COHORT_TARGET_SIZE <- 24L
+
+# Statuses that count toward the "active cohort" total (everything
+# committed in the In column, excluding the anchor and excluding Remove).
+.IN_COHORT_ACTIVE_STATUSES <- c("Keep", "Maybe", "Proposed")
+
 # 11 headline metrics shown in the cohort overview dashboard. Order is the
 # rendered grid order. Each entry must exist in .VARIABLES$metric so the
 # format / display name come from the catalog.
@@ -353,6 +363,17 @@ cohortUI <- function(id) {
       "variable's distribution and per-school values."),
 
     uiOutput(ns("cohort_view")),
+
+    # Map: header/intro in a renderUI (conditionally rendered), but the
+    # leafletOutput itself lives in the static UI tree so Shiny registers
+    # the output binding on app start. Without this, nesting the
+    # leafletOutput inside a renderUI sometimes leaves it unbound and
+    # nothing draws.
+    uiOutput(ns("cohort_map_header")),
+    tags$div(class = "cohort-map-container",
+      leaflet::leafletOutput(ns("cohort_leaflet"), height = "480px")
+    ),
+
     uiOutput(ns("cohort_dashboard")),
     uiOutput(ns("variable_inspector"))
   )
@@ -874,6 +895,174 @@ cohortServer <- function(id) {
       )
     }
 
+    # -------------------------------------------------------------------------
+    # Geographic map: Keep + Possible (+ anchor) schools.
+    #
+    # Shows the committed original peers (Keep) alongside the brainstormed
+    # candidates (Possible) on a leaflet map. Lets the user see at a glance
+    # whether the original cohort is geographically concentrated and where
+    # the candidate adds sit relative to it.
+    #
+    # Markers use the same color logic as everywhere else in the cohort
+    # tab: Anchor purple-dark, Keep green, Possible light purple. Maybe /
+    # Remove / Proposed are deliberately excluded to keep the map focused
+    # on "what's solidly in" vs "what's being considered".
+    # -------------------------------------------------------------------------
+    .MAP_ACTION_COLORS <- c(
+      Anchor   = "#251230",
+      Keep     = "#2e7d32",
+      Possible = "#9D7BB7"
+    )
+
+    # Whether the map section has anything worth showing.
+    .map_visible <- reactive({
+      df <- cohort_state(); if (is.null(df)) return(FALSE)
+      sum(df$action %in% c("Keep", "Possible")) > 0
+    })
+
+    output$cohort_map_header <- renderUI({
+      if (!isTRUE(.map_visible())) return(NULL)
+      tagList(
+        tags$hr(class = "cohort-section-divider"),
+        h4("Geographic distribution"),
+        p(class = "section-intro",
+          "Anchor school plus committed ", tags$strong("Keep"), " peers and ",
+          tags$strong("Possible"), " (brainstormed) candidates. Hover any ",
+          "marker for school details. Maybe / Proposed / Remove are ",
+          "intentionally hidden to keep the map focused on committed vs ",
+          "considered.")
+      )
+    })
+
+    # Use shinyjs to show/hide the static map container so the bound
+    # leafletOutput stays in the DOM while the wrapper styling reflects
+    # whether the section is currently in use.
+    observe({
+      visible <- isTRUE(.map_visible())
+      if (visible) shinyjs::show(selector = ".cohort-map-container")
+      else         shinyjs::hide(selector = ".cohort-map-container")
+    })
+
+    output$cohort_leaflet <- leaflet::renderLeaflet({
+      df    <- cohort_state(); req(df)
+      a_uid <- anchor_uid();   req(a_uid)
+
+      # Anchor row + Keep + Possible.
+      keep_poss <- df[df$action %in% c("Keep", "Possible"), ]
+      anchor_meta <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
+
+      anchor_df <- if (nrow(anchor_meta)) tibble::tibble(
+        unitid = anchor_meta$unitid,
+        instnm = anchor_meta$instnm,
+        stabbr = anchor_meta$stabbr,
+        action = "Anchor"
+      ) else tibble::tibble()
+
+      all_rows <- dplyr::bind_rows(
+        anchor_df,
+        keep_poss[, c("unitid", "instnm", "stabbr")] %>%
+          dplyr::mutate(action = as.character(keep_poss$action))
+      )
+
+      # Pull geo + classification context from .SCHOOLS.
+      ctx_cols <- c("unitid", "longitud", "latitude",
+                    "usnews_classification", "ic2025_label",
+                    "control_grp", "instsize_label")
+      ctx <- .SCHOOLS[, intersect(ctx_cols, names(.SCHOOLS)), drop = FALSE]
+      pts <- dplyr::left_join(all_rows, ctx, by = "unitid")
+      pts <- pts[is.finite(pts$longitud) & is.finite(pts$latitude), ]
+      req(nrow(pts) > 0)
+
+      # Build per-marker popup HTML + tooltip label.
+      pts$color  <- unname(.MAP_ACTION_COLORS[pts$action])
+      pts$tip    <- sprintf("<strong>%s</strong><br><span style='color:#6e6360'>%s &middot; %s</span>",
+                             pts$instnm, pts$stabbr, pts$action)
+      pts$popup  <- vapply(seq_len(nrow(pts)), function(i) {
+        r <- pts[i, ]
+        cls_u <- if (!is.na(r$usnews_classification))
+                   .prettify_classification(r$usnews_classification) else NA
+        cls_c <- if (!is.na(r$ic2025_label)) r$ic2025_label else NA
+        ctrl  <- if (!is.na(r$control_grp))
+                   .prettify_control(r$control_grp) else NA
+        size  <- if (!is.na(r$instsize_label)) r$instsize_label else NA
+        parts <- c(
+          sprintf("<strong>%s</strong>", r$instnm),
+          sprintf("<span style='color:#602D89;font-weight:600'>%s</span>",
+                  r$action),
+          sprintf("%s", r$stabbr),
+          if (!is.na(cls_u)) sprintf("<em>US News:</em> %s",  cls_u),
+          if (!is.na(cls_c)) sprintf("<em>Carnegie:</em> %s", cls_c),
+          if (!is.na(ctrl))  sprintf("<em>Sector:</em> %s",   ctrl),
+          if (!is.na(size))  sprintf("<em>Size:</em> %s",     size)
+        )
+        paste(parts, collapse = "<br>")
+      }, character(1))
+
+      # Anchor gets a distinct star marker; everything else is a colored
+      # circle. We use addAwesomeMarkers for the anchor only.
+      anchor_pts <- pts[pts$action == "Anchor", ]
+      other_pts  <- pts[pts$action != "Anchor", ]
+
+      m <- leaflet::leaflet(options = leaflet::leafletOptions(
+            zoomControl = TRUE, attributionControl = TRUE)) %>%
+        leaflet::addProviderTiles("CartoDB.Positron") %>%
+        leaflet::addCircleMarkers(
+          data  = other_pts,
+          lng   = ~longitud, lat = ~latitude,
+          color = ~color, fillColor = ~color,
+          radius = 7, weight = 2, opacity = 1, fillOpacity = 0.75,
+          label = lapply(other_pts$tip, htmltools::HTML),
+          popup = lapply(other_pts$popup, htmltools::HTML),
+          labelOptions = leaflet::labelOptions(
+            direction = "auto", offset = c(0, -10),
+            style = list("font-family" = "'Manrope', sans-serif",
+                          "font-size" = "12px")),
+          # Marker clustering: groups schools at identical or near-
+          # identical coordinates so all five Claremont colleges (or any
+          # other co-located pair) are visible. Click a numbered cluster
+          # to spiderfy it out into the individual schools; zooming in
+          # auto-expands. Coverage hover circle off to keep the visual
+          # clean against the light tile background.
+          clusterOptions = leaflet::markerClusterOptions(
+            showCoverageOnHover = FALSE,
+            zoomToBoundsOnClick = TRUE,
+            spiderfyOnMaxZoom   = TRUE,
+            disableClusteringAtZoom = 9
+          )
+        )
+
+      if (nrow(anchor_pts)) {
+        m <- m %>% leaflet::addAwesomeMarkers(
+          data = anchor_pts,
+          lng = ~longitud, lat = ~latitude,
+          icon = leaflet::awesomeIcons(
+            icon = "star", library = "fa",
+            iconColor = "#FFFFFF", markerColor = "purple"),
+          label = lapply(anchor_pts$tip, htmltools::HTML),
+          popup = lapply(anchor_pts$popup, htmltools::HTML),
+          labelOptions = leaflet::labelOptions(
+            direction = "auto", offset = c(0, -16),
+            style = list("font-family" = "'Manrope', sans-serif",
+                          "font-size" = "12px"))
+        )
+      }
+
+      # Fit bounds to all the points with a small buffer; if everything is
+      # in one state the auto-fit can over-zoom, so add a half-degree pad.
+      lng_rng <- range(pts$longitud, na.rm = TRUE)
+      lat_rng <- range(pts$latitude, na.rm = TRUE)
+      m %>% leaflet::fitBounds(
+        lng1 = lng_rng[1] - 0.5, lat1 = lat_rng[1] - 0.5,
+        lng2 = lng_rng[2] + 0.5, lat2 = lat_rng[2] + 0.5
+      ) %>% leaflet::addLegend(
+        position = "bottomright",
+        colors   = unname(.MAP_ACTION_COLORS),
+        labels   = names(.MAP_ACTION_COLORS),
+        opacity  = 0.85,
+        title    = "Status"
+      )
+    })
+
     output$cohort_dashboard <- renderUI({
       df    <- cohort_state(); if (is.null(df)) return(NULL)
       a_uid <- anchor_uid();   req(a_uid)
@@ -1317,26 +1506,11 @@ cohortServer <- function(id) {
                         zeroline = FALSE),
           yaxis  = list(title = "Number of institutions",
                         gridcolor = "#F4EDEC"),
-          legend = list(orientation = "h",
-                        x = 0, xanchor = "left",
-                        y = -0.22, yanchor = "top"),
           shapes = shapes,
-          annotations = annots,
-          plot_bgcolor  = "#FFFFFF",
-          paper_bgcolor = "#FFFFFF",
-          # Force hover tooltips to a dark slate background with white text
-          # so contrast doesn't depend on the trace color (the per-action
-          # rug markers default to using the marker color as the tooltip
-          # bg, which leaves purple-on-purple unreadable).
-          hoverlabel = list(bgcolor = "#251230", bordercolor = "#251230",
-                             font = list(color = "#FFFFFF", size = 12)),
-          margin = list(t = 40, r = 30, b = 80, l = 70)
+          annotations = annots
         ) %>%
-        config(
-          displayModeBar = TRUE,
-          displaylogo    = FALSE,
-          modeBarButtonsToRemove = c("lasso2d", "select2d", "autoScale2d")
-        )
+        cohc_plotly_theme(hovermode = "closest") %>%
+        cohc_modebar(filename_root = "cohort_inspector")
     })
 
     # ---- Inspector: per-school table ----
@@ -1605,14 +1779,16 @@ cohortServer <- function(id) {
 
       # Partition by action.
       #   IN  side (left column):  Anchor + Keep + Maybe + Proposed
-      #   OUT side (right column): Remove + Possible
-      # Within each side, sort by action (Keep/Maybe/Proposed for In;
-      # Remove/Possible for Out), then alphabetically by school name.
+      #   OUT side (right column): Possible (top) + Remove (bottom)
+      # Within each side, sort by action group, then alphabetically by
+      # school name. Remove sits below Possible on the Out side because
+      # Possibles are the active brainstorm queue (most interactive),
+      # while Removes are settled "we're done with these" rows.
       in_cohort  <- df[df$action %in% c("Keep", "Maybe", "Proposed"), ]
       out_cohort <- df[df$action %in% c("Remove", "Possible"), ]
 
       in_order  <- c("Keep", "Maybe", "Proposed")
-      out_order <- c("Remove", "Possible")
+      out_order <- c("Possible", "Remove")
       in_cohort  <- in_cohort[order(match(as.character(in_cohort$action),
                                             in_order),
                                       in_cohort$instnm), ]
@@ -1620,18 +1796,37 @@ cohortServer <- function(id) {
                                              out_order),
                                        out_cohort$instnm), ]
 
-      n_in  <- nrow(in_cohort) + 1L   # +1 for the anchor row
-      n_out <- nrow(out_cohort)
+      # In-cohort active count: Keep + Maybe + Proposed only. Anchor is
+      # NOT counted (the question is "how many peers do we have", not
+      # "how many rows are in the In column"). Remove is also excluded
+      # since those rows are queued for replacement.
+      n_active   <- nrow(in_cohort)
+      n_target   <- .COHORT_TARGET_SIZE
+      n_remain   <- max(0L, n_target - n_active)
+      n_overflow <- max(0L, n_active - n_target)
+      n_out      <- nrow(out_cohort)
+
+      remaining_msg <- if (n_overflow > 0)
+        sprintf("%d over the target", n_overflow)
+      else if (n_remain == 0)
+        "cohort is full"
+      else
+        sprintf("%d slot%s remaining", n_remain,
+                if (n_remain == 1) "" else "s")
 
       tagList(
         tags$div(class = "cohort-two-col",
           tags$section(class = "cohort-section cohort-section-in",
-            tags$h5(sprintf("In Cohort (%d)", n_in)),
+            tags$h5(sprintf("In Cohort — %d of %d", n_active, n_target),
+                    tags$small(class = "cohort-budget-pill",
+                                remaining_msg)),
             tags$p(class = "section-intro",
               tags$small(
                 "Anchor + ", tags$strong("Keep"), " / ",
-                tags$strong("Maybe"), " / ", tags$strong("Proposed"), ". ",
-                "Click ", tags$span(class = "cohort-inline-arrow", "→"),
+                tags$strong("Maybe"), " / ", tags$strong("Proposed"),
+                ". The anchor doesn't count toward the ", n_target,
+                "-school target. Click ",
+                tags$span(class = "cohort-inline-arrow", "→"),
                 " on any row to move it Out.")),
             .cohort_table(in_cohort, wide_df, side = "in",
                           anchor_row_df = anchor_row_df)
@@ -1641,9 +1836,10 @@ cohortServer <- function(id) {
             tags$h5(sprintf("Out / Considering (%d)", n_out)),
             tags$p(class = "section-intro",
               tags$small(
-                tags$strong("Remove"), " (originals flagged for replacement) ",
-                "and ", tags$strong("Possible"),
-                " (brainstormed additions not yet committed). ",
+                tags$strong("Possible"),
+                " (brainstormed additions not yet committed) at top, ",
+                tags$strong("Remove"),
+                " (originals flagged for replacement) at bottom. ",
                 "Click ", tags$span(class = "cohort-inline-arrow", "←"),
                 " to move a row back In.")),
             if (n_out > 0)

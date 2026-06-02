@@ -18,7 +18,7 @@
 
 .COMPARE_THEME_ORDER <- c(
   "scale", "selectivity", "resources", "finance",
-  "outcomes", "aid", "composition"
+  "outcomes", "aid", "composition", "athletics"
 )
 
 # -----------------------------------------------------------------------------
@@ -176,6 +176,7 @@
   outcomes    = "Outcomes",
   aid         = "Aid",
   composition = "Composition",
+  athletics   = "Athletics",
   descriptive = "Descriptive"
 )
 
@@ -190,7 +191,7 @@ compareSidebarUI <- function(id) {
     tags$hr(),
 
     selectizeInput(ns("anchor_compare"),
-                   label   = "Anchor",
+                   label   = "Anchor school",
                    choices = NULL, multiple = FALSE,
                    options = list(placeholder = "Type to search",
                                    maxOptions  = 50)),
@@ -600,6 +601,55 @@ compareServer <- function(id, peer_selection, peer_result) {
                         meta_row$display_name else metric
       years_label <- .VAR_YEARS_LABEL[metric] %||% "(unknown)"
 
+      # --- Definition block: source label, computed flag, format, plus the
+      # variable's notes/coverage_note as a description. Same vocabulary as
+      # the cohort dashboard card modal so the app reads consistently. ---
+      .source_lbl_map <- c(
+        ipeds          = "IPEDS",
+        ipeds_derived  = "IPEDS",
+        ccihe          = "Carnegie 2025 Data File",
+        cds_ai         = "Common Data Set",
+        cds_ai_derived = "Common Data Set",
+        scorecard      = "College Scorecard",
+        eada           = "EADA",
+        eada_derived   = "EADA"
+      )
+      .derived_sources <- c("ipeds_derived", "cds_ai_derived",
+                             "ccihe", "eada_derived")
+
+      def_chips <- tagList()
+      def_desc  <- NULL
+      if (nrow(meta_row)) {
+        src    <- meta_row$source
+        src_lbl <- if (!is.na(src) && nzchar(src))
+                     (.source_lbl_map[[src]] %||% src) else "Unknown source"
+        is_derived <- !is.na(src) && src %in% .derived_sources
+
+        def_chips <- tagList(
+          tags$span(class = "dash-modal-chip",
+                    tags$strong("Source: "), src_lbl),
+          if (!is.na(meta_row$category))
+            tags$span(class = "dash-modal-chip",
+                      tags$strong("Category: "), meta_row$category),
+          if (!is.na(meta_row$format))
+            tags$span(class = "dash-modal-chip",
+                      tags$strong("Format: "), meta_row$format),
+          tags$span(class = "dash-modal-chip",
+                    tags$strong("Years: "), years_label),
+          if (is_derived)
+            tags$span(class = "dash-modal-chip dash-modal-chip-computed",
+                      title = "Derived from one or more raw inputs.",
+                      "Computed")
+        )
+
+        def_desc <- if (!is.na(meta_row$notes) && nzchar(meta_row$notes))
+                      meta_row$notes
+                    else if (!is.na(meta_row$coverage_note) &&
+                              nzchar(meta_row$coverage_note))
+                      meta_row$coverage_note
+                    else NULL
+      }
+
       showModal(modalDialog(
         title = tagList(
           tags$div(display_name),
@@ -611,6 +661,11 @@ compareServer <- function(id, peer_selection, peer_result) {
         fade = TRUE,
         footer = modalButton("Close"),
         div(class = "distribution-modal-body",
+            # Definition first — answers "what am I looking at" before the
+            # chart shows where the schools sit.
+            tags$div(class = "dash-modal-chips", def_chips),
+            if (!is.null(def_desc))
+              tags$p(class = "dash-modal-desc", def_desc),
             uiOutput(session$ns("pool_description")),
             checkboxInput(session$ns("modal_show_peers"),
                           "Overlay other peers from the current search",
@@ -770,20 +825,11 @@ compareServer <- function(id, peer_selection, peer_result) {
                         zeroline = FALSE),
           yaxis  = list(title = "Number of institutions",
                         gridcolor = "#F4EDEC"),
-          legend = list(orientation = "h",
-                        x = 0, xanchor = "left",
-                        y = -0.22, yanchor = "top"),
           shapes = shapes,
-          annotations = annots,
-          plot_bgcolor  = "#FFFFFF",
-          paper_bgcolor = "#FFFFFF",
-          margin = list(t = 50, r = 30, b = 80, l = 70)
+          annotations = annots
         ) %>%
-        config(
-          displayModeBar = TRUE,
-          displaylogo    = FALSE,
-          modeBarButtonsToRemove = c("lasso2d", "select2d", "autoScale2d")
-        )
+        cohc_plotly_theme(hovermode = "closest") %>%
+        cohc_modebar(filename_root = "side_by_side_distribution")
     })
 
     output$distribution_stats <- renderUI({

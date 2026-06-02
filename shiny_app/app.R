@@ -72,6 +72,12 @@ ui <- page_navbar(
   ),
 
   nav_panel(
+    "Trends",
+    # School + variable + comparison group in a top control bar; no sidebar.
+    trendsUI("trends")
+  ),
+
+  nav_panel(
     "Cohort Builder",
     layout_sidebar(
       sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
@@ -83,6 +89,19 @@ ui <- page_navbar(
   nav_panel(
     "Saved Searches",
     sessionUI("session")
+  ),
+
+  # Reference tabs at the right end of the navbar.
+  nav_panel(
+    "Variables",
+    variablesUI("variables")
+  ),
+
+  nav_panel(
+    "Help",
+    div(class = "help-doc",
+      includeMarkdown(file.path(.PROJECT_ROOT, "docs", "USER_GUIDE.md"))
+    )
   )
 )
 
@@ -110,13 +129,22 @@ server <- function(input, output, session) {
   # Stratified Peers page (fully self-contained; no upstream state)
   stratifiedServer("stratified")
 
-  # Cohort Builder page
-  cohortServer("cohort")
+  # Cohort Builder page (returns reactives that other tabs consume)
+  cohort_module <- cohortServer("cohort")
+
+  # Trends page (consumes peer_result and the cohort module's state)
+  trendsServer("trends",
+               peer_result       = peer_table_state$result,
+               cohort_state      = cohort_module$cohort_state,
+               cohort_anchor_uid = cohort_module$anchor_uid)
 
   # Saved Searches page
   sessionServer("session",
                 saved_searches  = saved_searches,
                 restore_signal  = restore_signal)
+
+  # Variables reference tab (self-contained; reads .VARIABLES).
+  variablesServer("variables")
 
   # Save observer (Save button lives in the Peer Search sidebar)
   observeEvent(sidebar_state$save_trigger(), {

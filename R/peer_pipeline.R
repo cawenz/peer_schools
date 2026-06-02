@@ -102,10 +102,19 @@ THEME_VARS <- list(
   ),
   # Athletics theme (EADA-derived). Default weight is 0 in compute_peers —
   # existing peer searches behave identically until a user dials it up.
-  # Three orthogonal signals: intensity (athletes as % of UG), breadth
-  # (number of varsity sports), athletic culture (multi-sport ratio).
+  # The three CLUSTERING signals (orthogonal: intensity, breadth, culture)
+  # drive peer distance; the rest are descriptive only and never reach
+  # the weight calc (compute_peers filters to use_type == "clustering"
+  # in .load_wide_facts before THEME_VARS is consulted). Listing them
+  # all here so .var_theme() groups them together in the Side-by-Side
+  # view rather than dumping the descriptive ones into "Descriptive".
   athletics = c(
-    "pct_athletes_overall", "total_varsity_sports", "multi_sport_ratio"
+    # Clustering (in peer distance):
+    "pct_athletes_overall", "total_varsity_sports", "multi_sport_ratio",
+    # Descriptive (visible in Side-by-Side and the inspector, no weight):
+    "mens_varsity_sports", "womens_varsity_sports",
+    "male_athletes_undup", "female_athletes_undup", "total_athletes_undup",
+    "pct_male_athletes",   "pct_female_athletes"
   )
 )
 

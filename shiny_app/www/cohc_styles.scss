@@ -1696,3 +1696,295 @@ ul, ol {
 .asp-weights-grid .shiny-input-container {
   margin-bottom: 0.35rem;
 }
+
+/* ---------- Trends tab ---------- */
+.trend-control-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.5fr) minmax(220px, 1fr);
+  gap: 1rem;
+  align-items: end;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+
+  label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trend-var-header {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.trend-var-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.trend-var-name {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #251230;
+}
+
+.trend-var-cat {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #602D89;
+  padding: 2px 6px;
+  background: #efe6f5;
+  border-radius: 4px;
+}
+
+.trend-var-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.trend-chip {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #F4EDEC;
+  color: #251230;
+  font-weight: 500;
+  strong { color: #602D89; font-weight: 700; }
+}
+.trend-chip-computed {
+  background: #602D89;
+  color: #FFFFFF;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.trend-var-desc {
+  margin: 0.4rem 0 0 0;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: #251230;
+}
+
+/* Compact "what's the comparison" line above the plot. */
+.trend-compare-pill {
+  padding: 0.4rem 0.7rem;
+  background: #F4EDEC;
+  border-left: 3px solid #6e6360;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  font-size: 0.88rem;
+  color: #251230;
+}
+
+/* Trends chart container — hard bounds so the chart can't bleed into the
+ * year-by-year table below. plotly's html-widget output sometimes renders
+ * its SVG larger than the parent declares; constraining the parent and
+ * setting overflow:hidden keeps the layout deterministic. */
+.trend-chart-container {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 460px;          /* chart height (440px) + a small visual buffer */
+  margin: 0 0 1.5rem 0;
+  overflow: hidden;
+
+  > .html-widget,
+  > .html-widget-output,
+  > .plotly,
+  > div {
+    width: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
+.trend-table-container {
+  display: block;
+  position: relative;
+  width: 100%;
+  clear: both;
+  margin-top: 1rem;
+}
+
+/* ---------- Help tab (renders docs/USER_GUIDE.md) ---------- */
+.help-doc {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem 1.5rem;
+
+  h1 { border-bottom-color: #602D89; }
+  h2 { color: #602D89; margin-top: 2rem; }
+  h3 { color: #251230; margin-top: 1.5rem; }
+  h4 { color: #251230; }
+
+  blockquote {
+    border-left: 3px solid #602D89;
+    background: #F4EDEC;
+    padding: 0.5rem 0.85rem;
+    margin: 0.5rem 0 1rem 0;
+    color: #251230;
+    font-style: italic;
+  }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    margin: 0.5rem 0 1.25rem 0;
+    font-size: 0.9rem;
+
+    th {
+      background: #FAF6F5;
+      color: #251230;
+      font-weight: 600;
+      text-align: left;
+      padding: 0.5rem 0.6rem;
+      border-bottom: 2px solid #AC9E94;
+    }
+    td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid #F4EDEC;
+      color: #251230;
+      vertical-align: top;
+    }
+  }
+
+  code {
+    background: #F4EDEC;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #602D89;
+    font-size: 0.85em;
+  }
+
+  pre {
+    background: #FAF6F5;
+    border: 1px solid #F4EDEC;
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    overflow-x: auto;
+
+    code {
+      background: transparent;
+      color: #251230;
+      padding: 0;
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #AC9E94;
+    margin: 2rem 0;
+  }
+
+  ul, ol {
+    color: #251230;
+  }
+  li { margin-bottom: 0.35rem; }
+  li strong { color: #602D89; }
+}
+
+/* ---------- Variables tab ---------- */
+.var-filter-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+
+  label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #251230;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Detail-list block inside the variable detail modal. dl-style key/value
+ * pairs aligned in a two-column grid. */
+.var-detail-list {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1rem;
+  font-size: 0.9rem;
+
+  dt {
+    font-weight: 600;
+    color: #602D89;
+    margin: 0;
+  }
+  dd {
+    margin: 0;
+    color: #251230;
+    code {
+      background: #F4EDEC;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+/* In Cohort budget pill — shown inline next to the section heading.
+ * Communicates "X slots remaining" / "cohort is full" / "N over the
+ * target" at a glance. */
+.cohort-budget-pill {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 2px 10px;
+  background: #F4EDEC;
+  color: #602D89;
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: 10px;
+  vertical-align: middle;
+}
+
+/* Cohort Builder leaflet map container — explicit block + margin so it
+ * doesn't crowd the dashboard cards immediately below it. */
+.cohort-map-container {
+  display: block;
+  width: 100%;
+  margin: 0 0 1.5rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .leaflet-container {
+    border-radius: 8px;
+    border: 1px solid #F4EDEC;
+  }
+}

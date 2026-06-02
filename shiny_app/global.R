@@ -14,6 +14,7 @@ suppressMessages({
   library(readr); library(tibble); library(purrr)
   library(ggplot2)
   library(plotly)
+  library(leaflet)
 })
 
 # -----------------------------------------------------------------------------

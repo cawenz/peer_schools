@@ -66,8 +66,8 @@ aspirantUI <- function(id) {
                        ))
       ),
       tags$div(class = "asp-control-run",
-        actionButton(ns("run"), "Find aspirant peers",
-                     icon = icon("arrow-up"),
+        actionButton(ns("run"), "Run aspirant search",
+                     icon = icon("play"),
                      class = "btn btn-primary btn-lg")
       )
     ),

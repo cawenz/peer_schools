@@ -233,7 +233,7 @@ build_ath_variables <- function() {
     # else is descriptive (visible in the inspector and Side-by-Side, but
     # not folded into the peer distance to avoid double-counting since the
     # counts are linearly dependent with their percentages and totals).
-    "pct_athletes_overall",   "Athletes as % of full-time UG enrollment",      "eada_derived",  "total_athletes_undup / EFTotalCount (EADA's full-time UG headcount)",          "clustering",  "cross_category",  "percentage", TRUE,             "Ranges from ~1% at large D-I publics to >40% at small D-III LACs. HC is D-III with high participation.",
+    "pct_athletes_overall",   "Athletes as % of full-time UG enrollment",      "eada_derived",  "total_athletes_undup / EFTotalCount (EADA's full-time UG headcount)",          "clustering",  "cross_category",  "percentage", TRUE,             "Ranges from ~1% at large D-I publics to >40% at small D-III LACs. HC (D-I, Patriot League) has unusually high participation for a D-I school: ~23% of UG enrollment.",
     "total_varsity_sports",   "Total varsity sports",                          "eada_derived",  "mens_varsity_sports + womens_varsity_sports",                                  "clustering",  "cross_category",  "count",      FALSE,            "Breadth of program.",
     "multi_sport_ratio",      "Multi-sport athlete ratio",                     "eada_derived",  "(IL_SUM_PARTIC_MEN + IL_SUM_PARTIC_WOMEN) / total_athletes_undup",            "clustering",  "cross_category",  "ratio",      FALSE,            "Average sports per athlete. LACs run 1.20-1.35 (lots of two-sport athletes); D-I near 1.00.",
     # Descriptive variables — visible everywhere but excluded from theme weights.
