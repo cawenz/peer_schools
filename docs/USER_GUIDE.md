@@ -1,17 +1,14 @@
 # Peer Schools Explorer — User Guide
 
 A tool for finding, comparing, and curating institutional peers for the
-College of the Holy Cross. Built for the Institutional Research office
-and the colleagues, accreditors, and stakeholders who consume our peer
-analyses.
-
+any US College or University. 
 ---
 
-## What this app does, in one paragraph
+## What this app does
 
 You give the app a "home" institution (the **anchor**), and it returns
 the institutions most similar to that anchor on the dimensions you
-choose — size, selectivity, outcomes, finance, faculty resources, and
+choose: size, selectivity, outcomes, finance, faculty resources, and
 student composition. Beyond that core peer search, the app helps you
 compare two schools side by side, inspect a single school's trajectory
 over time, curate a hand-picked cohort (for accreditation work, for
@@ -24,7 +21,7 @@ change it on every tab.
 ## Quick start (about three clicks)
 
 1. Open the **Peer Search** tab. Click **Run search**. You'll see the top
-   20 institutions most similar to Holy Cross under the default
+   20 institutions most similar to your Anchor institution under the default
    methodology.
 2. Click any row in the results table. The app remembers your selection.
    Switch to **Side-by-Side**. The chosen peer is already loaded — you'll
