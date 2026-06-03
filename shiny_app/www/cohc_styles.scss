@@ -1140,22 +1140,25 @@ a {
   flex-wrap: wrap;
 }
 
+/* Info chip — white with neutral gray border. No tinted background. */
 .dash-modal-chip {
   font-size: 0.72rem;
   padding: 2px 8px;
   border-radius: 10px;
-  background: #e2e8f0;
-  color: #0d1b2a;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  color: #475569;
   font-weight: 500;
   letter-spacing: 0.01em;
   strong { color: #1d3557; font-weight: 700; }
 }
 
-/* Special-case chip for derived / computed variables: no key-value form,
- * just a flag. Tinted purple to call attention to it. */
+/* Special-case chip for derived / computed variables: solid brand fill
+ * with white text to call attention to it. */
 .dash-modal-chip-computed {
   background: #1d3557;
   color: #FFFFFF;
+  border-color: #1d3557;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1165,14 +1168,16 @@ a {
   padding: 0.5rem 0;
 }
 
+/* Description block — white with deep-blue left accent. */
 .dash-modal-desc {
   font-size: 0.9rem;
   line-height: 1.45;
   color: #0d1b2a;
   margin-bottom: 1rem;
   padding: 0.6rem 0.85rem;
-  background: #e2e8f0;
-  border-left: 3px solid #1d3557;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #1d3557;
   border-radius: 4px;
 }
 
@@ -1759,13 +1764,15 @@ ul, ol {
   color: #0d1b2a;
 }
 
+/* Category badge — solid brand-color fill, white text. Clearly "this
+ * is a category label", no ambiguity with the pale-tint info chips. */
 .trend-var-cat {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #1d3557;
-  padding: 2px 6px;
-  background: #dbeafe;
+  color: #FFFFFF;
+  padding: 2px 8px;
+  background: #1d3557;
   border-radius: 4px;
 }
 
@@ -1776,18 +1783,22 @@ ul, ol {
   margin-bottom: 0.5rem;
 }
 
+/* Info chips — white background, neutral gray border + text. No tint
+ * that could read as cream/lavender. */
 .trend-chip {
   font-size: 0.72rem;
   padding: 2px 8px;
   border-radius: 10px;
-  background: #e2e8f0;
-  color: #0d1b2a;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  color: #475569;
   font-weight: 500;
   strong { color: #1d3557; font-weight: 700; }
 }
 .trend-chip-computed {
   background: #1d3557;
   color: #FFFFFF;
+  border-color: #1d3557;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1800,11 +1811,14 @@ ul, ol {
   color: #0d1b2a;
 }
 
-/* Compact "what's the comparison" line above the plot. */
+/* Compact "what's the comparison" line above the plot. White bg + a
+ * clear deep-blue left accent so it reads as "info callout" rather
+ * than a tinted block. */
 .trend-compare-pill {
-  padding: 0.4rem 0.7rem;
-  background: #e2e8f0;
-  border-left: 3px solid #64748b;
+  padding: 0.5rem 0.85rem;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #1d3557;
   border-radius: 4px;
   margin-bottom: 0.5rem;
   font-size: 0.88rem;
