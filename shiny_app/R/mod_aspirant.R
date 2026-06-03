@@ -154,12 +154,12 @@ aspirantServer <- function(id) {
     anchor_choices <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
     updateSelectizeInput(session, "anchor_unitid",
                          choices = anchor_choices,
                          selected = character(0),
-                         server = TRUE)
+                         server = FALSE)
 
     raw_classes  <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
     class_choices <- setNames(raw_classes, .prettify_classification(raw_classes))

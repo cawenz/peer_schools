@@ -106,12 +106,12 @@ trendsServer <- function(id,
     school_choices <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
     updateSelectizeInput(session, "school_unitid",
                          choices  = school_choices,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
 
     # --- Compare-against choices: built from live cross-tab state so
     # each option says exactly what it'll resolve to right now. The

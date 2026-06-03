@@ -238,17 +238,17 @@ compareServer <- function(id, peer_selection, peer_result) {
     anchor_choices_all <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
 
     updateSelectizeInput(session, "anchor_compare",
                          choices = anchor_choices_all,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
     updateSelectizeInput(session, "peer_compare",
                          choices = anchor_choices_all,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
 
     # -------------------------------------------------------------------------
     # Peer choices react to the toggle and to peer_result changes.
@@ -280,7 +280,7 @@ compareServer <- function(id, peer_selection, peer_result) {
       cur <- isolate(input$peer_compare)
       sel <- if (length(cur) && cur %in% as.character(ch)) cur else character(0)
       updateSelectizeInput(session, "peer_compare",
-                           choices = ch, selected = sel, server = TRUE)
+                           choices = ch, selected = sel, server = FALSE)
     })
 
     # When a new search lands, sync the anchor picker to that search's anchor

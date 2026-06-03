@@ -198,15 +198,20 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
   moduleServer(id, function(input, output, session) {
 
     # --- Populate dynamic choices on startup from .SCHOOLS in global.R ---
+    # Sorted alphabetically by label and shipped client-side so selectize's
+    # Sifter scorer ranks word-start matches first (e.g. typing "Holy"
+    # surfaces "College of the Holy Cross" near the top). Server-side
+    # selectize would cap the dropdown at maxOptions in unitid order, which
+    # buries the school the user actually wants under common-prefix matches.
     anchor_choices <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
     updateSelectizeInput(session, "anchor_unitid",
                          choices  = anchor_choices,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
 
     # Pretty labels for usnews_classification (.prettify_classification
     # lives in R/helpers_format.R). Three sentinel "All" options at the

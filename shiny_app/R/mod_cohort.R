@@ -398,7 +398,7 @@ cohortServer <- function(id) {
     anchor_choices_all <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
 
     # ---- Load cohort from file ----
@@ -426,7 +426,7 @@ cohortServer <- function(id) {
     updateSelectizeInput(session, "add_school",
                          choices  = anchor_choices_all,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
 
     observeEvent(input$add_school_btn, {
       uid <- suppressWarnings(as.integer(input$add_school))

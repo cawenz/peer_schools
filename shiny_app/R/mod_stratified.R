@@ -249,12 +249,12 @@ stratifiedServer <- function(id) {
     anchor_choices_all <- {
       vals <- .SCHOOLS$unitid
       names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals
+      vals[order(names(vals))]
     }
     updateSelectizeInput(session, "anchor_strat",
                          choices  = anchor_choices_all,
                          selected = character(0),
-                         server   = TRUE)
+                         server   = FALSE)
 
     # ---- Theme weight presets ----
     .THEME_PRESETS_LOCAL <- list(
