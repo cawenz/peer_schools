@@ -243,7 +243,7 @@ compareServer <- function(id, peer_selection, peer_result) {
 
     updateSelectizeInput(session, "anchor_compare",
                          choices = anchor_choices_all,
-                         selected = .DEFAULT_ANCHOR_UNITID,
+                         selected = character(0),
                          server   = TRUE)
     updateSelectizeInput(session, "peer_compare",
                          choices = anchor_choices_all,
@@ -745,8 +745,8 @@ compareServer <- function(id, peer_selection, peer_result) {
           xbins = list(start = min(pool_vals),
                        end   = max(pool_vals) + bw,
                        size  = bw),
-          marker = list(color = "#F4EDEC",
-                        line  = list(color = "#AC9E94", width = 0.5)),
+          marker = list(color = "#e2e8f0",
+                        line  = list(color = "#94a3b8", width = 0.5)),
           hovertemplate = paste0(
             "<b>Pool bin</b><br>Around ", x_hover_fmt,
             ": %{y} institutions<extra></extra>")
@@ -754,7 +754,7 @@ compareServer <- function(id, peer_selection, peer_result) {
         add_lines(
           x = dens$x, y = dens_y_count,
           name = "Density estimate",
-          line = list(color = "#251230", width = 2),
+          line = list(color = "#0d1b2a", width = 2),
           hovertemplate = paste0("Density at ", x_hover_fmt,
                                   "<extra></extra>")
         )
@@ -773,7 +773,7 @@ compareServer <- function(id, peer_selection, peer_result) {
             y = rep(0, length(ix)),
             name = "Other peers in current search",
             text = pool_df$instnm[ix],
-            marker = list(symbol = "diamond", size = 9, color = "#251230",
+            marker = list(symbol = "diamond", size = 9, color = "#0d1b2a",
                           line = list(color = "#FFFFFF", width = 1)),
             hovertemplate = paste0("<b>%{text}</b><br>", x_label,
                                     ": ", x_hover_fmt, "<extra></extra>")
@@ -787,7 +787,7 @@ compareServer <- function(id, peer_selection, peer_result) {
         shapes <- c(shapes, list(list(
           type = "line", xref = "x", yref = "paper",
           x0 = a_val, x1 = a_val, y0 = 0, y1 = 1,
-          line = list(color = "#602D89", width = 2.5)
+          line = list(color = "#1d3557", width = 2.5)
         )))
         annots <- c(annots, list(list(
           x = a_val, y = 1, xref = "x", yref = "paper",
@@ -795,7 +795,7 @@ compareServer <- function(id, peer_selection, peer_result) {
           text = sprintf("<b>Anchor: %s (%s)</b>",
                           anchor_name, .format_value(a_val, fmt)),
           showarrow = FALSE,
-          bgcolor = "#602D89", bordercolor = "#602D89",
+          bgcolor = "#1d3557", bordercolor = "#1d3557",
           font = list(color = "#FFFFFF", size = 11),
           xshift = 4, yshift = 2
         )))
@@ -804,7 +804,7 @@ compareServer <- function(id, peer_selection, peer_result) {
         shapes <- c(shapes, list(list(
           type = "line", xref = "x", yref = "paper",
           x0 = p_val, x1 = p_val, y0 = 0, y1 = 1,
-          line = list(color = "#AC9E94", width = 2.5, dash = "dash")
+          line = list(color = "#94a3b8", width = 2.5, dash = "dash")
         )))
         annots <- c(annots, list(list(
           x = p_val, y = 1, xref = "x", yref = "paper",
@@ -812,7 +812,7 @@ compareServer <- function(id, peer_selection, peer_result) {
           text = sprintf("<b>Peer: %s (%s)</b>",
                           peer_name, .format_value(p_val, fmt)),
           showarrow = FALSE,
-          bgcolor = "#AC9E94", bordercolor = "#AC9E94",
+          bgcolor = "#94a3b8", bordercolor = "#94a3b8",
           font = list(color = "#FFFFFF", size = 11),
           xshift = 4, yshift = 22   # nudged down so it sits below the anchor chip
         )))
@@ -821,10 +821,10 @@ compareServer <- function(id, peer_selection, peer_result) {
       p %>%
         layout(
           # No chart title — the modal's header already shows the variable name.
-          xaxis  = list(title = x_label, gridcolor = "#F4EDEC",
+          xaxis  = list(title = x_label, gridcolor = "#e2e8f0",
                         zeroline = FALSE),
           yaxis  = list(title = "Number of institutions",
-                        gridcolor = "#F4EDEC"),
+                        gridcolor = "#e2e8f0"),
           shapes = shapes,
           annotations = annots
         ) %>%

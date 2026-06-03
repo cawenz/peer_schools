@@ -205,13 +205,39 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     }
     updateSelectizeInput(session, "anchor_unitid",
                          choices  = anchor_choices,
-                         selected = .DEFAULT_ANCHOR_UNITID,
+                         selected = character(0),
                          server   = TRUE)
 
     # Pretty labels for usnews_classification (.prettify_classification
-    # lives in R/helpers_format.R)
+    # lives in R/helpers_format.R). Three sentinel "All" options at the
+    # top expand to multiple raw classifications when the filter is
+    # applied — same pattern the state/region picker uses for "Region:
+    # Northeast" etc.
     raw_classes <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
-    class_choices <- setNames(raw_classes, .prettify_classification(raw_classes))
+    pretty <- .prettify_classification(raw_classes)
+
+    # Sentinel values are kept distinct from real classifications by the
+    # double-underscore prefix; the state-filter expander already follows
+    # this convention.
+    .USNEWS_SENTINEL_ALL                  <<- "__usnews_all__"
+    .USNEWS_SENTINEL_ALL_REGIONAL_COLLS   <<- "__usnews_all_regional_colleges__"
+    .USNEWS_SENTINEL_ALL_REGIONAL_UNIVS   <<- "__usnews_all_regional_universities__"
+    .USNEWS_REGIONAL_COLL_VALUES <<- grep("^regional-colleges-",
+                                           raw_classes, value = TRUE)
+    .USNEWS_REGIONAL_UNIV_VALUES <<- grep("^regional-universities-",
+                                           raw_classes, value = TRUE)
+
+    sentinel_values <- c(.USNEWS_SENTINEL_ALL,
+                         .USNEWS_SENTINEL_ALL_REGIONAL_COLLS,
+                         .USNEWS_SENTINEL_ALL_REGIONAL_UNIVS)
+    sentinel_labels <- c(
+      "All US News classifications",
+      "All Regional Colleges (Midwest + North + South + West)",
+      "All Regional Universities (Midwest + North + South + West)"
+    )
+    sentinel_choices <- setNames(sentinel_values, sentinel_labels)
+
+    class_choices <- c(sentinel_choices, setNames(raw_classes, pretty))
     updateSelectInput(session, "pool_class", choices = class_choices)
 
     # Better display labels for control_grp. Names = labels users see,
@@ -386,12 +412,26 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
       if (isTRUE(input$pool_ranked))
         pool$in_ranked_universe <- TRUE
 
-      # Classification: same-as-anchor uses anchor row; otherwise user picks
+      # Classification: same-as-anchor uses anchor row; otherwise user picks.
+      # Sentinel "All ..." values expand to their constituent raw codes
+      # (same pattern as the state picker's region sentinels).
       if (isTRUE(input$pool_class_same)) {
         if (!is.null(ar) && !is.na(ar$usnews_classification))
           pool$usnews_classification <- ar$usnews_classification
       } else if (length(input$pool_class)) {
-        pool$usnews_classification <- input$pool_class
+        sel <- input$pool_class
+        expanded <- unique(unlist(lapply(sel, function(v) {
+          if (identical(v, .USNEWS_SENTINEL_ALL)) {
+            sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
+          } else if (identical(v, .USNEWS_SENTINEL_ALL_REGIONAL_COLLS)) {
+            .USNEWS_REGIONAL_COLL_VALUES
+          } else if (identical(v, .USNEWS_SENTINEL_ALL_REGIONAL_UNIVS)) {
+            .USNEWS_REGIONAL_UNIV_VALUES
+          } else {
+            v
+          }
+        }), use.names = FALSE))
+        if (length(expanded)) pool$usnews_classification <- expanded
       }
 
       if (isTRUE(input$pool_control_same)) {

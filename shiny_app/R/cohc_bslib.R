@@ -1,10 +1,10 @@
 # cohc_bslib.R — Holy Cross bslib theme function for the Peer Schools app.
 #
 # Brand palette:
-#   #602D89  primary purple
-#   #251230  dark
-#   #F4EDEC  light beige
-#   #AC9E94  taupe / secondary
+#   #1d3557  primary purple
+#   #0d1b2a  dark
+#   #e2e8f0  light beige
+#   #94a3b8  taupe / secondary
 #   #FFFFFF  white
 #   #000000  black
 #
@@ -23,14 +23,14 @@ cohc_bslib <- function(scss_path = "www/cohc_styles.scss") {
     version = 5,
 
     # Primary palette
-    primary   = "#602D89",
-    secondary = "#AC9E94",
-    success   = "#602D89",
-    info      = "#602D89",
-    warning   = "#AC9E94",
-    danger    = "#602D89",
-    light     = "#F4EDEC",
-    dark      = "#251230",
+    primary   = "#1d3557",
+    secondary = "#94a3b8",
+    success   = "#1d3557",
+    info      = "#1d3557",
+    warning   = "#94a3b8",
+    danger    = "#1d3557",
+    light     = "#e2e8f0",
+    dark      = "#0d1b2a",
 
     bg = "#FFFFFF",
     fg = "#000000",

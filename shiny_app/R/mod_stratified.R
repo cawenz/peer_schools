@@ -253,7 +253,7 @@ stratifiedServer <- function(id) {
     }
     updateSelectizeInput(session, "anchor_strat",
                          choices  = anchor_choices_all,
-                         selected = .DEFAULT_ANCHOR_UNITID,
+                         selected = character(0),
                          server   = TRUE)
 
     # ---- Theme weight presets ----
