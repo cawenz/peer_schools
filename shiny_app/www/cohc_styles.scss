@@ -1475,11 +1475,14 @@ a {
   line-height: 1.6;
 }
 
-/* ---------- Layout ---------- */
+/* ---------- Layout ----------
+ * No global max-width: the app should use the full viewport so the
+ * Peer Search results table, Side-by-Side grids, and Cohort dashboard
+ * cards have room to breathe on wide monitors. Prose-heavy pages
+ * (Help) apply their own reading-width cap via .help-doc.
+ */
 .container-fluid {
   padding: 1.5rem 1.5rem;
-  max-width: 1400px;
-  margin: 0 auto;
 }
 
 ul, ol {
