@@ -233,7 +233,7 @@
       '<svg width="%d" height="%d" class="dist-bar" ',
       'xmlns="http://www.w3.org/2000/svg" aria-label="distribution bar">',
       '<title>%s</title>',
-      '<rect x="0" y="%d" width="%d" height="4" fill="#F4EDEC" rx="2"/>',
+      '<rect x="0" y="%d" width="%d" height="4" fill="#e2e8f0" rx="2"/>',
       '%s%s%s',          # Q1, Q3 (thin), median (taller, darker)
       '%s%s',             # anchor, peer
       '</svg>'
@@ -241,10 +241,10 @@
     width, height,
     htmltools::htmlEscape(tooltip),
     height %/% 2 - 2, width,
-    tick(q1x, 4, height - 4, "#AC9E94", 1),
-    tick(q3x, 4, height - 4, "#AC9E94", 1),
-    tick(mdx, 2, height - 2, "#251230", 1.5),
-    marker(ax, "#602D89", 4),
-    marker(px, "#AC9E94", 4)
+    tick(q1x, 4, height - 4, "#94a3b8", 1),
+    tick(q3x, 4, height - 4, "#94a3b8", 1),
+    tick(mdx, 2, height - 2, "#0d1b2a", 1.5),
+    marker(ax, "#1d3557", 4),
+    marker(px, "#94a3b8", 4)
   ))
 }

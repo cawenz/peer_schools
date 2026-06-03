@@ -740,10 +740,10 @@ cohortServer <- function(id) {
     # Color palette for the per-school rug ticks. Matches the action
     # badges used elsewhere in the cohort tab.
     .DASH_ACTION_COLORS <- c(
-      "Anchor"   = "#602D89",
+      "Anchor"   = "#1d3557",
       "Keep"     = "#2e7d32",
-      "Maybe"    = "#AC9E94",
-      "Proposed" = "#9D7BB7"
+      "Maybe"    = "#94a3b8",
+      "Proposed" = "#7591b3"
     )
 
     # SVG strip: faint universe density curve at top, per-school rug ticks
@@ -800,7 +800,7 @@ cohortServer <- function(id) {
                         rug_data$action != "Anchor", , drop = FALSE]
         if (nrow(rd)) {
           colors <- unname(.DASH_ACTION_COLORS[as.character(rd$action)])
-          colors[is.na(colors)] <- "#AC9E94"
+          colors[is.na(colors)] <- "#94a3b8"
           rug_parts <- vapply(seq_len(nrow(rd)), function(i) {
             x <- to_x(rd$value[i])
             sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="%.1f" y2="%.1f" ',
@@ -816,15 +816,15 @@ cohortServer <- function(id) {
       anchor_str <- if (is.finite(anchor_val)) {
         ax <- to_x(anchor_val)
         sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="2" y2="%.1f" ',
-                        'stroke="#602D89" stroke-width="2.5"/>',
-                        '<circle cx="%.1f" cy="2" r="3.5" fill="#602D89"/>'),
+                        'stroke="#1d3557" stroke-width="2.5"/>',
+                        '<circle cx="%.1f" cy="2" r="3.5" fill="#1d3557"/>'),
                 ax, ax, rug_bottom, ax)
       } else ""
 
       HTML(sprintf(
         paste0('<svg class="dash-strip" width="%d" height="%d" ',
                 'viewBox="0 0 %d %d" preserveAspectRatio="none">',
-                '<polygon points="%s" fill="#F4EDEC" stroke="#AC9E94" ',
+                '<polygon points="%s" fill="#e2e8f0" stroke="#94a3b8" ',
                 'stroke-width="0.5"/>',
                 '%s%s',
                 '</svg>'),
@@ -912,11 +912,11 @@ cohortServer <- function(id) {
     # the per-action badges used elsewhere in the cohort tab so the map
     # reads consistently with the cohort table and the dashboard.
     .MAP_ACTION_COLORS <- c(
-      Anchor   = "#251230",  # dark slate
+      Anchor   = "#0d1b2a",  # dark slate
       Keep     = "#2e7d32",  # green
-      Maybe    = "#AC9E94",  # taupe
-      Proposed = "#602D89",  # purple (committed addition)
-      Possible = "#9D7BB7"   # light purple (brainstormed)
+      Maybe    = "#94a3b8",  # taupe
+      Proposed = "#1d3557",  # purple (committed addition)
+      Possible = "#7591b3"   # light purple (brainstormed)
     )
 
     # Statuses that appear on the map (everything except Remove).
@@ -1016,7 +1016,7 @@ cohortServer <- function(id) {
 
       pts$color <- unname(.MAP_ACTION_COLORS[pts$action])
       pts$tip   <- sprintf(
-        "<strong>%s</strong><br><span style='color:#6e6360'>%s &middot; %s</span>",
+        "<strong>%s</strong><br><span style='color:#64748b'>%s &middot; %s</span>",
         pts$instnm, pts$stabbr, pts$action)
       pts$popup <- vapply(seq_len(nrow(pts)), function(i) {
         r <- pts[i, ]
@@ -1028,7 +1028,7 @@ cohortServer <- function(id) {
         size  <- if (!is.na(r$instsize_label)) r$instsize_label else NA
         parts <- c(
           sprintf("<strong>%s</strong>", r$instnm),
-          sprintf("<span style='color:#602D89;font-weight:600'>%s</span>",
+          sprintf("<span style='color:#1d3557;font-weight:600'>%s</span>",
                   r$action),
           sprintf("%s", r$stabbr),
           if (!is.na(cls_u)) sprintf("<em>US News:</em> %s",  cls_u),
@@ -1379,9 +1379,9 @@ cohortServer <- function(id) {
     .COHORT_ACTION_COLORS <- c(
       "Keep"     = "#2e7d32",
       "Remove"   = "#b53737",
-      "Maybe"    = "#AC9E94",
-      "Proposed" = "#602D89",
-      "Possible" = "#9D7BB7"
+      "Maybe"    = "#94a3b8",
+      "Proposed" = "#1d3557",
+      "Possible" = "#7591b3"
     )
 
     # Variable picker choices, grouped by category. Only numeric clustering /
@@ -1565,8 +1565,8 @@ cohortServer <- function(id) {
           xbins = list(start = min(pool_vals),
                        end   = max(pool_vals) + bw,
                        size  = bw),
-          marker = list(color = "#F4EDEC",
-                        line  = list(color = "#AC9E94", width = 0.5)),
+          marker = list(color = "#e2e8f0",
+                        line  = list(color = "#94a3b8", width = 0.5)),
           hovertemplate = paste0(
             "<b>Pool bin</b><br>Around ", x_hover_fmt,
             ": %{y} institutions<extra></extra>")
@@ -1603,7 +1603,7 @@ cohortServer <- function(id) {
         shapes <- c(shapes, list(list(
           type = "line", xref = "x", yref = "paper",
           x0 = a_val, x1 = a_val, y0 = 0, y1 = 1,
-          line = list(color = "#602D89", width = 2.5)
+          line = list(color = "#1d3557", width = 2.5)
         )))
         annots <- c(annots, list(list(
           x = a_val, y = 1, xref = "x", yref = "paper",
@@ -1611,7 +1611,7 @@ cohortServer <- function(id) {
           text = sprintf("<b>Anchor: %s (%s)</b>",
                           anchor_name, .format_value(a_val, fmt)),
           showarrow = FALSE,
-          bgcolor = "#251230", bordercolor = "#251230",
+          bgcolor = "#0d1b2a", bordercolor = "#0d1b2a",
           font = list(color = "#FFFFFF", size = 12),
           xshift = 4, yshift = 2
         )))
@@ -1619,10 +1619,10 @@ cohortServer <- function(id) {
 
       p %>%
         layout(
-          xaxis  = list(title = x_label, gridcolor = "#F4EDEC",
+          xaxis  = list(title = x_label, gridcolor = "#e2e8f0",
                         zeroline = FALSE),
           yaxis  = list(title = "Number of institutions",
-                        gridcolor = "#F4EDEC"),
+                        gridcolor = "#e2e8f0"),
           shapes = shapes,
           annotations = annots
         ) %>%
@@ -1692,7 +1692,7 @@ cohortServer <- function(id) {
           target = "cell",
           color = DT::styleEqual(
             c("Anchor",  names(.COHORT_ACTION_COLORS)),
-            c("#602D89", unname(.COHORT_ACTION_COLORS))
+            c("#1d3557", unname(.COHORT_ACTION_COLORS))
           ),
           fontWeight = "600"
         )

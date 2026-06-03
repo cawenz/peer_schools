@@ -20,15 +20,15 @@
 .COHC_FONT <- list(
   family = "'Manrope', 'Helvetica Neue', Arial, sans-serif",
   size   = 13,
-  color  = "#251230"
+  color  = "#0d1b2a"
 )
 
 # Dark slate hover label with crisp white text. Plotly's default colors
 # hover labels by trace, which gives white-on-light-purple etc. — the
 # branded version is always dark + white so contrast is consistent.
 .COHC_HOVERLABEL <- list(
-  bgcolor     = "#251230",
-  bordercolor = "#251230",
+  bgcolor     = "#0d1b2a",
+  bordercolor = "#0d1b2a",
   font        = list(
     family = "'Manrope', 'Helvetica Neue', Arial, sans-serif",
     color  = "#FFFFFF",

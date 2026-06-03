@@ -19,10 +19,10 @@ body {
  * on either the navbar wrapper or its container. Bootstrap's defaults add
  * ~1.5rem of left padding via .container-fluid; we override that here. */
 .navbar {
-  background-color: #602D89 !important;
-  border-bottom: 2px solid #251230;
+  background-color: #1d3557 !important;
+  border-bottom: 2px solid #0d1b2a;
   min-height: 48px;
-  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.1);
+  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.1);
   padding: 0 !important;
 }
 
@@ -66,19 +66,19 @@ body {
 }
 
 .navbar-nav .nav-link:hover {
-  color: #F4EDEC !important;
-  border-bottom-color: #F4EDEC;
+  color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0;
 }
 
 .navbar-nav .nav-link.active {
-  color: #F4EDEC !important;
-  border-bottom-color: #F4EDEC;
+  color: #e2e8f0 !important;
+  border-bottom-color: #e2e8f0;
 }
 
 /* ---------- Typography Hierarchy ---------- */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Gelasio', Georgia, serif;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   line-height: 1.25;
 }
@@ -87,7 +87,7 @@ h1 {
   font-size: 2.5rem;
   margin-top: 0;
   margin-bottom: 1rem;
-  border-bottom: 3px solid #602D89;
+  border-bottom: 3px solid #1d3557;
   padding-bottom: 0.5rem;
 }
 
@@ -95,7 +95,7 @@ h2 {
   font-size: 1.875rem;
   margin-top: 2rem;
   margin-bottom: 1rem;
-  color: #602D89;
+  color: #1d3557;
 }
 
 h3 {
@@ -114,7 +114,7 @@ h5, h6 {
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #251230;
+  color: #0d1b2a;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
 }
@@ -125,29 +125,29 @@ p {
 }
 
 a {
-  color: #602D89;
+  color: #1d3557;
   text-decoration: none;
   font-weight: 500;
 }
 
 a:hover {
-  color: #251230;
+  color: #0d1b2a;
   text-decoration: underline;
 }
 
 /* ---------- Cards ---------- */
 .card {
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.05);
+  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.05);
   margin-bottom: 1.5rem;
   background-color: #FFFFFF;
 }
 
 .card .card-header {
-  background-color: #F4EDEC;
-  border-bottom: 1px solid #AC9E94;
-  color: #251230;
+  background-color: #e2e8f0;
+  border-bottom: 1px solid #94a3b8;
+  color: #0d1b2a;
   font-weight: 600;
   font-family: 'Gelasio', Georgia, serif;
 }
@@ -158,27 +158,27 @@ a:hover {
 
 /* ---------- Buttons ---------- */
 .btn-primary {
-  background-color: #602D89;
-  border-color: #602D89;
+  background-color: #1d3557;
+  border-color: #1d3557;
   color: #FFFFFF;
   font-weight: 500;
 }
 
 .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
-  background-color: #251230 !important;
-  border-color: #251230 !important;
+  background-color: #0d1b2a !important;
+  border-color: #0d1b2a !important;
   color: #FFFFFF !important;
 }
 
 .btn-secondary {
-  background-color: #AC9E94;
-  border-color: #AC9E94;
+  background-color: #94a3b8;
+  border-color: #94a3b8;
   color: #FFFFFF;
 }
 
 .btn-secondary:hover {
-  background-color: #251230;
-  border-color: #251230;
+  background-color: #0d1b2a;
+  border-color: #0d1b2a;
   color: #FFFFFF;
 }
 
@@ -199,14 +199,14 @@ a:hover {
 }
 
 .bslib-sidebar-layout > .sidebar {
-  background-color: #F4EDEC;
-  border-right: 1px solid #AC9E94;
+  background-color: #e2e8f0;
+  border-right: 1px solid #94a3b8;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   /* Visible scrollbar so users have something to grab. */
   scrollbar-width: auto;
-  scrollbar-color: #AC9E94 #F4EDEC;
+  scrollbar-color: #94a3b8 #e2e8f0;
 }
 
 .bslib-sidebar-layout > .sidebar::-webkit-scrollbar {
@@ -214,19 +214,19 @@ a:hover {
 }
 
 .bslib-sidebar-layout > .sidebar::-webkit-scrollbar-track {
-  background: #F4EDEC;
-  border-left: 1px solid #d8cfca;
+  background: #e2e8f0;
+  border-left: 1px solid #cbd5e1;
 }
 
 .bslib-sidebar-layout > .sidebar::-webkit-scrollbar-thumb {
-  background: #AC9E94;
+  background: #94a3b8;
   border-radius: 6px;
-  border: 2px solid #F4EDEC;
+  border: 2px solid #e2e8f0;
   min-height: 40px;
 }
 
 .bslib-sidebar-layout > .sidebar::-webkit-scrollbar-thumb:hover {
-  background: #8d8079;
+  background: #475569;
 }
 
 .bslib-sidebar-layout > .sidebar .sidebar-content {
@@ -273,7 +273,7 @@ a:hover {
 
 /* Section dividers inside the sidebar */
 .sidebar hr {
-  border-top: 1px solid #AC9E94;
+  border-top: 1px solid #94a3b8;
   margin: 1.25rem 0;
   opacity: 0.6;
 }
@@ -288,8 +288,8 @@ a:hover {
 
 .stat-card {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 6px;
   padding: 1.25rem;
   text-align: left;
@@ -299,7 +299,7 @@ a:hover {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 2rem;
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   line-height: 1.1;
 }
 
@@ -307,7 +307,7 @@ a:hover {
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
@@ -335,16 +335,16 @@ a:hover {
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .compare-controls .compare-control label {
   display: block;
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
 }
 
@@ -354,12 +354,12 @@ a:hover {
 
 .compare-controls .compare-control-toggle label {
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   cursor: pointer;
 }
 
 .compare-distance-na {
-  color: #AC9E94 !important;
+  color: #94a3b8 !important;
   /* taupe instead of brand purple */
   font-size: 2rem !important;
   letter-spacing: -2px;
@@ -372,8 +372,8 @@ a:hover {
   align-items: center;
   padding: 1.25rem;
   margin-bottom: 1.5rem;
-  background: #F4EDEC;
-  border: 1px solid #AC9E94;
+  background: #e2e8f0;
+  border: 1px solid #94a3b8;
   border-radius: 8px;
 }
 
@@ -381,7 +381,7 @@ a:hover {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -390,7 +390,7 @@ a:hover {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   line-height: 1.2;
   margin-bottom: 0.25rem;
 }
@@ -414,7 +414,7 @@ a:hover {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 2rem;
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   line-height: 1;
 }
 
@@ -426,7 +426,7 @@ a:hover {
 
 .compare-header .compare-distance .compare-rank-label {
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-top: 0.5rem;
   font-weight: 500;
 }
@@ -449,11 +449,11 @@ a:hover {
 }
 
 .compare-legend .legend-dot.legend-anchor {
-  background: #602D89;
+  background: #1d3557;
 }
 
 .compare-legend .legend-dot.legend-peer {
-  background: #AC9E94;
+  background: #94a3b8;
 }
 
 .compare-legend .legend-spacer {
@@ -465,7 +465,7 @@ a:hover {
 }
 
 .compare-section h5 {
-  border-bottom: 1px solid #AC9E94;
+  border-bottom: 1px solid #94a3b8;
   padding-bottom: 0.4rem;
   margin-bottom: 0.75rem;
 }
@@ -486,10 +486,10 @@ a:hover {
 
 .compare-table thead th {
   text-align: left;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.4rem 0.6rem;
-  border-bottom: 1px solid #AC9E94;
+  border-bottom: 1px solid #94a3b8;
   background: transparent;
 }
 
@@ -512,7 +512,7 @@ a:hover {
 }
 
 .compare-table tbody tr {
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .compare-table tbody tr:last-child {
@@ -520,11 +520,11 @@ a:hover {
 }
 
 .compare-table tbody tr.clustering-var {
-  background: rgba(96, 45, 137, 0.04);
+  background: rgba(29, 53, 87, 0.04);
 }
 
 .compare-table tbody tr:hover {
-  background: rgba(96, 45, 137, 0.08);
+  background: rgba(29, 53, 87, 0.08);
 }
 
 .compare-table td {
@@ -551,12 +551,12 @@ a:hover {
 }
 
 .compare-table .var-anchor {
-  color: #602D89;
+  color: #1d3557;
   font-weight: 500;
 }
 
 .compare-table .var-peer {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .compare-table .var-diff {
@@ -588,7 +588,7 @@ a:hover {
   font-size: 1rem;
   opacity: 0.55;
   transition: opacity 0.15s ease, transform 0.15s ease;
-  color: #602D89;
+  color: #1d3557;
 }
 
 .inspect-icon:hover, .inspect-icon:focus {
@@ -606,11 +606,11 @@ a:hover {
 .pool-description {
   padding: 0.6rem 0.85rem;
   margin-bottom: 0.75rem;
-  background: #F4EDEC;
-  border-left: 3px solid #602D89;
+  background: #e2e8f0;
+  border-left: 3px solid #1d3557;
   border-radius: 4px;
   font-size: 0.9rem;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .pool-description em {
@@ -625,21 +625,21 @@ a:hover {
   row-gap: 0.25rem;
   margin: 0.75rem 0 0 0;
   padding: 0.75rem 1rem;
-  background: #F4EDEC;
+  background: #e2e8f0;
   border-radius: 6px;
   font-size: 0.9rem;
 }
 
 .distribution-stats dt {
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   margin: 0;
 }
 
 .distribution-stats dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 /* ---------- Stratified Peers tab ---------- */
@@ -651,16 +651,16 @@ a:hover {
   padding: 1rem 1.25rem;
   margin-bottom: 1.25rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .stratified-controls .stratified-control label {
   display: block;
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
 }
 
@@ -668,22 +668,22 @@ a:hover {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0.75rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .stratified-anchor label {
   display: block;
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
 }
 
 .stratum-card-anchor {
   border-left-width: 6px !important;
-  box-shadow: 0 3px 10px rgba(96, 45, 137, 0.18) !important;
+  box-shadow: 0 3px 10px rgba(29, 53, 87, 0.18) !important;
 }
 
 .anchor-badge {
@@ -696,37 +696,37 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 0.4px;
   color: #FFFFFF;
-  background: #602D89;
+  background: #1d3557;
   border-radius: 999px;
   vertical-align: middle;
 }
 
 .stratum-table tbody tr.anchor-row {
-  background: rgba(96, 45, 137, 0.08);
+  background: rgba(29, 53, 87, 0.08);
   font-weight: 500;
 }
 
 .stratum-table tbody tr.anchor-row td {
-  border-bottom: 2px solid #602D89;
+  border-bottom: 2px solid #1d3557;
 }
 
 .stratum-info {
   display: inline-block;
   margin-left: 0.4rem;
-  color: #602D89;
+  color: #1d3557;
   cursor: help;
   font-size: 0.9rem;
   vertical-align: middle;
 }
 
 .stratum-info:hover {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .stratified-filter-mode {
   margin: -0.5rem 0 1rem 0;
   padding: 0.5rem 0.85rem;
-  background: rgba(96, 45, 137, 0.04);
+  background: rgba(29, 53, 87, 0.04);
   border-radius: 6px;
   font-size: 0.88rem;
 }
@@ -737,47 +737,47 @@ a:hover {
 
 .stratified-summary {
   font-size: 0.95rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.5rem;
 }
 
 .stratified-legend {
   margin-bottom: 1.25rem;
   padding: 0.6rem 0.85rem;
-  background: #F4EDEC;
-  border-left: 3px solid #602D89;
+  background: #e2e8f0;
+  border-left: 3px solid #1d3557;
   border-radius: 4px;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.5;
 }
 
 .stratified-legend b {
-  color: #602D89;
+  color: #1d3557;
 }
 
 .stratum-card {
-  border: 1px solid #AC9E94;
-  border-left: 4px solid #602D89;
+  border: 1px solid #94a3b8;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
   background: #FFFFFF;
   padding: 1rem 1.25rem;
   margin-bottom: 1.75rem;
   /* clear vertical separation */
-  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.07);
+  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.07);
 }
 
 .stratum-header {
   padding-bottom: 0.6rem;
   margin-bottom: 0.8rem;
-  border-bottom: 2px solid #602D89;
+  border-bottom: 2px solid #1d3557;
 }
 
 .stratum-label {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   line-height: 1.25;
 }
 
@@ -800,16 +800,16 @@ a:hover {
 
 .stratum-table thead th {
   text-align: left;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid #AC9E94;
+  border-bottom: 1px solid #94a3b8;
   cursor: help;
   white-space: nowrap;
 }
 
 .stratum-table tbody tr {
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .stratum-table tbody tr:last-child {
@@ -817,7 +817,7 @@ a:hover {
 }
 
 .stratum-table tbody tr:hover {
-  background: rgba(96, 45, 137, 0.05);
+  background: rgba(29, 53, 87, 0.05);
 }
 
 .stratum-table td {
@@ -853,7 +853,7 @@ a:hover {
 .stratum-table .sp-reldist {
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: #602D89;
+  color: #1d3557;
   white-space: nowrap;
   width: 1%;
 }
@@ -861,7 +861,7 @@ a:hover {
 .stratum-table .sp-pct {
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: #602D89;
+  color: #1d3557;
   white-space: nowrap;
   width: 1%;
 }
@@ -870,17 +870,17 @@ a:hover {
 .classification-section {
   margin-bottom: 2rem;
   padding: 1rem 1.25rem;
-  border: 1px solid #AC9E94;
-  border-left: 4px solid #602D89;
+  border: 1px solid #94a3b8;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
   background: #FFFFFF;
 }
 
 .classification-section h5 {
-  border-bottom: 2px solid #602D89;
+  border-bottom: 2px solid #1d3557;
   padding-bottom: 0.5rem;
   margin-bottom: 0.5rem;
-  color: #602D89;
+  color: #1d3557;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -913,12 +913,12 @@ a:hover {
 }
 
 .ccount-tag.ccount-mid {
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
 }
 
 .ccount-tag.ccount-low {
-  background: #AC9E94;
+  background: #94a3b8;
   color: #FFFFFF;
 }
 
@@ -930,10 +930,10 @@ a:hover {
 
 .classification-table thead th {
   text-align: left;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.45rem 0.6rem;
-  border-bottom: 1px solid #AC9E94;
+  border-bottom: 1px solid #94a3b8;
   background: transparent;
   white-space: nowrap;
 }
@@ -944,7 +944,7 @@ a:hover {
 }
 
 .classification-table tbody tr {
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .classification-table tbody tr:last-child {
@@ -952,11 +952,11 @@ a:hover {
 }
 
 .classification-table tbody tr.match {
-  background: rgba(96, 45, 137, 0.05);
+  background: rgba(29, 53, 87, 0.05);
 }
 
 .classification-table tbody tr:hover {
-  background: rgba(96, 45, 137, 0.1);
+  background: rgba(29, 53, 87, 0.1);
 }
 
 .classification-table td {
@@ -967,26 +967,26 @@ a:hover {
 .classification-table .cf-label {
   width: 30%;
   font-weight: 500;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .classification-table .cf-value {
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.35;
 }
 
 .classification-table .cf-anchor {
-  color: #602D89;
+  color: #1d3557;
 }
 
 .classification-table .cf-peer {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .classification-table .cf-match {
   text-align: center;
   width: 70px;
-  color: #602D89;
+  color: #1d3557;
   font-weight: 600;
   font-size: 1.1rem;
   white-space: nowrap;
@@ -995,7 +995,7 @@ a:hover {
 /* ---------- Cohort Builder ---------- */
 .cohort-budget {
   padding: 0.6rem 0.85rem;
-  background: rgba(96, 45, 137, 0.05);
+  background: rgba(29, 53, 87, 0.05);
   border-radius: 6px;
   margin-bottom: 0.75rem;
 }
@@ -1006,7 +1006,7 @@ a:hover {
 }
 
 .cohort-budget-row strong {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .cohort-budget-drop {
@@ -1014,7 +1014,7 @@ a:hover {
 }
 
 .cohort-budget-maybe {
-  color: #AC9E94;
+  color: #94a3b8;
 }
 
 .cohort-budget-add {
@@ -1029,14 +1029,14 @@ a:hover {
 .cohort-anchor-banner {
   padding: 0.5rem 0.85rem;
   margin-bottom: 1rem;
-  background: #F4EDEC;
-  border-left: 3px solid #602D89;
+  background: #e2e8f0;
+  border-left: 3px solid #1d3557;
   border-radius: 4px;
   font-size: 0.92rem;
 }
 
 .cohort-anchor-banner strong {
-  color: #602D89;
+  color: #1d3557;
 }
 
 .cohort-section {
@@ -1044,10 +1044,10 @@ a:hover {
 }
 
 .cohort-section h5 {
-  border-bottom: 2px solid #602D89;
+  border-bottom: 2px solid #1d3557;
   padding-bottom: 0.5rem;
   margin-bottom: 0.75rem;
-  color: #602D89;
+  color: #1d3557;
 }
 
 .cohort-view-controls {
@@ -1057,16 +1057,16 @@ a:hover {
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .cohort-view-controls .cohort-view-control label {
   display: block;
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
 }
 
@@ -1086,11 +1086,11 @@ a:hover {
 
 .cohort-table.cohort-table-compact thead th {
   text-align: left;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.5rem 0.6rem;
-  border-bottom: 2px solid #AC9E94;
-  background: #FAF6F5;
+  border-bottom: 2px solid #94a3b8;
+  background: #f1f5f9;
   vertical-align: bottom;
   white-space: nowrap;
 }
@@ -1114,11 +1114,11 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact tbody tr {
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .cohort-table.cohort-table-compact tbody tr:hover td {
-  background-color: rgba(96, 45, 137, 0.05) !important;
+  background-color: rgba(29, 53, 87, 0.05) !important;
 }
 
 .cohort-table.cohort-table-compact td {
@@ -1134,21 +1134,21 @@ a:hover {
 .cohort-table.cohort-table-compact .cohort-state {
   text-align: center;
   width: 50px;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .cohort-table.cohort-table-compact .cohort-ctx {
-  color: #251230;
+  color: #0d1b2a;
   font-size: 0.85rem;
 }
 
 .cohort-table.cohort-table-compact .cohort-name {
   font-weight: 500;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-anchor td {
-  background-color: rgba(96, 45, 137, 0.08);
+  background-color: rgba(29, 53, 87, 0.08);
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-anchor td {
@@ -1175,21 +1175,21 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-maybe td {
-  background-color: rgba(172, 158, 148, 0.12);
+  background-color: rgba(148, 163, 184, 0.12);
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-proposed td {
-  background-color: rgba(96, 45, 137, 0.06);
+  background-color: rgba(29, 53, 87, 0.06);
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-possible td {
-  background-color: rgba(157, 123, 183, 0.08);
+  background-color: rgba(117, 145, 179, 0.08);
 }
 
 /* ---------- Cohort: Variable inspector + Export sections ---------- */
 .cohort-section-divider {
   border: none;
-  border-top: 1px solid #AC9E94;
+  border-top: 1px solid #94a3b8;
   margin: 2rem 0 1.25rem 0;
 }
 
@@ -1197,9 +1197,9 @@ a:hover {
   margin-bottom: 1rem;
   padding: 0.85rem 1rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .cohort-inspector-control-row {
@@ -1225,19 +1225,19 @@ a:hover {
 .cohort-pool-control label {
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.2rem;
 }
 
 .cohort-pool-description {
   padding: 0.4rem 0.6rem;
-  background: #F4EDEC;
+  background: #e2e8f0;
   border-radius: 4px;
   font-size: 0.85rem;
 }
 
 .cohort-pool-description strong {
-  color: #602D89;
+  color: #1d3557;
 }
 
 /* Action badge after each school name. Encodes both origin and action:
@@ -1266,9 +1266,9 @@ a:hover {
 }
 
 .cohort-badge-maybe {
-  background: #F4EDEC;
-  color: #6e6360;
-  border-color: #d8cfca;
+  background: #e2e8f0;
+  color: #64748b;
+  border-color: #cbd5e1;
 }
 
 .cohort-badge-remove {
@@ -1278,21 +1278,21 @@ a:hover {
 }
 
 .cohort-badge-proposed {
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
-  border-color: #602D89;
+  border-color: #1d3557;
 }
 
 .cohort-badge-possible {
-  background: #efe6f5;
-  color: #602D89;
-  border-color: #c9b3da;
+  background: #dbeafe;
+  color: #1d3557;
+  border-color: #b6cce2;
 }
 
 .cohort-badge-anchor {
-  background: #251230;
+  background: #0d1b2a;
   color: #FFFFFF;
-  border-color: #251230;
+  border-color: #0d1b2a;
 }
 
 .cohort-name-text {
@@ -1309,9 +1309,9 @@ a:hover {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: 4px;
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
-  border: 1px solid #602D89;
+  border: 1px solid #1d3557;
   min-width: 120px;
   text-align: center;
 }
@@ -1329,29 +1329,29 @@ a:hover {
 
 .dash-card {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
   cursor: pointer;
   transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
 }
 
 .dash-card:hover {
-  border-color: #602D89;
-  box-shadow: 0 2px 6px rgba(96, 45, 137, 0.15);
+  border-color: #1d3557;
+  box-shadow: 0 2px 6px rgba(29, 53, 87, 0.15);
   transform: translateY(-1px);
 }
 
 .dash-card:focus-within {
-  outline: 2px solid #602D89;
+  outline: 2px solid #1d3557;
   outline-offset: 2px;
 }
 
 .dash-card-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.25;
   margin-bottom: 0.4rem;
   min-height: 2.5em;
@@ -1370,14 +1370,14 @@ a:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #602D89;
+  color: #1d3557;
 }
 
 .dash-card-anchor-val {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1393,10 +1393,10 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #FAF6F5;
-  border: 1px dashed #d8cfca;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
   border-radius: 4px;
-  color: #6e6360;
+  color: #64748b;
   font-size: 0.78rem;
   font-style: italic;
   margin: 0.25rem 0 0.5rem 0;
@@ -1407,7 +1407,7 @@ a:hover {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.35rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.2;
 }
 
@@ -1422,21 +1422,21 @@ a:hover {
   font-size: 0.72rem;
   padding: 2px 8px;
   border-radius: 10px;
-  background: #F4EDEC;
-  color: #251230;
+  background: #e2e8f0;
+  color: #0d1b2a;
   font-weight: 500;
   letter-spacing: 0.01em;
 }
 
 .dash-modal-chip strong {
-  color: #602D89;
+  color: #1d3557;
   font-weight: 700;
 }
 
 /* Special-case chip for derived / computed variables: no key-value form,
  * just a flag. Tinted purple to call attention to it. */
 .dash-modal-chip-computed {
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
   font-weight: 600;
   text-transform: uppercase;
@@ -1450,11 +1450,11 @@ a:hover {
 .dash-modal-desc {
   font-size: 0.9rem;
   line-height: 1.45;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 1rem;
   padding: 0.6rem 0.85rem;
-  background: #F4EDEC;
-  border-left: 3px solid #602D89;
+  background: #e2e8f0;
+  border-left: 3px solid #1d3557;
   border-radius: 4px;
 }
 
@@ -1475,7 +1475,7 @@ a:hover {
   flex-wrap: wrap;
   gap: 0.85rem;
   font-size: 0.78rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 1rem;
 }
 
@@ -1501,23 +1501,23 @@ a:hover {
 
 .dash-modal-table thead th {
   text-align: left;
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.4rem 0.5rem;
-  border-bottom: 2px solid #AC9E94;
-  background: #FAF6F5;
+  border-bottom: 2px solid #94a3b8;
+  background: #f1f5f9;
   white-space: nowrap;
 }
 
 .dash-modal-table tbody tr:hover td {
-  background-color: rgba(96, 45, 137, 0.04);
+  background-color: rgba(29, 53, 87, 0.04);
 }
 
 .dash-modal-table td {
   padding: 0.4rem 0.5rem;
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
   vertical-align: middle;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .dash-modal-table .dt-center {
@@ -1531,13 +1531,13 @@ a:hover {
 
 .dash-card-cohort {
   font-size: 0.8rem;
-  color: #251230;
+  color: #0d1b2a;
   font-variant-numeric: tabular-nums;
 }
 
 .dash-card-n {
   font-size: 0.72rem;
-  color: #6e6360;
+  color: #64748b;
   margin-top: 0.15rem;
 }
 
@@ -1550,10 +1550,10 @@ a:hover {
 .cohort-action-select {
   font-size: 0.85rem;
   padding: 4px 8px;
-  border: 1px solid #AC9E94;
+  border: 1px solid #94a3b8;
   border-radius: 4px;
   background: #FFFFFF;
-  color: #251230;
+  color: #0d1b2a;
   cursor: pointer;
   flex: 1 1 auto;
   min-width: 0;
@@ -1561,8 +1561,8 @@ a:hover {
 
 .cohort-action-select:focus {
   outline: none;
-  border-color: #602D89;
-  box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
+  border-color: #1d3557;
+  box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
 }
 
 /* Mini variant used in the two-column table — only needs to hold
@@ -1602,9 +1602,9 @@ a:hover {
 .cohort-empty-col {
   padding: 1rem 1.25rem;
   text-align: center;
-  color: #6e6360;
-  background: #FAF6F5;
-  border: 1px dashed #d8cfca;
+  color: #64748b;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
   border-radius: 6px;
 }
 
@@ -1612,7 +1612,7 @@ a:hover {
   display: inline-block;
   padding: 0 4px;
   font-weight: 700;
-  color: #602D89;
+  color: #1d3557;
 }
 
 /* Arrow button that moves a row across the In/Out partition. Sized
@@ -1624,7 +1624,7 @@ a:hover {
   padding: 0;
   font-size: 1rem;
   line-height: 1;
-  color: #602D89;
+  color: #1d3557;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 4px;
@@ -1633,14 +1633,14 @@ a:hover {
 }
 
 .cohort-move-btn:hover {
-  background: rgba(96, 45, 137, 0.12);
-  border-color: #c9b3da;
+  background: rgba(29, 53, 87, 0.12);
+  border-color: #b6cce2;
 }
 
 .cohort-move-btn:focus {
   outline: none;
-  border-color: #602D89;
-  box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
+  border-color: #1d3557;
+  box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
 }
 
 /* Small × button that deletes an addition row outright. Only renders on
@@ -1673,17 +1673,17 @@ a:hover {
 
 /* ---------- Saved Searches cards ---------- */
 .saved-search-card {
-  border: 1px solid #AC9E94;
-  border-left: 4px solid #602D89;
+  border: 1px solid #94a3b8;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
   background: #FFFFFF;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.05);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.05);
 }
 
 .saved-search-card .ssc-header {
-  border-bottom: 1px solid #F4EDEC;
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -1692,7 +1692,7 @@ a:hover {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.15rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.3;
 }
 
@@ -1704,7 +1704,7 @@ a:hover {
 
 .saved-search-card .ssc-sep {
   margin: 0 0.35rem;
-  color: #AC9E94;
+  color: #94a3b8;
 }
 
 .saved-search-card .ssc-body {
@@ -1713,7 +1713,7 @@ a:hover {
 
 .saved-search-card .ssc-row {
   font-size: 0.88rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.2rem;
   line-height: 1.4;
 }
@@ -1722,7 +1722,7 @@ a:hover {
   display: inline-block;
   width: 70px;
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
 }
 
 .saved-search-card .ssc-actions {
@@ -1750,7 +1750,7 @@ a:hover {
 .peer-section-divider {
   margin-top: 2.5rem;
   margin-bottom: 1.5rem;
-  border-top: 2px solid #AC9E94;
+  border-top: 2px solid #94a3b8;
   opacity: 0.5;
 }
 
@@ -1764,12 +1764,12 @@ a:hover {
 
 .emphasis {
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
 }
 
 .note-box, .alert-warning, .alert-secondary {
-  background: #F4EDEC;
-  border: 1px solid #AC9E94;
+  background: #e2e8f0;
+  border: 1px solid #94a3b8;
   padding: 1rem;
   margin: 1.25rem 0;
   font-size: 0.95rem;
@@ -1778,7 +1778,7 @@ a:hover {
 }
 
 .note-box strong, .alert-warning strong, .alert-secondary strong {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .section-intro {
@@ -1809,15 +1809,15 @@ ul li, ol li {
 
 /* ---------- Form controls ---------- */
 .form-control, .form-select {
-  border: 1px solid #AC9E94;
+  border: 1px solid #94a3b8;
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
   font-size: 0.9rem;
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #602D89;
-  box-shadow: 0 0 0 0.2rem rgba(96, 45, 137, 0.25);
+  border-color: #1d3557;
+  box-shadow: 0 0 0 0.2rem rgba(29, 53, 87, 0.25);
 }
 
 /* Sliders */
@@ -1825,12 +1825,12 @@ ul li, ol li {
 .irs--shiny .irs-from,
 .irs--shiny .irs-to,
 .irs--shiny .irs-single {
-  background-color: #602D89;
-  border-color: #602D89;
+  background-color: #1d3557;
+  border-color: #1d3557;
 }
 
 .irs--shiny .irs-handle > i:first-child {
-  background-color: #602D89;
+  background-color: #1d3557;
 }
 
 /* Compact form labels in the sidebar */
@@ -1838,7 +1838,7 @@ ul li, ol li {
 .sidebar label {
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
 }
 
@@ -1911,13 +1911,13 @@ ul li, ol li {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.35rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
   line-height: 1.2;
 }
 
 .asp-modal-subtitle {
   font-size: 0.95rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-top: 0.3rem;
   font-weight: 400;
 }
@@ -1930,8 +1930,8 @@ ul li, ol li {
  * candidate / delta laid out as a 4-column grid below. */
 .asp-gap-row {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 3px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid #1d3557;
   border-radius: 6px;
   padding: 0.75rem 1rem;
   margin-bottom: 0.75rem;
@@ -1939,7 +1939,7 @@ ul li, ol li {
 
 .asp-gap-label {
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   font-size: 0.95rem;
   margin-bottom: 0.5rem;
 }
@@ -1967,7 +1967,7 @@ ul li, ol li {
   flex-direction: column;
   gap: 0.15rem;
   font-size: 1rem;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .asp-gap-tag {
@@ -1975,7 +1975,7 @@ ul li, ol li {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6e6360;
+  color: #64748b;
 }
 
 .asp-gap-arrow {
@@ -1985,7 +1985,7 @@ ul li, ol li {
 }
 
 .asp-gap-delta {
-  color: #6e6360;
+  color: #64748b;
   font-size: 0.9rem;
   text-align: right;
 }
@@ -1999,16 +1999,16 @@ ul li, ol li {
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .asp-control-bar label {
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
   display: block;
 }
@@ -2048,7 +2048,7 @@ ul li, ol li {
 .asp-advanced-section h6 {
   margin-top: 0;
   margin-bottom: 0.5rem;
-  border-bottom: 1px solid #d8cfca;
+  border-bottom: 1px solid #cbd5e1;
   padding-bottom: 0.3rem;
 }
 
@@ -2077,16 +2077,16 @@ ul li, ol li {
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .trend-control-bar label {
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
   display: block;
 }
@@ -2099,7 +2099,7 @@ ul li, ol li {
 
 .trend-var-header {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
@@ -2116,16 +2116,16 @@ ul li, ol li {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .trend-var-cat {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: #602D89;
+  color: #1d3557;
   padding: 2px 6px;
-  background: #efe6f5;
+  background: #dbeafe;
   border-radius: 4px;
 }
 
@@ -2140,18 +2140,18 @@ ul li, ol li {
   font-size: 0.72rem;
   padding: 2px 8px;
   border-radius: 10px;
-  background: #F4EDEC;
-  color: #251230;
+  background: #e2e8f0;
+  color: #0d1b2a;
   font-weight: 500;
 }
 
 .trend-chip strong {
-  color: #602D89;
+  color: #1d3557;
   font-weight: 700;
 }
 
 .trend-chip-computed {
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
   font-weight: 600;
   text-transform: uppercase;
@@ -2162,18 +2162,18 @@ ul li, ol li {
   margin: 0.4rem 0 0 0;
   font-size: 0.88rem;
   line-height: 1.4;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 /* Compact "what's the comparison" line above the plot. */
 .trend-compare-pill {
   padding: 0.4rem 0.7rem;
-  background: #F4EDEC;
-  border-left: 3px solid #6e6360;
+  background: #e2e8f0;
+  border-left: 3px solid #64748b;
   border-radius: 4px;
   margin-bottom: 0.5rem;
   font-size: 0.88rem;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 /* Trends chart container — hard bounds so the chart can't bleed into the
@@ -2214,29 +2214,29 @@ ul li, ol li {
 }
 
 .help-doc h1 {
-  border-bottom-color: #602D89;
+  border-bottom-color: #1d3557;
 }
 
 .help-doc h2 {
-  color: #602D89;
+  color: #1d3557;
   margin-top: 2rem;
 }
 
 .help-doc h3 {
-  color: #251230;
+  color: #0d1b2a;
   margin-top: 1.5rem;
 }
 
 .help-doc h4 {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .help-doc blockquote {
-  border-left: 3px solid #602D89;
-  background: #F4EDEC;
+  border-left: 3px solid #1d3557;
+  background: #e2e8f0;
   padding: 0.5rem 0.85rem;
   margin: 0.5rem 0 1rem 0;
-  color: #251230;
+  color: #0d1b2a;
   font-style: italic;
 }
 
@@ -2249,32 +2249,32 @@ ul li, ol li {
 }
 
 .help-doc table th {
-  background: #FAF6F5;
-  color: #251230;
+  background: #f1f5f9;
+  color: #0d1b2a;
   font-weight: 600;
   text-align: left;
   padding: 0.5rem 0.6rem;
-  border-bottom: 2px solid #AC9E94;
+  border-bottom: 2px solid #94a3b8;
 }
 
 .help-doc table td {
   padding: 0.5rem 0.6rem;
-  border-bottom: 1px solid #F4EDEC;
-  color: #251230;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0d1b2a;
   vertical-align: top;
 }
 
 .help-doc code {
-  background: #F4EDEC;
+  background: #e2e8f0;
   padding: 1px 5px;
   border-radius: 3px;
-  color: #602D89;
+  color: #1d3557;
   font-size: 0.85em;
 }
 
 .help-doc pre {
-  background: #FAF6F5;
-  border: 1px solid #F4EDEC;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
   padding: 0.85rem 1rem;
   overflow-x: auto;
@@ -2282,18 +2282,18 @@ ul li, ol li {
 
 .help-doc pre code {
   background: transparent;
-  color: #251230;
+  color: #0d1b2a;
   padding: 0;
 }
 
 .help-doc hr {
   border: none;
-  border-top: 1px solid #AC9E94;
+  border-top: 1px solid #94a3b8;
   margin: 2rem 0;
 }
 
 .help-doc ul, .help-doc ol {
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .help-doc li {
@@ -2301,7 +2301,7 @@ ul li, ol li {
 }
 
 .help-doc li strong {
-  color: #602D89;
+  color: #1d3557;
 }
 
 /* ---------- Variables tab ---------- */
@@ -2312,16 +2312,16 @@ ul li, ol li {
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .var-filter-bar label {
   font-weight: 500;
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 0.25rem;
   display: block;
 }
@@ -2344,17 +2344,17 @@ ul li, ol li {
 
 .var-detail-list dt {
   font-weight: 600;
-  color: #602D89;
+  color: #1d3557;
   margin: 0;
 }
 
 .var-detail-list dd {
   margin: 0;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .var-detail-list dd code {
-  background: #F4EDEC;
+  background: #e2e8f0;
   padding: 1px 6px;
   border-radius: 3px;
   font-size: 0.85rem;
@@ -2367,8 +2367,8 @@ ul li, ol li {
   display: inline-block;
   margin-left: 0.6rem;
   padding: 2px 10px;
-  background: #F4EDEC;
-  color: #602D89;
+  background: #e2e8f0;
+  color: #1d3557;
   font-weight: 600;
   font-size: 0.72rem;
   letter-spacing: 0.03em;
@@ -2389,7 +2389,7 @@ ul li, ol li {
 
 .cohort-map-container .leaflet-container {
   border-radius: 8px;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
 }
 
 /* Cohort map layer control — branded checkboxes for showing/hiding each
@@ -2398,19 +2398,19 @@ ul li, ol li {
   font-family: 'Manrope', sans-serif;
   background: rgba(255, 255, 255, 0.96) !important;
   border-radius: 6px !important;
-  border: 1px solid #d8cfca !important;
-  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.12) !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.12) !important;
 }
 
 .leaflet-control-layers label {
-  color: #251230;
+  color: #0d1b2a;
   font-weight: 500;
   margin: 0.2rem 0;
   font-size: 0.85rem;
 }
 
 .leaflet-control-layers input[type="checkbox"] {
-  accent-color: #602D89;
+  accent-color: #1d3557;
   margin-right: 0.4rem;
 }
 
@@ -2419,7 +2419,7 @@ ul li, ol li {
 }
 
 .leaflet-control-layers .leaflet-control-layers-separator {
-  border-top-color: #d8cfca;
+  border-top-color: #cbd5e1;
   margin: 0.4rem 0;
 }
 
@@ -2434,10 +2434,10 @@ ul li, ol li {
   padding: 0.75rem 1rem;
   margin: 0.5rem 0;
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .cohort-map-control-block {
@@ -2456,13 +2456,13 @@ ul li, ol li {
 
 .cohort-map-control-block .radio-inline, .cohort-map-control-block .checkbox-inline {
   margin-right: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   font-size: 0.88rem;
   font-weight: 500;
 }
 
 .cohort-map-control-block input[type="radio"], .cohort-map-control-block input[type="checkbox"] {
-  accent-color: #602D89;
+  accent-color: #1d3557;
   margin-right: 0.3rem;
 }
 
@@ -2471,7 +2471,7 @@ ul li, ol li {
   font-size: 0.78rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #602D89;
+  color: #1d3557;
 }
 
 /* ---------- Peer Search follow-up sections ---------- */
@@ -2479,14 +2479,14 @@ ul li, ol li {
  * it's clear they're "after the search" tools. */
 .peer-refine-divider {
   border: none;
-  border-top: 2px solid #AC9E94;
+  border-top: 2px solid #94a3b8;
   margin: 2rem 0 1.25rem 0;
 }
 
 .peer-refine-controls {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
-  border-left: 4px solid #602D89;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #1d3557;
   border-radius: 8px;
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
@@ -2502,15 +2502,15 @@ ul li, ol li {
 
 .peer-strat-card {
   background: #FFFFFF;
-  border: 1px solid #F4EDEC;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
 }
 
 .peer-strat-card.peer-strat-card-anchor {
-  border-left: 4px solid #602D89;
-  background: #FAF6F5;
+  border-left: 4px solid #1d3557;
+  background: #f1f5f9;
 }
 
 .peer-strat-card-title {
@@ -2524,7 +2524,7 @@ ul li, ol li {
   font-family: 'Gelasio', Georgia, serif;
   font-size: 1rem;
   font-weight: 600;
-  color: #251230;
+  color: #0d1b2a;
 }
 
 .peer-strat-anchor-chip {
@@ -2534,7 +2534,7 @@ ul li, ol li {
   text-transform: uppercase;
   padding: 2px 7px;
   border-radius: 10px;
-  background: #602D89;
+  background: #1d3557;
   color: #FFFFFF;
 }
 
@@ -2546,18 +2546,18 @@ ul li, ol li {
 }
 
 .peer-strat-card-table thead th {
-  background: #FAF6F5;
-  color: #251230;
+  background: #f1f5f9;
+  color: #0d1b2a;
   font-weight: 600;
   padding: 0.3rem 0.45rem;
-  border-bottom: 1px solid #AC9E94;
+  border-bottom: 1px solid #94a3b8;
   text-align: left;
 }
 
 .peer-strat-card-table td {
   padding: 0.3rem 0.45rem;
-  border-bottom: 1px solid #F4EDEC;
-  color: #251230;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0d1b2a;
 }
 
 .peer-strat-card-table .dt-center {
@@ -2601,9 +2601,9 @@ ul li, ol li {
 }
 
 .peer-strat-status-empty {
-  background: #F4EDEC;
-  color: #6e6360;
-  border-color: #d8cfca;
+  background: #e2e8f0;
+  color: #64748b;
+  border-color: #cbd5e1;
 }
 
 .peer-strat-status-error {
@@ -2613,7 +2613,7 @@ ul li, ol li {
 }
 
 .peer-strat-card-empty {
-  background: #FAF6F5;
+  background: #f1f5f9;
   border-style: dashed;
 }
 
@@ -2623,14 +2623,14 @@ ul li, ol li {
 
 .peer-strat-empty-reason {
   font-size: 0.85rem;
-  color: #251230;
+  color: #0d1b2a;
   margin: 0 0 0.35rem 0;
   line-height: 1.35;
 }
 
 .peer-strat-empty-pool-size {
   font-size: 0.72rem;
-  color: #6e6360;
+  color: #64748b;
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -2642,12 +2642,12 @@ ul li, ol li {
   border-left: 4px solid #ffb347;
   border-radius: 6px;
   font-size: 0.9rem;
-  color: #251230;
+  color: #0d1b2a;
   margin-bottom: 1rem;
 }
 
 .ssc-shared-notice strong {
-  color: #602D89;
+  color: #1d3557;
 }
 
 .ssc-working-as {
@@ -2656,8 +2656,8 @@ ul li, ol li {
   gap: 0.75rem;
   margin: 0.75rem 0 1.25rem 0;
   padding: 0.6rem 0.85rem;
-  background: #FAF6F5;
-  border: 1px solid #F4EDEC;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
 }
 
@@ -2667,7 +2667,7 @@ ul li, ol li {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #602D89;
+  color: #1d3557;
   white-space: nowrap;
 }
 
