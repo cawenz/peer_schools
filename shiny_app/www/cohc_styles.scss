@@ -27,9 +27,13 @@ body {
  */
 .navbar {
   background-color: #FFFFFF !important;
-  border-bottom: 1px solid #cbd5e1;
+  /* Thin deep-blue accent stripe at the very top edge — visible identity
+   * without filling the whole navbar. Bottom border in the same color
+   * but thinner, tying the navbar to the active-tab underline accent. */
+  border-top: 4px solid #1d3557;
+  border-bottom: 1px solid #1d3557;
   min-height: 48px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.06);
   padding: 0 !important;
 
   > .container,
