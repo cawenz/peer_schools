@@ -2473,3 +2473,209 @@ ul li, ol li {
   text-transform: uppercase;
   color: #602D89;
 }
+
+/* ---------- Peer Search follow-up sections ---------- */
+/* Heavy divider between the main result and the follow-up sections, so
+ * it's clear they're "after the search" tools. */
+.peer-refine-divider {
+  border: none;
+  border-top: 2px solid #AC9E94;
+  margin: 2rem 0 1.25rem 0;
+}
+
+.peer-refine-controls {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Stratified results grid: small cards per stratum value. */
+.peer-strat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.peer-strat-card {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
+}
+
+.peer-strat-card.peer-strat-card-anchor {
+  border-left: 4px solid #602D89;
+  background: #FAF6F5;
+}
+
+.peer-strat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.peer-strat-card-label {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #251230;
+}
+
+.peer-strat-anchor-chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #602D89;
+  color: #FFFFFF;
+}
+
+.peer-strat-card-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+}
+
+.peer-strat-card-table thead th {
+  background: #FAF6F5;
+  color: #251230;
+  font-weight: 600;
+  padding: 0.3rem 0.45rem;
+  border-bottom: 1px solid #AC9E94;
+  text-align: left;
+}
+
+.peer-strat-card-table td {
+  padding: 0.3rem 0.45rem;
+  border-bottom: 1px solid #F4EDEC;
+  color: #251230;
+}
+
+.peer-strat-card-table .dt-center {
+  text-align: center;
+}
+
+.peer-strat-card-table .dt-right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Two-column refine controls row (metrics multi-select + pool-K slider). */
+.peer-refine-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: 1rem;
+  align-items: end;
+}
+
+@media (max-width: 800px) {
+  .peer-refine-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.peer-refine-cell .form-group,
+.peer-refine-cell .shiny-input-container {
+  margin-bottom: 0;
+}
+
+/* Stratified card status chips (empty pool, no peers ranked) and
+ * matching faded card body for the "nothing to show here" case. */
+.peer-strat-status-chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.peer-strat-status-empty {
+  background: #F4EDEC;
+  color: #6e6360;
+  border-color: #d8cfca;
+}
+
+.peer-strat-status-error {
+  background: #fbe7e7;
+  color: #b53737;
+  border-color: #f0c3c3;
+}
+
+.peer-strat-card-empty {
+  background: #FAF6F5;
+  border-style: dashed;
+}
+
+.peer-strat-empty-body {
+  padding: 0.4rem 0.1rem;
+}
+
+.peer-strat-empty-reason {
+  font-size: 0.85rem;
+  color: #251230;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.35;
+}
+
+.peer-strat-empty-pool-size {
+  font-size: 0.72rem;
+  color: #6e6360;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Saved Searches: shared-visibility warning + Working-as input. */
+.ssc-shared-notice {
+  padding: 0.75rem 1rem;
+  background: #fff3cd;
+  border-left: 4px solid #ffb347;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #251230;
+  margin-bottom: 1rem;
+}
+
+.ssc-shared-notice strong {
+  color: #602D89;
+}
+
+.ssc-working-as {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0 1.25rem 0;
+  padding: 0.6rem 0.85rem;
+  background: #FAF6F5;
+  border: 1px solid #F4EDEC;
+  border-radius: 6px;
+}
+
+.ssc-working-as label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #602D89;
+  white-space: nowrap;
+}
+
+.ssc-working-as .form-group, .ssc-working-as .shiny-input-container {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+.ssc-working-as input[type="text"] {
+  font-family: 'Manrope', sans-serif;
+}

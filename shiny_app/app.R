@@ -7,8 +7,11 @@
 # can be changed independently). The only state shared across pages is:
 #   - peer_result    : most recent Peer Search result (used by Side-by-Side
 #                      for distance-context and the peer-group limit)
-#   - saved_searches : in-memory list of saved searches; View action
-#                      restores into the Peer Search page
+#   - saved_searches : persisted to disk at output/saved_searches.rds.
+#                      Loaded on app start, written atomically on each
+#                      save / delete / rename. Shared across all users
+#                      of this deployment; per-record saved_by attribution.
+#                      View action restores into the Peer Search page.
 #   - restore_signal : channel from Saved Searches View action back to
 #                      Peer Search page's sidebar
 #
@@ -54,24 +57,6 @@ ui <- page_navbar(
   ),
 
   nav_panel(
-    "Stratified Peers",
-    layout_sidebar(
-      sidebar = sidebar(width = 320, open = "open", bg = "#F4EDEC",
-                        stratifiedSidebarUI("stratified")),
-      stratifiedUI("stratified")
-    )
-  ),
-
-  nav_panel(
-    "Aspirant Peers",
-    # No sidebar — the essential controls (anchor + aspirational metrics +
-    # Run) live in a compact bar at the top of the page, and the
-    # secondary controls (pool filters, theme weights, output sizes) live
-    # behind a collapsed Advanced accordion.
-    aspirantUI("aspirant")
-  ),
-
-  nav_panel(
     "Trends",
     # School + variable + comparison group in a top control bar; no sidebar.
     trendsUI("trends")
@@ -109,7 +94,10 @@ ui <- page_navbar(
 # Server
 # -----------------------------------------------------------------------------
 server <- function(input, output, session) {
-  saved_searches <- reactiveVal(list())
+  # Saved searches now persist to disk. Initial value comes from the
+  # shared RDS file (returns empty list if the file doesn't exist or
+  # contains nothing readable). See .load_saved_searches in mod_session.R.
+  saved_searches <- reactiveVal(.load_saved_searches())
   restore_signal <- reactiveVal(NULL)
 
   # Peer Search page (sidebar + main panel)
@@ -123,11 +111,12 @@ server <- function(input, output, session) {
                 peer_selection = peer_table_state$selected_peer,
                 peer_result    = peer_table_state$result)
 
-  # Aspirant Peers page — wholly self-contained, no upstream state.
-  aspirantServer("aspirant")
-
-  # Stratified Peers page (fully self-contained; no upstream state)
-  stratifiedServer("stratified")
+  # Aspirant Peers and Stratified Peers are no longer standalone tabs;
+  # their result sections live below the Peer Search results page now.
+  # The aspirant logic uses ASPIRANT_DIRECTIONS / ASPIRANT_LABELS from
+  # R/peer_pipeline.R; the stratified inline section reads .STRATIFY_DIMS
+  # from R/mod_stratified.R (still sourced at app start even though the
+  # nav_panel and server bindings are gone).
 
   # Cohort Builder page (returns reactives that other tabs consume)
   cohort_module <- cohortServer("cohort")
@@ -138,10 +127,11 @@ server <- function(input, output, session) {
                cohort_state      = cohort_module$cohort_state,
                cohort_anchor_uid = cohort_module$anchor_uid)
 
-  # Saved Searches page
-  sessionServer("session",
-                saved_searches  = saved_searches,
-                restore_signal  = restore_signal)
+  # Saved Searches page. Returns a `saved_by` reactive populated from
+  # the "Working as" text input (and seeded from browser localStorage).
+  session_state <- sessionServer("session",
+                                  saved_searches  = saved_searches,
+                                  restore_signal  = restore_signal)
 
   # Variables reference tab (self-contained; reads .VARIABLES).
   variablesServer("variables")
@@ -161,19 +151,41 @@ server <- function(input, output, session) {
     sid <- gsub("[^A-Za-z0-9_]", "_", sid)
     record <- list(
       id            = sid,
+      version       = .SAVED_SEARCHES_VERSION,
       label         = .auto_label(res, state),
       saved_at      = Sys.time(),
+      # Human identity from the "Working as" field on the Saved Searches
+      # tab. Seeded from browser localStorage, so once the user types
+      # their name on a given browser it sticks. Without a name set the
+      # value reads "(unknown)" — fine but the user can fix attribution
+      # by setting their name and re-saving.
+      saved_by      = session_state$saved_by(),
       sidebar_state = state,
       peer_result   = res
     )
     current <- saved_searches()
     current[[sid]] <- record
     saved_searches(current)
+    .persist_saved_searches(current)
 
     showNotification(
       tagList(tags$strong("Saved: "), record$label),
       type = "message", duration = 4
     )
+
+    # Nudge first-time savers to fill in their identity. Doesn't block
+    # the save; the record just shows "(unknown)" until they re-save.
+    if (identical(record$saved_by, "(unknown)")) {
+      showNotification(
+        tagList(
+          tags$strong("Attribution: "),
+          "set a name in the Saved Searches tab's ",
+          tags$em("Working as"),
+          " field so future saves show who you are."
+        ),
+        type = "default", duration = 8
+      )
+    }
   }, ignoreInit = TRUE, ignoreNULL = TRUE)
 
   # Saved Searches View action navigates to the Peer Search page

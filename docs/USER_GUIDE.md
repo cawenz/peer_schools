@@ -43,27 +43,48 @@ for different questions.
 ### Peer Search
 
 > **What it answers:** "Which institutions, in our judgment of what
-> matters, look most like the anchor?"
+> matters, look most like the anchor — and of those, which ones beat us
+> on growth metrics, and how do they break down across institutional
+> categories?"
 
 The headline tab. You set an **anchor school**, define a **candidate
 pool** (the universe to search within), and adjust **theme weights** that
 control how much each dimension matters. The app ranks every candidate
-by similarity to the anchor.
+by similarity to the anchor, then offers two follow-up refinements right
+below the result.
 
 **What's on screen.** The left sidebar holds all the controls. Anchor
 at the top, then pool filters (ranked universe, US News classification,
 sector, state/region, religious affiliation), then theme weight sliders,
 then output settings (number of peers to return). Click **Run search**.
-Results appear in the main panel: a summary header, then a table of the
-top peers sorted by similarity, then a diagnostics section showing
-which variables were used and what got dropped.
+The main panel shows:
+
+1. **Summary header + top peers table.** The closest K peers, sorted by
+   similarity. Click any row to load that institution into Side-by-Side.
+2. **Diagnostics accordion.** Which variables drove the result, what
+   got dropped by coverage, what got dropped because the anchor had no
+   value.
+3. **Refine: aspirant peers.** Pick one or more metrics from the
+   *Aspire higher on* dropdown (acceptance rate, grad rate, endowment
+   per FTE, etc., with direction baked in). The app filters the top K
+   peers to schools that beat the anchor on every chosen metric
+   (**strict aspirants**) and schools that beat it on all but one
+   (**near-miss**). Click any row to open the per-metric **Aspirational
+   gap** modal. The filter runs on the just-found peer set — fast and
+   tied to the search you're already looking at.
+4. **Expand search into other groups.** Pick a stratification
+   dimension (US News classification, Carnegie Research Activity,
+   Region, Sector, etc.) and the app runs a separate peer search per
+   value of that dimension, using the same anchor + theme weights. Get
+   "who's HC's closest LAC, closest R1, closest regional university"
+   in one view without reconfiguring anything.
 
 **Quick tips.** The pool filters do most of the work — if you want to
 compare only against private liberal arts colleges, narrow the pool
 before adjusting weights. The theme weights all default to 1.0 (equal
-across themes); Athletics defaults to 0 because peer comparison for
-academic purposes usually isn't athletics-driven. Click any peer row to
-load that school into the Side-by-Side tab.
+across themes); Athletics defaults to 0. Click any peer row to load
+that school into the Side-by-Side tab. The refine and expand sections
+appear only after you've run a search.
 
 ### Side-by-Side
 
@@ -90,50 +111,6 @@ difference but the bar shows both schools in roughly the same percentile
 of the pool, the difference may not be meaningful in context. Click any
 variable to open the distribution modal — that's where the variable's
 full definition and source live.
-
-### Stratified Peers
-
-> **What it answers:** "Within each value of a chosen institutional
-> dimension, who's the closest peer?"
-
-Pick the anchor and one or two stratification dimensions (Carnegie
-Research Activity, US News classification, region, and so on). The app
-runs a separate peer search inside each stratum value and presents the
-top matches per stratum side by side.
-
-**Use this when** you want to see "HC's closest R1, closest R2, closest
-LAC, and closest regional university all at once" — useful for
-accreditation context or for stakeholder briefings that need to show
-peers across multiple institutional types.
-
-### Aspirant Peers
-
-> **What it answers:** "Which institutions look like the anchor in
-> context, but beat the anchor on the metrics we want to grow into?"
-
-This is the strategic-planning tab. Pick the metrics you want the
-aspirants to exceed Holy Cross on — *lower acceptance rate*, *higher
-graduation rate*, *higher endowment*, etc. — and the app finds schools
-that beat Holy Cross on every one of them.
-
-**Two sections in the result.**
-
-- **Strict aspirants** — schools that beat the anchor on *every* chosen
-  metric. These are unambiguous "look-up" peers.
-- **Near-miss aspirants** — schools that beat the anchor on all but one
-  metric, with the missed metric named. Useful for catching schools that
-  are very close to being aspirants but fall slightly short on a single
-  dimension.
-
-Click any row for the **Aspirational gap** modal: a clean per-metric
-comparison showing the anchor's value, the aspirant's value, the
-direction, and the magnitude of the gap.
-
-**Quick tips.** Start with one or two aspirational metrics. The strict
-filter is conjunctive: with three or four metrics chosen, the strict
-list shrinks fast. The Advanced section behind the accordion at the top
-of the page holds pool filters and context theme weights — defaults
-work for most searches.
 
 ### Trends
 
@@ -203,17 +180,18 @@ single zip.
 Use the **→** arrow to send a school from In to Out, **←** to bring one
 back. The × on additions deletes the row entirely.
 
-### Aspirant Peers, Trends, Cohort Builder — when to use which
+### When to use which tab
 
-- Use **Peer Search** when the question is "who are our peers?"
-- Use **Aspirant Peers** when the question is "who are we trying to
-  become?"
+- Use **Peer Search** when the question is "who are our peers?" Drop
+  into the Refine section right below the result to ask "of those, who
+  are we trying to become?" The Expand section answers "what about
+  peers in other categories?"
+- Use **Side-by-Side** when you have two specific institutions and want
+  the full variable-by-variable comparison.
 - Use **Trends** when the question is "how are *we* doing on a specific
   metric, over time?"
 - Use **Cohort Builder** when an external party (NECHE, a board, an
   accreditor) has handed you a list and you need to assess it.
-- Use **Stratified Peers** when one peer set isn't enough and you need
-  the closest peer per institutional type.
 
 ### Variables
 
@@ -225,10 +203,17 @@ measure?"
 
 ### Saved Searches
 
-A simple list of every search you saved on the Peer Search tab. Each
-saved search records the anchor, the candidate pool, the theme weights,
-the distance metric, and the resulting peer list. Click View to restore
-that configuration into Peer Search.
+Every search you saved with the *Save this search* button. Each record
+includes the anchor, the candidate pool, the theme weights, the distance
+metric, who saved it, when, and the resulting peer list as it was when
+saved. Per-card actions: **View** (loads the saved configuration into
+Peer Search), **Rename**, **Download** (zip bundle), **Delete** (asks
+for confirmation).
+
+**Saved searches persist across sessions.** They live in a shared store
+on the server, so closing the browser or restarting the app doesn't
+lose them. Everyone using this deployment sees the same list, with
+*saved by* attribution on each card.
 
 ### Help
 
