@@ -26,14 +26,13 @@ body {
  * override that here.
  */
 .navbar {
-  background-color: #FFFFFF !important;
-  /* Thin deep-blue accent stripe at the very top edge — visible identity
-   * without filling the whole navbar. Bottom border in the same color
-   * but thinner, tying the navbar to the active-tab underline accent. */
-  border-top: 4px solid #1d3557;
-  border-bottom: 1px solid #1d3557;
+  /* Solid deep-blue fill — provides a clear visual band that separates
+   * the navbar from the white content area below. Darker bottom border
+   * sharpens the boundary; soft shadow lifts the bar above the body. */
+  background-color: #1d3557 !important;
+  border-bottom: 2px solid #0d1b2a;
   min-height: 48px;
-  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.06);
+  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.18);
   padding: 0 !important;
 
   > .container,
@@ -47,7 +46,7 @@ body {
 }
 
 .navbar-brand {
-  color: #0d1b2a !important;
+  color: #FFFFFF !important;
   font-weight: 600;
   line-height: 1;
   margin: 0 !important;
@@ -62,7 +61,9 @@ body {
   margin-left: 2rem;
 
   .nav-link {
-    color: #475569 !important;            /* mid slate for inactive */
+    /* Inactive tabs slightly muted vs the brand title so the active
+     * underline is the clear cue for the current page. */
+    color: rgba(255, 255, 255, 0.78) !important;
     font-weight: 500;
     border-bottom: 2px solid transparent;
     transition: all 0.2s ease;
@@ -74,13 +75,13 @@ body {
     padding-bottom: 0.5rem;
 
     &:hover {
-      color: #1d3557 !important;          /* deep blue on hover */
-      border-bottom-color: #94a3b8;       /* subtle gray underline */
+      color: #FFFFFF !important;
+      border-bottom-color: rgba(255, 255, 255, 0.45);
     }
 
     &.active {
-      color: #1d3557 !important;          /* deep blue accent */
-      border-bottom-color: #1d3557;       /* deep blue underline */
+      color: #FFFFFF !important;
+      border-bottom-color: #FFFFFF;
       font-weight: 600;
     }
   }

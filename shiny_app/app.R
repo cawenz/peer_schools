@@ -35,9 +35,10 @@ ui <- page_navbar(
   title = "Peer Schools Explorer",
   theme = cohc_bslib(),
   id    = "main_nav",          # used for programmatic page switching
-  # Neutral white navbar with a thin border — no bold fill. Theme "light"
-  # so the tab text reads dark against the white background.
-  navbar_options = navbar_options(bg = "#FFFFFF", theme = "light"),
+  # Solid deep-blue navbar so the header reads as a clear band,
+  # cleanly separated from the white content area. Theme "dark" so
+  # the brand title + tab labels render in white against the fill.
+  navbar_options = navbar_options(bg = "#1d3557", theme = "dark"),
   header = useShinyjs(),
 
   nav_panel(
