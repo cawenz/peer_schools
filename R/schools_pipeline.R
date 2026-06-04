@@ -45,6 +45,14 @@ SCHOOLS_CONFIG <- list(
   ranked_classes = c("national-universities", "national-liberal-arts-colleges"),
   labels_year = 2024,
   carnegie_file = .data_path("2025-Public-Data-File.xlsx"),
+  # US News overall (within-category) rank — sourced from Academic Insights
+  # as a single metric pulled for the latest available AI year. The metric_id
+  # starts as NA: discover the correct one with
+  #   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
+  # pick the row that matches the published overall rank, and set it here.
+  # (rank is a snapshot per institution, not a longitudinal facts series —
+  # we pull only the most recent year and store as usnews_rank.)
+  usnews_rank_metric_id = NA_integer_,
   labeled_fields = c(
     "sector", "control", "iclevel",
     "hbcu", "hospital", "medical", "tribal",
@@ -203,29 +211,52 @@ build_classification <- function(cfg) {
   if (!nrow(raw) || !"ipeds_id" %in% names(raw)) {
     warning("classification pull returned nothing usable"); return(tibble())
   }
-  # US News overall (within-category) rank — AI's exact field name has
-  # historically varied. Try a few plausible names; first match wins.
-  # Verify against the live response if the rank column comes out empty
-  # after a refresh (likely cause: AI renamed the field).
-  rank_candidates <- c("rank", "current_rank", "numeric_rank",
-                       "us_news_rank", "overall_rank")
-  rank_col <- intersect(rank_candidates, names(raw))
-  raw$usnews_rank <- if (length(rank_col)) {
-    suppressWarnings(as.integer(raw[[rank_col[1]]]))
-  } else {
-    message(sprintf("  no rank field found in AI response; tried: %s",
-                    paste(rank_candidates, collapse = ", ")))
-    NA_integer_
-  }
   raw %>%
     filter(!is.na(ipeds_id)) %>%
-    transmute(unitid = as.integer(ipeds_id),
-              usnews_classification = classification,
-              usnews_rank = usnews_rank) %>%
+    transmute(unitid = as.integer(ipeds_id), usnews_classification = classification) %>%
     distinct(unitid, .keep_all = TRUE) %>%
     mutate(in_ranked_universe =
              usnews_classification %in% cfg$ranked_classes |
              grepl("^regional-universities-", usnews_classification))
+}
+
+# =============================================================================
+# 3a. US News overall rank (Academic Insights, single metric, latest year)
+# =============================================================================
+# Returns tibble(unitid, usnews_rank). NA for unranked schools.
+# Helper to discover the right metric_id, run once when wiring this up:
+#   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
+# then set SCHOOLS_CONFIG$usnews_rank_metric_id.
+build_usnews_rank <- function(cfg) {
+  mid <- cfg$usnews_rank_metric_id
+  if (is.null(mid) || is.na(mid)) {
+    message("SCHOOLS_CONFIG$usnews_rank_metric_id not set; skipping rank pull. ",
+            "Discover the metric_id via search_ai_metrics(SCHOOLS_CONFIG, contains = \"rank\").")
+    return(tibble(unitid = integer(), usnews_rank = integer()))
+  }
+  # Latest AI year corresponds to our latest collection year.
+  ai_year <- ipeds_to_ai_year(max(cfg$collection_years))
+  message(sprintf("Pulling US News rank (metric_id %d, AI year %d) ...",
+                  mid, ai_year))
+  res <- tryCatch(
+    ai_get(cfg, paste0("facts/", cfg$ai_dataset),
+           query = list(metric_ids = mid, years = ai_year, all_data = "true")),
+    error = function(e) {
+      warning(sprintf("rank facts pull failed: %s", conditionMessage(e)))
+      NULL
+    })
+  df <- as_tibble(res)
+  if (!nrow(df) || !"ipeds_id" %in% names(df) || !"value" %in% names(df)) {
+    warning("rank facts pull returned nothing usable")
+    return(tibble(unitid = integer(), usnews_rank = integer()))
+  }
+  out <- df %>%
+    filter(!is.na(ipeds_id)) %>%
+    transmute(unitid     = as.integer(ipeds_id),
+              usnews_rank = suppressWarnings(as.integer(value))) %>%
+    distinct(unitid, .keep_all = TRUE)
+  message(sprintf("  pulled rank for %d institutions", nrow(out)))
+  out
 }
 
 # =============================================================================
@@ -602,6 +633,15 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
     left_join(classn, by = "unitid") %>%
     mutate(in_ranked_universe = ifelse(is.na(in_ranked_universe),
                                        FALSE, in_ranked_universe))
+
+  # US News overall rank — separate AI pull because rank is a metric
+  # (facts/) not an institutional attribute (schools/). Returns an empty
+  # tibble when the metric_id is unset, so the join is a no-op until
+  # SCHOOLS_CONFIG$usnews_rank_metric_id is filled in.
+  usn_rank <- build_usnews_rank(cfg)
+  if (nrow(usn_rank)) {
+    schools <- schools %>% left_join(usn_rank, by = "unitid")
+  }
   
   carnegie <- build_carnegie(cfg)
   if (nrow(carnegie$data)) {
