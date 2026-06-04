@@ -203,9 +203,25 @@ build_classification <- function(cfg) {
   if (!nrow(raw) || !"ipeds_id" %in% names(raw)) {
     warning("classification pull returned nothing usable"); return(tibble())
   }
+  # US News overall (within-category) rank — AI's exact field name has
+  # historically varied. Try a few plausible names; first match wins.
+  # Verify against the live response if the rank column comes out empty
+  # after a refresh (likely cause: AI renamed the field).
+  rank_candidates <- c("rank", "current_rank", "numeric_rank",
+                       "us_news_rank", "overall_rank")
+  rank_col <- intersect(rank_candidates, names(raw))
+  raw$usnews_rank <- if (length(rank_col)) {
+    suppressWarnings(as.integer(raw[[rank_col[1]]]))
+  } else {
+    message(sprintf("  no rank field found in AI response; tried: %s",
+                    paste(rank_candidates, collapse = ", ")))
+    NA_integer_
+  }
   raw %>%
     filter(!is.na(ipeds_id)) %>%
-    transmute(unitid = as.integer(ipeds_id), usnews_classification = classification) %>%
+    transmute(unitid = as.integer(ipeds_id),
+              usnews_classification = classification,
+              usnews_rank = usnews_rank) %>%
     distinct(unitid, .keep_all = TRUE) %>%
     mutate(in_ranked_universe =
              usnews_classification %in% cfg$ranked_classes |

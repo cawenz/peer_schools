@@ -397,10 +397,13 @@ compute_peers <- function(
   }
   
   # -- 4. Join wide facts to candidates --
+  # usnews_rank may be absent from older schools.csv files; tidyselect's
+  # any_of() drops it gracefully. The display layer treats missing as NA.
   cdat <- candidates %>%
     select(unitid, instnm, sector, control_grp,
            usnews_classification, in_ranked_universe, stabbr,
-           religious_affiliation, religious_tradition) %>%
+           religious_affiliation, religious_tradition,
+           any_of("usnews_rank")) %>%
     left_join(wide, by = "unitid")
   
   # -- 4b. Build the same_religious_tradition clustering variable from the
@@ -619,10 +622,12 @@ compute_peers <- function(
     left_join(
       candidates %>% select(unitid, instnm, sector, control_grp,
                             usnews_classification, stabbr,
-                            religious_affiliation),
+                            religious_affiliation,
+                            any_of("usnews_rank")),
       by = "unitid"
     ) %>%
-    select(rank, unitid, instnm, sector, usnews_classification, stabbr,
+    select(rank, unitid, instnm, sector, usnews_classification,
+           any_of("usnews_rank"), stabbr,
            control_grp, religious_affiliation, distance)
 
   meta <- list(

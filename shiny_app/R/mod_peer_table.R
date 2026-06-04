@@ -182,15 +182,25 @@ peerTableServer <- function(id, sidebar_state) {
       req(res, nrow(res$peers) > 0)
       df <- res$peers
 
+      # US News within-category rank — populated by the pipeline from
+      # Academic Insights. NA for unranked schools (or any school if the
+      # column hasn't been refreshed yet); render those as blank.
+      usn_rank_disp <- if ("usnews_rank" %in% names(df)) {
+        ifelse(is.na(df$usnews_rank), "", as.character(df$usnews_rank))
+      } else {
+        rep("", nrow(df))
+      }
+
       display_df <- data.frame(
-        Rank      = df$rank,
-        School    = df$instnm,
-        `Class.`  = .prettify_classification(df$usnews_classification),
-        Sector    = .prettify_control(df$control_grp),
-        State     = df$stabbr,
-        Religious = ifelse(is.na(df$religious_affiliation), "",
-                           df$religious_affiliation),
-        Distance  = round(df$distance, 3),
+        Rank        = df$rank,
+        School      = df$instnm,
+        `Class.`    = .prettify_classification(df$usnews_classification),
+        `USN Rank`  = usn_rank_disp,
+        Sector      = .prettify_control(df$control_grp),
+        State       = df$stabbr,
+        Religious   = ifelse(is.na(df$religious_affiliation), "",
+                             df$religious_affiliation),
+        Distance    = round(df$distance, 3),
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -204,7 +214,8 @@ peerTableServer <- function(id, sidebar_state) {
           dom        = "tip",
           order      = list(list(0, "asc")),
           columnDefs = list(
-            list(className = "dt-right",  targets = c("Distance", "Rank")),
+            list(className = "dt-right",  targets = c("Distance", "Rank",
+                                                       "USN Rank")),
             list(className = "dt-center", targets = "State")
           )
         ),
