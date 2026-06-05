@@ -256,13 +256,15 @@ build_usnews_rank <- function(cfg) {
       NULL
     })
   df <- as_tibble(res)
-  if (!nrow(df) || !"ipeds_id" %in% names(df) || !"value" %in% names(df)) {
+  # facts/{dataset} keys IPEDS as school_ipeds_id (not ipeds_id, which is
+  # the schools/{dataset} convention). The numeric rank is in `value`.
+  if (!nrow(df) || !"school_ipeds_id" %in% names(df) || !"value" %in% names(df)) {
     warning("rank facts pull returned nothing usable")
     return(tibble(unitid = integer(), usnews_rank = integer()))
   }
   out <- df %>%
-    filter(!is.na(ipeds_id)) %>%
-    transmute(unitid     = as.integer(ipeds_id),
+    filter(!is.na(school_ipeds_id)) %>%
+    transmute(unitid      = as.integer(school_ipeds_id),
               usnews_rank = suppressWarnings(as.integer(value))) %>%
     distinct(unitid, .keep_all = TRUE)
   message(sprintf("  pulled rank for %d institutions", nrow(out)))
