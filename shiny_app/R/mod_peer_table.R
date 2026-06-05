@@ -449,7 +449,11 @@ peerTableServer <- function(id, sidebar_state) {
         rownames  = FALSE,
         selection = list(mode = "single", target = "row"),
         options = list(
-          pageLength = 50,
+          # pageLength generous enough to hold the maximum K (100) plus
+          # the prepended anchor row + a little headroom — single page
+          # is the right UX so users see everything at once and the
+          # in-DT sort applies across the whole result set.
+          pageLength = 150,
           dom        = "tip",
           order      = list(list(0, "asc")),
           columnDefs = list(

@@ -158,7 +158,7 @@ peerSearchSidebarUI <- function(id) {
     # ---------------- K + advanced ----------------
     tags$h6("Output"),
     sliderInput(ns("k"), "Number of peers",
-                min = 5, max = 50, value = 20, step = 1, ticks = FALSE),
+                min = 5, max = 100, value = 20, step = 1, ticks = FALSE),
 
     accordion(
       open = FALSE,
