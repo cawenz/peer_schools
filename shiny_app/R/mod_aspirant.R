@@ -158,7 +158,7 @@ aspirantServer <- function(id) {
     }
     updateSelectizeInput(session, "anchor_unitid",
                          choices = anchor_choices,
-                         selected = character(0),
+                         selected = .DEFAULT_ANCHOR_UNITID,
                          server = FALSE)
 
     raw_classes  <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))

@@ -243,7 +243,7 @@ compareServer <- function(id, peer_selection, peer_result) {
 
     updateSelectizeInput(session, "anchor_compare",
                          choices = anchor_choices_all,
-                         selected = character(0),
+                         selected = .DEFAULT_ANCHOR_UNITID,
                          server   = FALSE)
     updateSelectizeInput(session, "peer_compare",
                          choices = anchor_choices_all,

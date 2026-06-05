@@ -35,16 +35,16 @@ ui <- page_navbar(
   title = "Peer Schools Explorer",
   theme = cohc_bslib(),
   id    = "main_nav",          # used for programmatic page switching
-  # Solid deep-blue navbar so the header reads as a clear band,
+  # Solid Holy Cross purple navbar so the header reads as a clear band,
   # cleanly separated from the white content area. Theme "dark" so
   # the brand title + tab labels render in white against the fill.
-  navbar_options = navbar_options(bg = "#1d3557", theme = "dark"),
+  navbar_options = navbar_options(bg = "#602D89", theme = "dark"),
   header = useShinyjs(),
 
   nav_panel(
     "Peer Search",
     layout_sidebar(
-      sidebar = sidebar(width = 340, open = "open", bg = "#f1f5f9",
+      sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
                         peerSearchSidebarUI("peer_search_sidebar")),
       peerTableUI("peer_table")
     )
@@ -53,7 +53,7 @@ ui <- page_navbar(
   nav_panel(
     "Side-by-Side",
     layout_sidebar(
-      sidebar = sidebar(width = 320, open = "open", bg = "#f1f5f9",
+      sidebar = sidebar(width = 320, open = "open", bg = "#F4EDEC",
                         compareSidebarUI("compare")),
       compareUI("compare")
     )
@@ -68,7 +68,7 @@ ui <- page_navbar(
   nav_panel(
     "Cohort Builder",
     layout_sidebar(
-      sidebar = sidebar(width = 340, open = "open", bg = "#f1f5f9",
+      sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
                         cohortSidebarUI("cohort")),
       cohortUI("cohort")
     )

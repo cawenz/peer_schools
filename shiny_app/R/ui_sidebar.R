@@ -210,7 +210,7 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     }
     updateSelectizeInput(session, "anchor_unitid",
                          choices  = anchor_choices,
-                         selected = character(0),
+                         selected = .DEFAULT_ANCHOR_UNITID,
                          server   = FALSE)
 
     # Pretty labels for usnews_classification (.prettify_classification

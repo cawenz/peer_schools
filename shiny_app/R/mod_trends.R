@@ -110,7 +110,7 @@ trendsServer <- function(id,
     }
     updateSelectizeInput(session, "school_unitid",
                          choices  = school_choices,
-                         selected = character(0),
+                         selected = .DEFAULT_ANCHOR_UNITID,
                          server   = FALSE)
 
     # --- Compare-against choices: built from live cross-tab state so
