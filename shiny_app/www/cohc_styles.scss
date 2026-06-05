@@ -465,14 +465,74 @@ a {
 }
 
 .peer-results-about {
+  /* Legacy class kept in case any other surface still uses it */
   font-size: 0.85rem;
   color: #1d3557;
   text-decoration: none;
   cursor: pointer;
 
   &:hover, &:focus { text-decoration: underline; color: #0d1b2a; }
+}
 
-  .glyphicon { font-style: normal; font-weight: 700; }
+/* Prominent button styling for "About this table" — solid deep-blue
+ * fill with white text, info-circle icon. Reads as a real CTA, not a
+ * link, so users notice it. */
+.peer-about-btn {
+  background: #1d3557;
+  color: #FFFFFF;
+  border: 1px solid #1d3557;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover, &:focus {
+    background: #0d1b2a;
+    border-color: #0d1b2a;
+    color: #FFFFFF;
+    text-decoration: none;
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.25);
+  }
+
+  .peer-about-icon {
+    font-size: 1.05rem;
+    line-height: 1;
+    font-weight: 700;
+    font-style: normal;
+  }
+}
+
+/* Anchor row in the peer table — soft tint + bold school name so the
+ * user can tell at a glance which row is the reference. */
+.peer-results-table {
+  table tr.peer-anchor-row {
+    background: #e7eef7 !important;
+    font-weight: 600;
+    color: #0d1b2a;
+
+    td {
+      border-top: 2px solid #1d3557;
+      border-bottom: 2px solid #1d3557;
+    }
+    td:first-child {
+      border-left: 4px solid #1d3557;
+    }
+
+    &:hover {
+      background: #d8e2f0 !important;
+    }
+  }
 }
 
 /* Modal content: definition-list typography for the per-column

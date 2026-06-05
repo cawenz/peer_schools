@@ -218,14 +218,11 @@ peerTableServer <- function(id, sidebar_state) {
               div(class = "stat-value", k_actual),
               div(class = "stat-subtitle",
                   sprintf("of %d requested",
-                          isolate(sidebar_state$state()$k)))),
-          div(class = "stat-card",
-              div(class = "stat-title", "Distance"),
-              div(class = "stat-value", style = "font-size: 1.1rem;",
-                  dist_label),
-              div(class = "stat-subtitle",
-                  sprintf("%d vars used, %d dropped",
-                          n_vars, n_dropped_c + n_dropped_a)))
+                          isolate(sidebar_state$state()$k))))
+          # Distance card retired — the distance metric + var counts
+          # live in the Diagnostics accordion below, which is where users
+          # need them when interpreting results. Top-of-page should
+          # surface the headline counts, not methodology details.
       )
     })
 
@@ -239,15 +236,16 @@ peerTableServer <- function(id, sidebar_state) {
         div(class = "peer-results-header",
             h5(sprintf("Top %d peers (click a row to compare)",
                        nrow(res$peers))),
-            actionLink(ns("about_table_btn"),
-                       label = tagList(tags$span(class = "glyphicon",
-                                                  style = "margin-right:0.25em",
-                                                  HTML("&#9432;")),
-                                       "About this table"),
-                       class = "peer-results-about")),
+            actionButton(ns("about_table_btn"),
+                         label = tagList(
+                           tags$span(class = "peer-about-icon",
+                                      HTML("&#9432;")),
+                           "About this table"),
+                         class = "btn peer-about-btn")),
         p(class = "text-muted",
-          tags$small("Sorted by distance ascending. Click any column ",
-                     "header to re-sort."))
+          tags$small("Anchor school appears highlighted at the top. ",
+                     "Peers below sorted by distance ascending. Click ",
+                     "any column header to re-sort."))
       )
     })
 
@@ -412,6 +410,40 @@ peerTableServer <- function(id, sidebar_state) {
         stringsAsFactors = FALSE
       )
 
+      # Prepend the anchor school as row 1 so the user sees "this is
+      # what we're comparing against" before scrolling the peers. Rank
+      # is rendered as a dash; distance is 0 (anchor is zero from itself).
+      # Excluded from the click-to-select callback in selected_peer().
+      anchor_uid <- res$meta$anchor_unitid
+      a <- if (!is.null(anchor_uid)) {
+        .SCHOOLS[.SCHOOLS$unitid == anchor_uid, , drop = FALSE]
+      } else .SCHOOLS[0, , drop = FALSE]
+      if (nrow(a) == 1) {
+        .one <- function(v) if (is.null(v) || length(v) == 0 ||
+                                  is.na(v)) "" else as.character(v)
+        a_wamo <- if (!is.na(a$wamo_rank) &&
+                       !is.na(a$wamo_category %||% NA)) {
+          paste0(a$wamo_rank, " (",
+                  wamo_short[a$wamo_category] %||% a$wamo_category, ")")
+        } else if (!is.na(a$wamo_rank)) {
+          as.character(a$wamo_rank)
+        } else ""
+        anchor_row_df <- data.frame(
+          Rank          = 0L,
+          School        = paste0("★ ", a$instnm, "  (anchor)"),
+          `Class.`      = .prettify_classification(a$usnews_classification),
+          `USN Rank`    = .one(a$usnews_rank),
+          `WM Rank`     = a_wamo,
+          `Forbes Rank` = .one(a$forbes_rank),
+          Sector        = .prettify_control(a$control_grp),
+          State         = .one(a$stabbr),
+          Distance      = 0,
+          check.names = FALSE,
+          stringsAsFactors = FALSE
+        )
+        display_df <- rbind(anchor_row_df, display_df)
+      }
+
       DT::datatable(
         display_df,
         rownames  = FALSE,
@@ -425,8 +457,21 @@ peerTableServer <- function(id, sidebar_state) {
                                                        "USN Rank",
                                                        "WM Rank",
                                                        "Forbes Rank")),
-            list(className = "dt-center", targets = "State")
-          )
+            list(className = "dt-center", targets = "State"),
+            # Render rank 0 (anchor) as an em-dash so it doesn't read as
+            # an actual rank position.
+            list(targets = "Rank",
+                 render = DT::JS(
+                   "function(data, type, row) {",
+                   "  if (type === 'display' && data === 0) return '\\u2014';",
+                   "  return data;",
+                   "}"))
+          ),
+          # Tag the anchor row with a class so SCSS can highlight it.
+          rowCallback = DT::JS(
+            "function(row, data) {",
+            "  if (data[0] === 0) $(row).addClass('peer-anchor-row');",
+            "}")
         ),
         class = "compact stripe hover"
       ) |>
@@ -440,7 +485,13 @@ peerTableServer <- function(id, sidebar_state) {
       res <- peer_result()
       sel <- input$peer_table_rows_selected
       if (is.null(res) || !length(sel)) return(NULL)
-      res$peers[sel, , drop = FALSE]
+      # Anchor row is prepended at display position 1 (which DT reports
+      # as input row 1, 1-indexed). Subtract one to map back to the
+      # peers tibble row. Clicking the anchor itself (sel == 1) is a
+      # no-op for Side-by-Side — return NULL so the comparison view
+      # doesn't try to set the anchor as its own peer.
+      if (sel == 1L) return(NULL)
+      res$peers[sel - 1L, , drop = FALSE]
     })
 
     # -------------------------------------------------------------------------
