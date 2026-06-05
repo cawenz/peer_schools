@@ -186,13 +186,18 @@ peerTableServer <- function(id, sidebar_state) {
       #   usnews_rank   : Academic Insights metric 24 (Overall Rank).
       #   wamo_rank     : Washington Monthly category rank.
       #   wamo_category : WM category short label (LA / Bacc / Mas / Nat).
+      #   forbes_rank   : Forbes America's Top Colleges overall rank.
       # NA for unranked schools or for older schools.csv files that don't
       # have these columns yet — display as blank in either case.
-      usn_rank_disp <- if ("usnews_rank" %in% names(df)) {
-        ifelse(is.na(df$usnews_rank), "", as.character(df$usnews_rank))
-      } else {
-        rep("", nrow(df))
+      .rank_disp <- function(col) {
+        if (col %in% names(df)) {
+          ifelse(is.na(df[[col]]), "", as.character(df[[col]]))
+        } else {
+          rep("", nrow(df))
+        }
       }
+      usn_rank_disp    <- .rank_disp("usnews_rank")
+      forbes_rank_disp <- .rank_disp("forbes_rank")
       wamo_short <- c("Liberal Arts" = "LA", "Baccalaureate" = "Bacc",
                       "Master's" = "Mas",  "National" = "Nat")
       wamo_disp <- if ("wamo_rank" %in% names(df)) {
@@ -206,16 +211,17 @@ peerTableServer <- function(id, sidebar_state) {
       }
 
       display_df <- data.frame(
-        Rank        = df$rank,
-        School      = df$instnm,
-        `Class.`    = .prettify_classification(df$usnews_classification),
-        `USN Rank`  = usn_rank_disp,
-        `WM Rank`   = wamo_disp,
-        Sector      = .prettify_control(df$control_grp),
-        State       = df$stabbr,
-        Religious   = ifelse(is.na(df$religious_affiliation), "",
-                             df$religious_affiliation),
-        Distance    = round(df$distance, 3),
+        Rank          = df$rank,
+        School        = df$instnm,
+        `Class.`      = .prettify_classification(df$usnews_classification),
+        `USN Rank`    = usn_rank_disp,
+        `WM Rank`     = wamo_disp,
+        `Forbes Rank` = forbes_rank_disp,
+        Sector        = .prettify_control(df$control_grp),
+        State         = df$stabbr,
+        Religious     = ifelse(is.na(df$religious_affiliation), "",
+                               df$religious_affiliation),
+        Distance      = round(df$distance, 3),
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -231,7 +237,8 @@ peerTableServer <- function(id, sidebar_state) {
           columnDefs = list(
             list(className = "dt-right",  targets = c("Distance", "Rank",
                                                        "USN Rank",
-                                                       "WM Rank")),
+                                                       "WM Rank",
+                                                       "Forbes Rank")),
             list(className = "dt-center", targets = "State")
           )
         ),

@@ -404,7 +404,8 @@ compute_peers <- function(
     select(unitid, instnm, sector, control_grp,
            usnews_classification, in_ranked_universe, stabbr,
            religious_affiliation, religious_tradition,
-           any_of(c("usnews_rank", "wamo_rank", "wamo_category"))) %>%
+           any_of(c("usnews_rank", "wamo_rank", "wamo_category",
+                    "forbes_rank"))) %>%
     left_join(wide, by = "unitid")
   
   # -- 4b. Build the same_religious_tradition clustering variable from the
@@ -625,11 +626,12 @@ compute_peers <- function(
                             usnews_classification, stabbr,
                             religious_affiliation,
                             any_of(c("usnews_rank", "wamo_rank",
-                                      "wamo_category"))),
+                                      "wamo_category", "forbes_rank"))),
       by = "unitid"
     ) %>%
     select(rank, unitid, instnm, sector, usnews_classification,
-           any_of(c("usnews_rank", "wamo_rank", "wamo_category")),
+           any_of(c("usnews_rank", "wamo_rank", "wamo_category",
+                    "forbes_rank")),
            stabbr, control_grp, religious_affiliation, distance)
 
   meta <- list(

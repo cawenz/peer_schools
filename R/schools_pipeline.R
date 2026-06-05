@@ -51,6 +51,12 @@ SCHOOLS_CONFIG <- list(
   # Pattern: data/washington_monthly_<year>.xlsx. Build helper picks the
   # latest year present.
   washington_monthly_file = .data_path("washington_monthly_2025.xlsx"),
+  # Forbes America's Top Colleges — scraped annually with
+  # R/scrape_forbes_rankings.py. Forbes has no public data feed, so the
+  # script uses Playwright to load forbes.com/top-colleges/ and dump
+  # rank + name + state + type. No IPEDS in the source; build_forbes()
+  # matches names to schools by normalized exact match within state.
+  forbes_file = .data_path("forbes_top_colleges_2025.csv"),
   # US News overall (within-category) rank — Academic Insights metric_id 24
   # ("Overall Rank"). Confirmed via
   #   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
@@ -383,6 +389,120 @@ build_washington_monthly <- function(cfg) {
                   nrow(out),
                   paste(sprintf("%s=%d", by_cat$wamo_category, by_cat$n),
                         collapse = ", ")))
+  out
+}
+
+# =============================================================================
+# 3d. Forbes America's Top Colleges
+# =============================================================================
+# Reads the CSV produced by R/scrape_forbes_rankings.py and matches each
+# Forbes row to a unitid via normalized exact match within state, then a
+# small fuzzy fallback for the residual. Returns tibble(unitid, forbes_rank).
+#
+# Matching strategy (kept simple — Forbes publishes ~500 well-known
+# schools; the exact-within-state path catches the overwhelming majority):
+#   1. lowercase + strip punctuation + collapse whitespace + drop
+#      trailing "university"/"college" filler
+#   2. inner-join on (norm_name, stabbr=state)
+#   3. base::adist() fuzzy match on the residual, within same state, with
+#      a tight edit-distance cap (max 4) so loose matches are rejected
+# Unmatched rows are written to data/forbes_unmatched_<year>.csv as an
+# audit trail — review and add explicit overrides to FORBES_OVERRIDES
+# below if you spot a real school being missed.
+#
+# Requires an institutional lookup df with columns (unitid, instnm, stabbr).
+FORBES_OVERRIDES <- c(
+  # Hand-curated forbes_name -> unitid for stubborn mismatches. Add as
+  # needed after reviewing data/forbes_unmatched_<year>.csv.
+  # "Some Tricky Name" = "166124"
+)
+
+.forbes_normalize <- function(s) {
+  s <- tolower(s %||% "")
+  s <- gsub("[[:punct:]]+", " ", s)
+  s <- gsub("\\s+university\\s*$|\\s+college\\s*$", "", s)
+  s <- gsub("\\s+the\\s+", " ", s)
+  s <- gsub("\\s+", " ", s)
+  trimws(s)
+}
+
+build_forbes <- function(cfg, id_lookup) {
+  fp <- cfg$forbes_file
+  if (is.null(fp) || !file.exists(fp)) {
+    message(sprintf("Forbes file not found at '%s'; skipping.",
+                    fp %||% "<unset>"))
+    return(tibble(unitid = integer(), forbes_rank = integer()))
+  }
+  if (is.null(id_lookup) ||
+      !all(c("unitid", "instnm", "stabbr") %in% names(id_lookup))) {
+    warning("build_forbes: id_lookup needs (unitid, instnm, stabbr); skipping")
+    return(tibble(unitid = integer(), forbes_rank = integer()))
+  }
+  message(sprintf("Loading Forbes rankings: %s ...", basename(fp)))
+  forbes <- suppressMessages(readr::read_csv(fp, show_col_types = FALSE))
+  forbes$norm_name <- .forbes_normalize(forbes$name)
+  forbes$state     <- toupper(trimws(as.character(forbes$state)))
+
+  lk <- id_lookup %>%
+    transmute(unitid    = as.integer(unitid),
+              norm_name = .forbes_normalize(instnm),
+              state     = toupper(trimws(stabbr)))
+
+  # 1. Hand-curated overrides
+  if (length(FORBES_OVERRIDES)) {
+    ov <- tibble::tibble(name = names(FORBES_OVERRIDES),
+                          unitid = as.integer(FORBES_OVERRIDES))
+    fmatch_ov <- forbes %>% inner_join(ov, by = "name")
+  } else {
+    fmatch_ov <- tibble()
+  }
+  remaining <- forbes %>% anti_join(fmatch_ov, by = "rank")
+
+  # 2. Exact normalized match within state
+  fmatch_x <- remaining %>%
+    inner_join(lk, by = c("norm_name", "state"))
+  remaining <- remaining %>% anti_join(fmatch_x, by = "rank")
+
+  # 3. Fuzzy fallback within state (base R adist, tight cap)
+  fmatch_f <- list()
+  for (i in seq_len(nrow(remaining))) {
+    fr <- remaining[i, ]
+    pool <- lk[lk$state == fr$state, , drop = FALSE]
+    if (!nrow(pool)) next
+    d <- as.integer(adist(fr$norm_name, pool$norm_name,
+                           ignore.case = TRUE, partial = FALSE))
+    j <- which.min(d)
+    if (length(j) && d[j] <= 4) {
+      fmatch_f[[length(fmatch_f) + 1]] <- tibble(
+        rank = fr$rank, name = fr$name, state = fr$state,
+        unitid = pool$unitid[j])
+    }
+  }
+  fmatch_f <- bind_rows(fmatch_f)
+
+  matched <- bind_rows(
+    fmatch_ov %>% transmute(rank, unitid),
+    fmatch_x  %>% transmute(rank, unitid),
+    fmatch_f  %>% transmute(rank, unitid)
+  ) %>%
+    distinct(unitid, .keep_all = TRUE)
+
+  out <- matched %>%
+    transmute(unitid = as.integer(unitid),
+              forbes_rank = as.integer(rank))
+
+  unmatched <- forbes %>% anti_join(matched, by = "rank")
+  if (nrow(unmatched)) {
+    out_path <- .data_path(sub("\\.csv$",
+                                "_unmatched.csv",
+                                basename(fp)))
+    suppressMessages(readr::write_csv(unmatched, out_path))
+    message(sprintf("  matched %d of %d Forbes schools to unitid (%d unmatched -> %s)",
+                    nrow(out), nrow(forbes), nrow(unmatched),
+                    basename(out_path)))
+  } else {
+    message(sprintf("  matched all %d Forbes schools to unitid", nrow(out)))
+  }
   out
 }
 
@@ -732,6 +852,14 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
   wamo <- build_washington_monthly(cfg)
   if (nrow(wamo)) {
     schools <- schools %>% left_join(wamo, by = "unitid")
+  }
+
+  # Forbes America's Top Colleges — matched to unitid via instnm + stabbr
+  # because the Forbes CSV doesn't carry IPEDS. No-op when the CSV is
+  # missing (run R/scrape_forbes_rankings.py to produce it).
+  forbes <- build_forbes(cfg, schools %>% select(unitid, instnm, stabbr))
+  if (nrow(forbes)) {
+    schools <- schools %>% left_join(forbes, by = "unitid")
   }
   
   carnegie <- build_carnegie(cfg)
