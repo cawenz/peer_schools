@@ -397,7 +397,7 @@ trendsServer <- function(id,
                   all(ss$value > 0, na.rm = TRUE) &&
                   (is.null(cs) || all(cs$minv > 0, na.rm = TRUE))
 
-      yaxis_cfg <- list(title = ylab, gridcolor = "#e2e8f0",
+      yaxis_cfg <- list(title = ylab, gridcolor = "#F4EDEC",
                          zeroline = FALSE)
       if (use_log) {
         yaxis_cfg$type <- "log"
@@ -429,7 +429,7 @@ trendsServer <- function(id,
                        bordercolor = "rgba(0,0,0,0)"),
         plot_bgcolor  = "#FFFFFF",
         paper_bgcolor = "#FFFFFF",
-        hoverlabel = list(bgcolor = "#0d1b2a", bordercolor = "#0d1b2a",
+        hoverlabel = list(bgcolor = "#251230", bordercolor = "#251230",
                            font = list(color = "#FFFFFF", size = 12)),
         margin = list(t = 20, r = 30, b = 100, l = 80)
       )
@@ -476,13 +476,13 @@ trendsServer <- function(id,
             jitter = 0.3,
             marker = list(color = "rgba(148, 163, 184, 0.6)", size = 4),
             fillcolor = "rgba(29, 53, 87, 0.18)",
-            line = list(color = "#1d3557", width = 1.5),
+            line = list(color = "#602D89", width = 1.5),
             hovertemplate = paste0(yfmt, "<extra></extra>")
           ) %>%
           add_markers(
             x = grp, y = ss$value[1],
             name = anchor_name,
-            marker = list(color = "#1d3557", size = 14, symbol = "diamond",
+            marker = list(color = "#602D89", size = 14, symbol = "diamond",
                           line = list(color = "#FFFFFF", width = 2)),
             hovertemplate = hover_school
           )
@@ -492,9 +492,9 @@ trendsServer <- function(id,
           x = grp, y = ss$value[1],
           text = sprintf("<b>%s</b>", anchor_name),
           showarrow = TRUE, arrowhead = 2, arrowsize = 1,
-          arrowwidth = 1.5, arrowcolor = "#1d3557",
+          arrowwidth = 1.5, arrowcolor = "#602D89",
           ax = 45, ay = 0,
-          bgcolor = "#0d1b2a", bordercolor = "#0d1b2a",
+          bgcolor = "#251230", bordercolor = "#251230",
           font = list(color = "#FFFFFF", size = 11),
           xanchor = "left", yanchor = "middle"
         ))
@@ -507,7 +507,7 @@ trendsServer <- function(id,
           p %>%
             layout(
               xaxis = list(title = "", showticklabels = FALSE,
-                            gridcolor = "#e2e8f0", zeroline = FALSE),
+                            gridcolor = "#F4EDEC", zeroline = FALSE),
               annotations = annots
             ) %>%
             cohc_plotly_theme(hovermode = "closest", yaxis = yaxis_cfg) %>%
@@ -559,14 +559,14 @@ trendsServer <- function(id,
           add_lines(
             x = ss$year, y = ss$value,
             name = anchor_name,
-            line   = list(color = "#1d3557", width = 3),
-            marker = list(color = "#1d3557", size = 8),
+            line   = list(color = "#602D89", width = 3),
+            marker = list(color = "#602D89", size = 8),
             hovertemplate = hover_school
           ) %>%
           add_markers(
             x = ss$year, y = ss$value,
             name = anchor_name,
-            marker = list(color = "#1d3557", size = 9,
+            marker = list(color = "#602D89", size = 9,
                           line = list(color = "#FFFFFF", width = 1.5)),
             hovertemplate = hover_school,
             showlegend = FALSE
@@ -577,7 +577,7 @@ trendsServer <- function(id,
           add_markers(
             x = ss$year, y = ss$value,
             name = anchor_name,
-            marker = list(color = "#1d3557", size = 12,
+            marker = list(color = "#602D89", size = 12,
                           line = list(color = "#FFFFFF", width = 2)),
             hovertemplate = hover_school
           )
@@ -598,7 +598,7 @@ trendsServer <- function(id,
       # one series at a time.
       p %>%
         layout(
-          xaxis = list(title = "Year", gridcolor = "#e2e8f0",
+          xaxis = list(title = "Year", gridcolor = "#F4EDEC",
                        tickmode = "array",
                        tickvals = years_axis,
                        ticktext = as.character(years_axis))

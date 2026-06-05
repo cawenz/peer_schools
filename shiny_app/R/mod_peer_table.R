@@ -604,7 +604,7 @@ peerTableServer <- function(id, sidebar_state) {
         m <- m %>% leaflet::addCircleMarkers(
           data = peer_pts,
           lng = ~longitud, lat = ~latitude,
-          color = "#1d3557", fillColor = "#1d3557",
+          color = "#602D89", fillColor = "#602D89",
           radius = 7, weight = 2, opacity = 1, fillOpacity = 0.7,
           label = lapply(peer_pts$tip, htmltools::HTML),
           popup = lapply(peer_pts$popup, htmltools::HTML),
@@ -637,7 +637,7 @@ peerTableServer <- function(id, sidebar_state) {
       ) %>%
         leaflet::addLegend(
           position = "bottomright",
-          colors   = c("#581C87", "#1d3557"),
+          colors   = c("#581C87", "#602D89"),
           labels   = c("Anchor", "Peer"),
           opacity  = 0.85
         )
