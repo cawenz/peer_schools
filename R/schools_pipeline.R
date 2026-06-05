@@ -134,6 +134,17 @@ ai_get <- function(cfg, path, query = list()) {
     resp_body_json(simplifyVector = TRUE)
 }
 
+# Discovery helper — query the AI metrics catalog and (optionally) filter
+# by a substring of the description. Use this to find metric_ids before
+# wiring them into any *_CONFIG$ai_metric_ids list. Example:
+#   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
+# Also defined in R/aid_module_pipeline.R for the same purpose; kept here
+# so schools_pipeline.R is self-contained.
+search_ai_metrics <- function(cfg, contains = NULL) {
+  q <- list(); if (!is.null(contains)) q$description_contains <- contains
+  as_tibble(ai_get(cfg, paste0("metrics/", cfg$ai_dataset), query = q))
+}
+
 # Year-naming conventions:
 #   IPEDS uses fall-year (HD2024 = fall 2024 collection = academic year 2024-25)
 #   Academic Insights publishes data with a 2-year lag relative to IPEDS year.
