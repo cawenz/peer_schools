@@ -412,9 +412,21 @@ build_washington_monthly <- function(cfg) {
 #
 # Requires an institutional lookup df with columns (unitid, instnm, stabbr).
 FORBES_OVERRIDES <- c(
-  # Hand-curated forbes_name -> unitid for stubborn mismatches. Add as
-  # needed after reviewing data/forbes_unmatched_<year>.csv.
-  # "Some Tricky Name" = "166124"
+  # Hand-curated forbes_name -> unitid for stubborn mismatches. Add
+  # entries after reviewing data/forbes_top_colleges_<year>_unmatched.csv.
+  # Key is the exact `name` value from the Forbes CSV.
+  "Virginia Tech"                                     = "233921",  # Virginia Polytechnic Institute and State University
+  "CUNY, Baruch College"                              = "190664",  # CUNY Bernard M Baruch College
+  "Louisiana State University"                        = "159391",  # LSU and A&M College
+  "CUNY, The City College of New York"                = "190150",  # CUNY City College
+  "Sewanee—University of the South"              = "221768",  # University of the South (em-dash variant)
+  "The Citadel"                                       = "217864",  # The Citadel-Military College of South Carolina
+  "Indiana University-Purdue University, Indianapolis" = "151111", # IUPUI legacy unitid (split since 2024)
+  "SUNY, College at New Paltz"                        = "196097",  # SUNY at New Paltz
+  "St. Joseph's College (NY)"                         = "194161",  # St Joseph's College-New York
+  "Montana Tech of the University of Montana"         = "180489",  # Montana Technological University
+  "SUNY College at Old Westbury"                      = "196219",  # SUNY College at Old Westbury
+  "SUNY Cortland"                                     = "196060"   # SUNY College at Cortland
 )
 
 .forbes_normalize <- function(s) {
@@ -426,20 +438,26 @@ FORBES_OVERRIDES <- c(
 
   # ---- IPEDS-side suffixes we know cause misses ----
   # "-Main Campus" appears on many multi-campus state systems (Pitt,
-  # UVA, Georgia Tech, etc.).
+  # UVA, Georgia Tech, etc.). Drop these BEFORE the generic "campus"
+  # strip so we don't leave a dangling "main".
   s <- gsub("\\s+main campus\\s*$", "", s)
+  # Generic trailing " campus" — "University of Washington Seattle Campus"
+  # -> "university of washington seattle". This is intentionally NOT
+  # combined with a city-name strip; we want UT Austin / UT Dallas /
+  # UT El Paso etc. to stay distinct.
+  s <- gsub("\\s+campus\\s*$", "", s)
+  # Some IPEDS names repeat the city as both the dash-suffix and the
+  # implied location ("University of Pittsburgh-Pittsburgh Campus").
+  # After the punct + campus strip we get "...pittsburgh pittsburgh".
+  # Collapse duplicate adjacent tokens of length > 3 (length guard
+  # avoids collapsing legitimate "york new york" style sequences).
+  s <- gsub("\\b(\\w{4,})\\s+\\1\\b", "\\1", s)
   # Columbia in IPEDS is "Columbia University in the City of New York".
   s <- gsub("\\s+in the city of new york\\s*$", "", s)
-  # Cooper Union etc. have very long formal names — drop trailing
-  # "for the advancement of ..." style. Conservative: only after a
-  # bare "of/for the".
+  # Cooper Union etc. have very long formal names.
   s <- gsub("\\s+for the advancement of.*$", "", s)
-  # "X-Columbia" / "X-Seattle" campus suffix on flagship state schools
-  # (e.g., "University of South Carolina-Columbia",
-  # "University of Washington-Seattle Campus") — strip the trailing
-  # hyphenated city/campus. We already removed the hyphen via punct,
-  # so look for " <single-word> campus?" trailing tokens.
-  s <- gsub("\\s+(seattle|columbia|austin|denver|el paso|dallas|norman|bothell|indianapolis|cincinnati|main|amherst|knoxville)( campus)?\\s*$", "", s)
+  # Tulane is "Tulane University of Louisiana" in IPEDS.
+  s <- gsub("\\s+of louisiana\\s*$", "", s)
 
   # ---- Forbes-side patterns ----
   # Trailing 2-letter state disambiguator: "trinity college ct" -> "trinity college"
