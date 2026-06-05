@@ -50,3 +50,11 @@ data/*.zip
 data/*Tablesdoc.xlsx
 data/*TablesDoc.xlsx
 data/ReadMe*.docx
+
+# Python build artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Scraper audit snapshots (regenerated on each run)
+data/forbes_page_*.html
