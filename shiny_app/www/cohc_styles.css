@@ -536,9 +536,56 @@ a:hover {
   font-style: normal;
 }
 
-/* Below-table analytical surfaces tab strip. Sits inside a bslib
- * navset_card_tab; the wrapper styles below mostly polish what
- * bslib already gives us. */
+/* Below-table analytical surfaces tab strip. Built with shiny's
+ * tabsetPanel rather than a bslib navset for max portability across
+ * bslib versions; styled here to read like the rest of the app. */
+.peer-analysis-tabs {
+  margin-top: 1rem;
+  /* Tab row */
+  /* Active tab body */
+}
+
+.peer-analysis-tabs > .tabbable > .nav-tabs {
+  border-bottom: 2px solid #1d3557;
+  margin-bottom: 0;
+}
+
+.peer-analysis-tabs > .tabbable > .nav-tabs > li {
+  margin-bottom: -2px;
+}
+
+.peer-analysis-tabs > .tabbable > .nav-tabs > li > a {
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: transparent;
+}
+
+.peer-analysis-tabs > .tabbable > .nav-tabs > li > a:hover, .peer-analysis-tabs > .tabbable > .nav-tabs > li > a:focus {
+  background: #f1f5f9;
+  color: #1d3557;
+  border-color: #cbd5e1 #cbd5e1 transparent #cbd5e1;
+}
+
+.peer-analysis-tabs > .tabbable > .nav-tabs > li.active > a,
+.peer-analysis-tabs > .tabbable > .nav-tabs > li > a.active {
+  color: #FFFFFF !important;
+  background: #1d3557 !important;
+  border-color: #1d3557 !important;
+}
+
+.peer-analysis-tabs > .tabbable > .tab-content {
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-top: none;
+  padding: 1.25rem 1.25rem;
+  border-radius: 0 0 6px 6px;
+}
+
 .peer-tab-placeholder {
   background: #FFFFFF;
   border: 1px dashed #cbd5e1;

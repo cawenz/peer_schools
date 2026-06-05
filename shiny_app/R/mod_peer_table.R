@@ -537,71 +537,64 @@ peerTableServer <- function(id, sidebar_state) {
 
       tagList(
         tags$hr(class = "peer-refine-divider"),
-        navset_card_tab(
-          id = ns("analysis_nav"),
+        div(class = "peer-analysis-tabs",
+          tabsetPanel(
+            id = ns("analysis_nav"),
+            type = "tabs",
 
-          # ---- Composition (representation bars) ----
-          nav_panel(
-            title = tagList(icon("chart-bar"), " Composition"),
-            value = "composition",
-            .placeholder(
-              "Composition of the peer set",
-              paste("Stacked bars summarizing how the peer set breaks",
-                    "down on the same nine categorical dimensions used",
-                    "in the Cohort Builder (region, sector, control,",
-                    "religious tradition, athletics division, etc.),",
-                    "with the anchor's category marked for comparison."))
-          ),
+            tabPanel(
+              title = "Composition",
+              value = "composition",
+              .placeholder(
+                "Composition of the peer set",
+                paste("Stacked bars summarizing how the peer set breaks",
+                      "down on the same nine categorical dimensions used",
+                      "in the Cohort Builder (region, sector, control,",
+                      "religious tradition, athletics division, etc.),",
+                      "with the anchor's category marked for comparison."))
+            ),
 
-          # ---- Map ----
-          nav_panel(
-            title = tagList(icon("map-location-dot"), " Map"),
-            value = "map",
-            .placeholder(
-              "Geographic distribution",
-              paste("Leaflet map plotting every peer's primary campus,",
-                    "with the anchor distinguished by its own marker.",
-                    "Cluster + heatmap toggles match the Cohort Builder",
-                    "map controls."))
-          ),
+            tabPanel(
+              title = "Map",
+              value = "map",
+              .placeholder(
+                "Geographic distribution",
+                paste("Leaflet map plotting every peer's primary campus,",
+                      "with the anchor distinguished by its own marker.",
+                      "Cluster + heatmap toggles match the Cohort Builder",
+                      "map controls."))
+            ),
 
-          # ---- Dashboard ----
-          nav_panel(
-            title = tagList(icon("table-columns"), " Dashboard"),
-            value = "dashboard",
-            .placeholder(
-              "Peer-set dashboard",
-              paste("11 metric cards summarizing the peer set's median",
-                    "values (enrollment, net price, graduation rate,",
-                    "endowment per FTE, etc.), each with an inline",
-                    "marker showing the anchor's position on the same",
-                    "scale. Same widget as the Cohort Builder dashboard,",
-                    "applied to this search result."))
-          ),
+            tabPanel(
+              title = "Dashboard",
+              value = "dashboard",
+              .placeholder(
+                "Peer-set dashboard",
+                paste("11 metric cards summarizing the peer set's median",
+                      "values (enrollment, net price, graduation rate,",
+                      "endowment per FTE, etc.), each with an inline",
+                      "marker showing the anchor's position on the same",
+                      "scale. Same widget as the Cohort Builder dashboard,",
+                      "applied to this search result."))
+            ),
 
-          # ---- Refine: Aspirant ----
-          # Body is the existing uiOutput which already self-hides when
-          # the user hasn't opted into aspirant refinement.
-          nav_panel(
-            title = tagList(icon("arrow-up-right-dots"),
-                             " Refine: Aspirant"),
-            value = "aspirant",
-            uiOutput(ns("aspirant_refine_section"))
-          ),
+            tabPanel(
+              title = "Refine: Aspirant",
+              value = "aspirant",
+              uiOutput(ns("aspirant_refine_section"))
+            ),
 
-          # ---- Refine: Stratified ----
-          nav_panel(
-            title = tagList(icon("layer-group"), " Refine: Stratified"),
-            value = "stratified",
-            uiOutput(ns("stratified_expand_section"))
-          ),
+            tabPanel(
+              title = "Refine: Stratified",
+              value = "stratified",
+              uiOutput(ns("stratified_expand_section"))
+            ),
 
-          # ---- Diagnostics ----
-          nav_panel(
-            title = tagList(icon("magnifying-glass-chart"),
-                             " Diagnostics"),
-            value = "diagnostics",
-            uiOutput(ns("diagnostics_accordion"))
+            tabPanel(
+              title = "Diagnostics",
+              value = "diagnostics",
+              uiOutput(ns("diagnostics_accordion"))
+            )
           )
         )
       )
