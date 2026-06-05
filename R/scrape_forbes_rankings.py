@@ -111,6 +111,47 @@ def _looks_like_rank(text: str) -> Optional[int]:
     return None
 
 
+def _parse_row(cells: List[str]) -> Optional[dict]:
+    """Convert a list of cell strings into a {rank, name, state, type}
+    record, or None if the row doesn't look like a ranking row.
+    """
+    rank: Optional[int] = None
+    name: Optional[str] = None
+    state: Optional[str] = None
+    forbes_type: Optional[str] = None
+    for c in cells:
+        if rank is None:
+            r = _looks_like_rank(c)
+            if r is not None:
+                rank = r
+                continue
+        if state is None:
+            s = _state_code_from(c)
+            if s and len(c) <= 4:        # bare state cell, e.g. "MA"
+                state = s
+                continue
+        # The longest non-numeric cell is usually the name. Short tokens
+        # like "Public" / "Private not-for-profit" get filtered later.
+        if not c.isdigit() and len(c) > 4 and (
+                name is None or len(c) > len(name)):
+            name = c
+            s2 = _state_code_from(c)
+            if s2 and state is None:
+                state = s2
+                name = re.sub(r",\s*[A-Z]{2}\s*$", "", c).strip()
+    for c in cells:
+        if re.fullmatch(r"(Public|Private(?:\s+not-for-profit)?)",
+                        c, re.IGNORECASE):
+            forbes_type = c
+            break
+    if rank is None or name is None:
+        return None
+    return {"rank": rank,
+            "name": name,
+            "state": state or "",
+            "type": forbes_type or ""}
+
+
 def scrape() -> List[dict]:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -121,7 +162,16 @@ def scrape() -> List[dict]:
         page = ctx.new_page()
 
         print(f"Loading {URL} (headless={HEADLESS}) ...", flush=True)
-        page.goto(URL, wait_until="networkidle", timeout=60_000)
+        # Forbes runs constant background ad / analytics traffic, so
+        # `networkidle` never resolves and goto() hangs the full 60s.
+        # `domcontentloaded` returns as soon as the DOM is parsed; we
+        # then rely on wait_for_selector below to know when the actual
+        # ranking rows are populated. Errors here are non-fatal — the
+        # selector wait will still try to find rows.
+        try:
+            page.goto(URL, wait_until="domcontentloaded", timeout=45_000)
+        except PWTimeout:
+            print("  domcontentloaded timed out; continuing anyway", flush=True)
 
         # Forbes sometimes shows a privacy / cookie banner that covers the
         # list. Try to dismiss it. Non-fatal if absent.
@@ -155,101 +205,94 @@ def scrape() -> List[dict]:
             )
         print(f"  using row selector: {used_selector}", flush=True)
 
-        # Scroll until row count stops growing for N consecutive passes.
-        stable_passes = 0
-        last_count = page.locator(used_selector).count()
-        for i in range(MAX_SCROLLS):
-            page.mouse.wheel(0, SCROLL_DELTA_PX)
-            page.wait_for_timeout(SCROLL_DELAY_MS)
-            n = page.locator(used_selector).count()
-            if n == last_count:
-                stable_passes += 1
-                if stable_passes >= SCROLL_STABLE_PASSES:
-                    break
-            else:
-                stable_passes = 0
-                last_count = n
-            if n >= TARGET_ROWS + 5:
-                # Some extra padding past 500 to catch ties; stop here.
-                break
-            if i % 10 == 0:
-                print(f"  scroll {i}: {n} rows", flush=True)
-
-        print(f"  final row count: {last_count}", flush=True)
-        OUT_HTML.write_text(page.content(), encoding="utf-8")
-
-        # Extract each row's text content, then parse heuristically.
-        # Different layouts put rank/name/state in different cells, so
-        # we go by content rather than position.
-        rows = page.locator(used_selector).all()
+        # Forbes paginates 50 schools per page across 10 pages. We click
+        # the "Next" button between pages and accumulate row content as
+        # we go. Detect end-of-list by Next being disabled OR by reaching
+        # MAX_PAGES as a safety net.
         out: List[dict] = []
-        for row in rows:
-            try:
-                cells = [c.strip() for c in row.locator(CELL_SELECTOR)
-                                              .all_inner_texts()]
-            except Exception:
-                continue
-            if not cells:
-                # Whole row inner_text fallback (semicolon-separated guess)
-                txt = (row.inner_text() or "").strip()
-                if not txt:
+        seen_keys = set()
+        MAX_PAGES = 15
+
+        def harvest_current_page() -> int:
+            """Extract rows visible right now, append to `out`. Returns
+            the count of new entries added (skipping duplicates)."""
+            rows = page.locator(used_selector).all()
+            added = 0
+            for row in rows:
+                try:
+                    cells = [c.strip() for c in row.locator(CELL_SELECTOR)
+                                                  .all_inner_texts()]
+                except Exception:
                     continue
-                cells = [t.strip() for t in re.split(r"\n+", txt) if t.strip()]
+                if not cells:
+                    txt = (row.inner_text() or "").strip()
+                    if not txt:
+                        continue
+                    cells = [t.strip() for t in re.split(r"\n+", txt) if t.strip()]
+                parsed = _parse_row(cells)
+                if parsed is None:
+                    continue
+                key = (parsed["rank"], parsed["name"])
+                if key in seen_keys:
+                    continue
+                seen_keys.add(key)
+                out.append(parsed)
+                added += 1
+            return added
 
-            rank = None
-            name = None
-            state = None
-            forbes_type = None
-            for c in cells:
-                if rank is None:
-                    r = _looks_like_rank(c)
-                    if r is not None:
-                        rank = r
-                        continue
-                if state is None:
-                    s = _state_code_from(c)
-                    if s and len(c) <= 4:    # bare state cell
-                        state = s
-                        continue
-                # The longest non-numeric cell is usually the name; cells
-                # like "Private not-for-profit", "Public" are short and
-                # often tagged separately. Track best-name candidate.
-                if not c.isdigit() and len(c) > 4 and (
-                        name is None or len(c) > len(name)):
-                    name = c
-                    # If the name has a trailing ", MA" style state, capture
-                    # that too and clean the name.
-                    s2 = _state_code_from(c)
-                    if s2 and state is None:
-                        state = s2
-                        name = re.sub(r",\s*[A-Z]{2}\s*$", "", c).strip()
-            # Identify "type" cell loosely
-            for c in cells:
-                if re.fullmatch(r"(Public|Private(?:\s+not-for-profit)?)",
-                                c, re.IGNORECASE):
-                    forbes_type = c
+        for page_num in range(1, MAX_PAGES + 1):
+            # Scroll the table into view in case lazy chunks need it
+            try:
+                page.locator(used_selector).first.scroll_into_view_if_needed(
+                    timeout=2000)
+            except Exception:
+                pass
+            page.wait_for_timeout(400)
+            added = harvest_current_page()
+            print(f"  page {page_num}: +{added} new (total {len(out)})",
+                  flush=True)
+
+            # Click "Next" to advance — bail out if it's missing or disabled.
+            next_btn = page.locator('button[aria-label="Next"]').first
+            try:
+                if next_btn.count() == 0:
+                    print("  no Next button found; stopping", flush=True)
                     break
+                if next_btn.is_disabled():
+                    print("  Next button disabled; reached last page",
+                          flush=True)
+                    break
+                next_btn.scroll_into_view_if_needed(timeout=2000)
+                next_btn.click(timeout=5000)
+            except Exception as e:
+                print(f"  Next click failed ({e}); stopping", flush=True)
+                break
 
-            if rank is None or name is None:
-                continue
-            out.append({"rank": rank,
-                        "name": name,
-                        "state": state or "",
-                        "type": forbes_type or ""})
+            # Wait for the table to repaint. Forbes' table rows are reused
+            # (same DOM nodes, updated content), so a row-count diff
+            # doesn't fire. Instead we wait for the first cell's text to
+            # change vs. what we just saw.
+            try:
+                first_cell_now = page.locator(used_selector).nth(0)\
+                                     .locator(CELL_SELECTOR).first\
+                                     .inner_text(timeout=3000)
+                # Poll for change with a 4s budget
+                for _ in range(20):
+                    page.wait_for_timeout(200)
+                    new_first = page.locator(used_selector).nth(0)\
+                                    .locator(CELL_SELECTOR).first\
+                                    .inner_text(timeout=1000)
+                    if new_first != first_cell_now:
+                        break
+            except Exception:
+                page.wait_for_timeout(1500)
 
+        OUT_HTML.write_text(page.content(), encoding="utf-8")
+        print(f"  collected {len(out)} unique schools across pages",
+              flush=True)
         browser.close()
 
-    # Dedupe by (rank, name) — Forbes occasionally renders duplicate rows
-    # mid-stream during scroll-load.
-    seen = set()
-    deduped: List[dict] = []
-    for r in sorted(out, key=lambda r: r["rank"]):
-        key = (r["rank"], r["name"])
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append(r)
-    return deduped
+    return sorted(out, key=lambda r: r["rank"])
 
 
 def main() -> int:
