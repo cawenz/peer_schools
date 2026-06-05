@@ -322,6 +322,127 @@ a {
   }
 }
 
+/* ---------- Peer Search empty-state hero ----------
+ * Shown until the user clicks Run search. Replaces the small
+ * "No search run yet" note with a full first-run guide.
+ */
+.peer-empty-hero {
+  margin: 0.5rem 0 2rem 0;
+  padding: 1.5rem 1.5rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #FFFFFF 100%);
+  border: 1px solid #cbd5e1;
+  border-left: 4px solid #1d3557;
+  border-radius: 6px;
+}
+
+.peer-empty-headline {
+  h3 {
+    color: #1d3557;
+    font-size: 1.4rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+  }
+}
+
+.peer-empty-lede {
+  color: #334155;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+  max-width: 70ch;
+}
+
+/* Three numbered step cards in a responsive grid */
+.peer-empty-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.peer-step {
+  display: flex;
+  gap: 0.85rem;
+  padding: 1rem;
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+
+  h6 {
+    color: #1d3557;
+    margin: 0 0 0.35rem 0;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  p {
+    margin: 0 0 0.5rem 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  p:last-child { margin-bottom: 0; }
+}
+
+.peer-step-num {
+  flex: 0 0 2.2rem;
+  height: 2.2rem;
+  width: 2.2rem;
+  border-radius: 50%;
+  background: #1d3557;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.peer-step-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.peer-step-aside {
+  font-size: 0.85rem !important;
+  color: #64748b !important;
+  border-left: 2px solid #e2e8f0;
+  padding-left: 0.6rem;
+}
+
+/* Methodology recap — 4 numbered items in a tighter inline list */
+.peer-empty-method {
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+
+  h6 {
+    color: #1d3557;
+    font-weight: 700;
+    margin: 0 0 0.6rem 0;
+    font-size: 0.95rem;
+  }
+}
+
+.peer-empty-method-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #334155;
+
+  li {
+    margin-bottom: 0.35rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  li:last-child { margin-bottom: 0; }
+  strong { color: #0d1b2a; }
+}
+
+.peer-empty-footer {
+  p { margin: 0; color: #64748b; }
+}
+
 /* ---------- Peer results table wrapper ---------- */
 .peer-results-table {
   margin-bottom: 1.5rem;
