@@ -45,14 +45,13 @@ SCHOOLS_CONFIG <- list(
   ranked_classes = c("national-universities", "national-liberal-arts-colleges"),
   labels_year = 2024,
   carnegie_file = .data_path("2025-Public-Data-File.xlsx"),
-  # US News overall (within-category) rank — sourced from Academic Insights
-  # as a single metric pulled for the latest available AI year. The metric_id
-  # starts as NA: discover the correct one with
+  # US News overall (within-category) rank — Academic Insights metric_id 24
+  # ("Overall Rank"). Confirmed via
   #   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
-  # pick the row that matches the published overall rank, and set it here.
-  # (rank is a snapshot per institution, not a longitudinal facts series —
-  # we pull only the most recent year and store as usnews_rank.)
-  usnews_rank_metric_id = NA_integer_,
+  # Pulled for the latest AI-equivalent year. Rank is a per-institution
+  # snapshot, not a longitudinal facts series, so we keep only the latest
+  # year and store as usnews_rank.
+  usnews_rank_metric_id = 24L,
   labeled_fields = c(
     "sector", "control", "iclevel",
     "hbcu", "hospital", "medical", "tribal",
