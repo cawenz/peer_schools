@@ -115,7 +115,11 @@ peerSearchSidebarUI <- function(id) {
       tags$label("Institution type",
                   tags$small(class = "pool-label-hint",
                              "(public vs. private nonprofit)")),
-      checkboxInput(ns("pool_control_same"), "Same as anchor", value = TRUE),
+      # Default OFF: most users want the pool wide-open across both
+      # sectors. The picker is pre-populated with both choices at app
+      # start (see updateSelectInput in the server below), so flipping
+      # the default here doesn't strand them in an empty multi-select.
+      checkboxInput(ns("pool_control_same"), "Same as anchor", value = FALSE),
       selectInput(ns("pool_control"), label = NULL,
                   choices = NULL, multiple = TRUE,
                   selectize = TRUE)
