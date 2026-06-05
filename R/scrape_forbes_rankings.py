@@ -111,39 +111,66 @@ def _looks_like_rank(text: str) -> Optional[int]:
     return None
 
 
+TYPE_RE     = re.compile(r"^\s*(Public|Private(?:\s+not-for-profit)?)\s*$",
+                          re.IGNORECASE)
+STATE_RE    = re.compile(r"^\s*[A-Z]{2}\s*$")
+MONEY_RE    = re.compile(r"^[$\-+]?[\d,]+(\.\d+)?%?$")
+TRAIL_ST_RE = re.compile(r",\s*([A-Z]{2})\s*$")
+
+
 def _parse_row(cells: List[str]) -> Optional[dict]:
     """Convert a list of cell strings into a {rank, name, state, type}
     record, or None if the row doesn't look like a ranking row.
+
+    Forbes' table columns are typically ordered:
+        rank | name | state | type | <metrics: salary, debt, ...>
+    so we classify cells by content and take the *first* name candidate
+    rather than the longest — "Private not-for-profit" is 22 chars,
+    which used to outrun "Columbia University" (19) under a longest-wins
+    rule and produce garbage names for ~10% of rows.
     """
     rank: Optional[int] = None
     name: Optional[str] = None
     state: Optional[str] = None
     forbes_type: Optional[str] = None
-    for c in cells:
+    name_candidates: List[str] = []
+
+    for raw in cells:
+        c = (raw or "").strip()
+        if not c:
+            continue
+        # 1. Rank — first numeric cell in 1..999
         if rank is None:
             r = _looks_like_rank(c)
             if r is not None:
                 rank = r
                 continue
-        if state is None:
-            s = _state_code_from(c)
-            if s and len(c) <= 4:        # bare state cell, e.g. "MA"
-                state = s
-                continue
-        # The longest non-numeric cell is usually the name. Short tokens
-        # like "Public" / "Private not-for-profit" get filtered later.
-        if not c.isdigit() and len(c) > 4 and (
-                name is None or len(c) > len(name)):
-            name = c
-            s2 = _state_code_from(c)
-            if s2 and state is None:
-                state = s2
-                name = re.sub(r",\s*[A-Z]{2}\s*$", "", c).strip()
-    for c in cells:
-        if re.fullmatch(r"(Public|Private(?:\s+not-for-profit)?)",
-                        c, re.IGNORECASE):
-            forbes_type = c
-            break
+        # 2. Type cell — exact-match Public / Private / Private not-for-profit
+        if TYPE_RE.match(c):
+            if forbes_type is None:
+                forbes_type = c
+            continue
+        # 3. Bare state code — "MA", "NY", ...
+        if STATE_RE.match(c):
+            if state is None:
+                state = c
+            continue
+        # 4. Currency / numeric metric — skip outright
+        if MONEY_RE.match(c):
+            continue
+        # 5. Anything else > 4 chars is a name candidate
+        if len(c) > 4:
+            name_candidates.append(c)
+
+    # First name candidate in column order = the school name.
+    if name_candidates:
+        name = name_candidates[0]
+        # Trailing ", XX" -> pull off state if we didn't already get one
+        m = TRAIL_ST_RE.search(name)
+        if m and state is None:
+            state = m.group(1)
+            name = TRAIL_ST_RE.sub("", name).strip()
+
     if rank is None or name is None:
         return None
     return {"rank": rank,
