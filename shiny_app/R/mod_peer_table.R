@@ -935,7 +935,14 @@ peerTableServer <- function(id, sidebar_state) {
           tags$th("School"),
           tags$th(class = "dt-center", "State"),
           tags$th(class = "dt-right",  "Value"),
-          tags$th(class = "dt-right",  "Pct.")
+          tags$th(class = "dt-right",
+                  title = paste("Percentile in the ranked universe —",
+                                 "e.g., 73 means this school's value is",
+                                 "higher than 73% of ranked institutions",
+                                 "on this metric. Higher number = higher",
+                                 "value, not 'better' (acceptance rate,",
+                                 "net price, etc. flip the interpretation)."),
+                   "%ile")
         )),
         tags$tbody(lapply(seq_len(nrow(tbl_rows)), function(i) {
           a <- as.character(tbl_rows$action[i])
