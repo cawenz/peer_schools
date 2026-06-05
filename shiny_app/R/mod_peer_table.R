@@ -182,11 +182,25 @@ peerTableServer <- function(id, sidebar_state) {
       req(res, nrow(res$peers) > 0)
       df <- res$peers
 
-      # US News within-category rank — populated by the pipeline from
-      # Academic Insights. NA for unranked schools (or any school if the
-      # column hasn't been refreshed yet); render those as blank.
+      # External rankings — populated by the pipeline:
+      #   usnews_rank   : Academic Insights metric 24 (Overall Rank).
+      #   wamo_rank     : Washington Monthly category rank.
+      #   wamo_category : WM category short label (LA / Bacc / Mas / Nat).
+      # NA for unranked schools or for older schools.csv files that don't
+      # have these columns yet — display as blank in either case.
       usn_rank_disp <- if ("usnews_rank" %in% names(df)) {
         ifelse(is.na(df$usnews_rank), "", as.character(df$usnews_rank))
+      } else {
+        rep("", nrow(df))
+      }
+      wamo_short <- c("Liberal Arts" = "LA", "Baccalaureate" = "Bacc",
+                      "Master's" = "Mas",  "National" = "Nat")
+      wamo_disp <- if ("wamo_rank" %in% names(df)) {
+        cat <- if ("wamo_category" %in% names(df)) df$wamo_category
+               else rep(NA_character_, nrow(df))
+        sfx <- ifelse(is.na(cat), "", paste0(" (", wamo_short[cat], ")"))
+        ifelse(is.na(df$wamo_rank), "",
+               paste0(as.character(df$wamo_rank), sfx))
       } else {
         rep("", nrow(df))
       }
@@ -196,6 +210,7 @@ peerTableServer <- function(id, sidebar_state) {
         School      = df$instnm,
         `Class.`    = .prettify_classification(df$usnews_classification),
         `USN Rank`  = usn_rank_disp,
+        `WM Rank`   = wamo_disp,
         Sector      = .prettify_control(df$control_grp),
         State       = df$stabbr,
         Religious   = ifelse(is.na(df$religious_affiliation), "",
@@ -215,7 +230,8 @@ peerTableServer <- function(id, sidebar_state) {
           order      = list(list(0, "asc")),
           columnDefs = list(
             list(className = "dt-right",  targets = c("Distance", "Rank",
-                                                       "USN Rank")),
+                                                       "USN Rank",
+                                                       "WM Rank")),
             list(className = "dt-center", targets = "State")
           )
         ),

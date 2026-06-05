@@ -45,6 +45,12 @@ SCHOOLS_CONFIG <- list(
   ranked_classes = c("national-universities", "national-liberal-arts-colleges"),
   labels_year = 2024,
   carnegie_file = .data_path("2025-Public-Data-File.xlsx"),
+  # Washington Monthly College Guide — downloaded annually from
+  # https://washingtonmonthly.com/<year>-college-guide/ (look for the
+  # "download the full data set" link on any of the category pages).
+  # Pattern: data/washington_monthly_<year>.xlsx. Build helper picks the
+  # latest year present.
+  washington_monthly_file = .data_path("washington_monthly_2025.xlsx"),
   # US News overall (within-category) rank — Academic Insights metric_id 24
   # ("Overall Rank"). Confirmed via
   #   search_ai_metrics(SCHOOLS_CONFIG, contains = "rank")
@@ -311,6 +317,72 @@ build_accreditor <- function(cfg) {
     filter(!is.na(unitid)) %>%
     distinct(unitid, .keep_all = TRUE)
   message(sprintf("  pulled accreditor for %d institutions", nrow(out)))
+  out
+}
+
+# =============================================================================
+# 3c. Washington Monthly College Guide rankings
+# =============================================================================
+# Reads the publicly distributed WM College Guide spreadsheet (downloaded
+# manually each year from washingtonmonthly.com/<year>-college-guide/). The
+# file has four sheets:
+#   "All"           — every 4-year institution WM ranks, including National
+#                     Universities (no separate sheet for them)
+#   "Master's"      — Master's universities (category-specific rank)
+#   "Baccalaureate" — Bachelor's colleges
+#   "Liberal Arts"  — National Liberal Arts colleges
+# Schools in Master's/Bacc/LA also appear in "All", but with a different
+# (master-list) rank. For peer comparison we surface the more specific
+# category-rank when available, and the "All" rank for National Universities
+# that have no category sheet.
+#
+# Returns tibble(unitid, wamo_rank, wamo_category).
+#   wamo_category ∈ {"Liberal Arts", "Baccalaureate", "Master's", "National"}
+#   "National" means the school was only in "All" — by elimination, a
+#   National University.
+build_washington_monthly <- function(cfg) {
+  fp <- cfg$washington_monthly_file
+  if (is.null(fp) || !file.exists(fp)) {
+    warning(sprintf("Washington Monthly file not found at '%s'; ",
+                    fp %||% "<unset>"),
+            "schools will be built without WM rankings.")
+    return(tibble(unitid = integer(),
+                  wamo_rank = integer(),
+                  wamo_category = character()))
+  }
+  message(sprintf("Loading Washington Monthly rankings: %s ...",
+                  basename(fp)))
+  sheets <- c("All", "Master's", "Baccalaureate", "Liberal Arts")
+  # Header row is row 1 inside the sheet's data area; readxl's skip = 1
+  # advances past the title row that sits above it in each sheet.
+  read_sheet <- function(s) {
+    d <- suppressWarnings(suppressMessages(
+      readxl::read_excel(fp, sheet = s, skip = 1)))
+    d %>%
+      transmute(unitid    = suppressWarnings(as.integer(UnitID)),
+                wamo_rank = suppressWarnings(as.integer(Rank)),
+                sheet     = s) %>%
+      filter(!is.na(unitid), !is.na(wamo_rank))
+  }
+  stacked <- bind_rows(lapply(sheets, read_sheet))
+
+  # For schools present in a category sheet, prefer the category rank;
+  # for schools only in "All", treat them as National Universities.
+  cat_rows <- stacked %>% filter(sheet != "All")
+  only_all <- stacked %>%
+    filter(sheet == "All", !unitid %in% cat_rows$unitid) %>%
+    mutate(sheet = "National")
+  out <- bind_rows(cat_rows, only_all) %>%
+    transmute(unitid,
+              wamo_rank,
+              wamo_category = sheet) %>%
+    distinct(unitid, .keep_all = TRUE)
+
+  by_cat <- out %>% count(wamo_category, name = "n")
+  message(sprintf("  %d schools with a WM rank (%s)",
+                  nrow(out),
+                  paste(sprintf("%s=%d", by_cat$wamo_category, by_cat$n),
+                        collapse = ", ")))
   out
 }
 
@@ -653,6 +725,13 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
   usn_rank <- build_usnews_rank(cfg)
   if (nrow(usn_rank)) {
     schools <- schools %>% left_join(usn_rank, by = "unitid")
+  }
+
+  # Washington Monthly rankings (offline XLSX). Empty tibble when the
+  # file is missing, so this is a no-op until the file is dropped in.
+  wamo <- build_washington_monthly(cfg)
+  if (nrow(wamo)) {
+    schools <- schools %>% left_join(wamo, by = "unitid")
   }
   
   carnegie <- build_carnegie(cfg)
