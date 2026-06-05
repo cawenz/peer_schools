@@ -24,6 +24,7 @@ peerTableUI <- function(id) {
       "US News, Carnegie, EADA, and Scorecard data."),
 
     uiOutput(ns("header_or_empty")),
+    uiOutput(ns("analysis_indicator")),
 
     # Results section with a clear label above the table so the table reads
     # as the primary result, not as something nested inside another widget.
@@ -220,6 +221,27 @@ peerTableServer <- function(id, sidebar_state) {
           # live in the Diagnostics accordion below, which is where users
           # need them when interpreting results. Top-of-page should
           # surface the headline counts, not methodology details.
+      )
+    })
+
+    # ---- More-analysis-below indicator ---------------------------------
+    # Sits between the stats grid and the results table, so the user
+    # sees right away that there's a tab strip of additional views
+    # further down. Click smooth-scrolls to the analysis tab area.
+    output$analysis_indicator <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) return(NULL)
+      tags$div(
+        class = "peer-analysis-indicator",
+        onclick = sprintf(
+          "document.getElementById('%s').scrollIntoView({behavior:'smooth', block:'start'});",
+          ns("analysis_tabs")),
+        title = "Jump to additional analytical views",
+        tags$span(class = "peer-ai-icon", HTML("&#8595;")),
+        tags$span(class = "peer-ai-text",
+                   tags$strong("More analysis below:"),
+                   " Composition · Map · Dashboard · Aspirant · ",
+                   "Stratified · Diagnostics")
       )
     })
 
@@ -512,6 +534,130 @@ peerTableServer <- function(id, sidebar_state) {
       uiOutput(ns("diagnostics_ui"))
     })
 
+    # ---- Map tab data + render -------------------------------------------
+    # Build a single tibble with anchor + peers, lat/long, and a popup
+    # HTML chunk. anchor flag drives the marker style choice below.
+    peer_map_points <- reactive({
+      res <- peer_result()
+      if (is.null(res)) return(NULL)
+      a_uid <- res$meta$anchor_unitid
+      peer_uids <- res$peers$unitid
+      uids <- unique(c(a_uid, peer_uids))
+      df <- .SCHOOLS[match(uids, .SCHOOLS$unitid), , drop = FALSE]
+      df <- df[!is.na(df$latitude) & !is.na(df$longitud), , drop = FALSE]
+      if (!nrow(df)) return(NULL)
+      df$is_anchor <- df$unitid == a_uid
+      # Pull rank from the peer-result tibble (anchor row gets rank "—")
+      rank_lookup <- stats::setNames(res$peers$rank, res$peers$unitid)
+      df$peer_rank <- ifelse(df$is_anchor, NA_integer_,
+                              rank_lookup[as.character(df$unitid)])
+      # Popup HTML — escape minimal HTML chars defensively
+      .esc <- function(x) gsub("<", "&lt;", gsub("&", "&amp;", x %||% ""))
+      df$popup <- vapply(seq_len(nrow(df)), function(i) {
+        r <- df[i, ]
+        bits <- c(
+          sprintf("<strong>%s</strong>", .esc(r$instnm)),
+          sprintf("%s &middot; %s",
+                  .esc(.prettify_classification(r$usnews_classification)),
+                  .esc(r$stabbr)))
+        if (r$is_anchor) {
+          bits <- c(bits, "<em>Anchor school</em>")
+        } else if (!is.na(r$peer_rank)) {
+          bits <- c(bits, sprintf("Peer rank: <strong>%d</strong>",
+                                   as.integer(r$peer_rank)))
+        }
+        if (!is.na(r$usnews_rank)) {
+          bits <- c(bits, sprintf("USN: %d", as.integer(r$usnews_rank)))
+        }
+        if (!is.null(r$forbes_rank) && !is.na(r$forbes_rank)) {
+          bits <- c(bits, sprintf("Forbes: %d", as.integer(r$forbes_rank)))
+        }
+        paste(bits, collapse = "<br>")
+      }, character(1))
+      df$tip <- vapply(seq_len(nrow(df)), function(i) {
+        if (df$is_anchor[i])
+          sprintf("&#9733; %s (anchor)", .esc(df$instnm[i]))
+        else if (!is.na(df$peer_rank[i]))
+          sprintf("#%d &middot; %s",
+                  as.integer(df$peer_rank[i]), .esc(df$instnm[i]))
+        else .esc(df$instnm[i])
+      }, character(1))
+      df
+    })
+
+    output$peer_map <- leaflet::renderLeaflet({
+      pts <- peer_map_points()
+      m <- leaflet::leaflet(
+        options = leaflet::leafletOptions(zoomControl = TRUE,
+                                           attributionControl = TRUE)
+      ) %>%
+        leaflet::addProviderTiles("CartoDB.Positron")
+
+      if (is.null(pts) || !nrow(pts)) {
+        return(m %>% leaflet::setView(lng = -98.5, lat = 39.5, zoom = 4))
+      }
+
+      anchor_pts <- pts[pts$is_anchor, , drop = FALSE]
+      peer_pts   <- pts[!pts$is_anchor, , drop = FALSE]
+
+      if (nrow(peer_pts)) {
+        m <- m %>% leaflet::addCircleMarkers(
+          data = peer_pts,
+          lng = ~longitud, lat = ~latitude,
+          color = "#1d3557", fillColor = "#1d3557",
+          radius = 7, weight = 2, opacity = 1, fillOpacity = 0.7,
+          label = lapply(peer_pts$tip, htmltools::HTML),
+          popup = lapply(peer_pts$popup, htmltools::HTML),
+          labelOptions = leaflet::labelOptions(
+            direction = "auto", offset = c(0, -10),
+            style = list("font-family" = "'Manrope', sans-serif",
+                          "font-size" = "12px"))
+        )
+      }
+      if (nrow(anchor_pts)) {
+        m <- m %>% leaflet::addAwesomeMarkers(
+          data = anchor_pts,
+          lng = ~longitud, lat = ~latitude,
+          icon = leaflet::awesomeIcons(
+            icon = "star", library = "fa",
+            iconColor = "#FFFFFF", markerColor = "darkpurple"),
+          label = lapply(anchor_pts$tip, htmltools::HTML),
+          popup = lapply(anchor_pts$popup, htmltools::HTML),
+          labelOptions = leaflet::labelOptions(
+            direction = "auto", offset = c(0, -16),
+            style = list("font-family" = "'Manrope', sans-serif",
+                          "font-size" = "12px"))
+        )
+      }
+
+      # Fit bounds around the rendered set; pad so markers aren't clipped.
+      m %>% leaflet::fitBounds(
+        lng1 = min(pts$longitud), lat1 = min(pts$latitude),
+        lng2 = max(pts$longitud), lat2 = max(pts$latitude)
+      ) %>%
+        leaflet::addLegend(
+          position = "bottomright",
+          colors   = c("#581C87", "#1d3557"),
+          labels   = c("Anchor", "Peer"),
+          opacity  = 0.85
+        )
+    })
+
+    # Tabs that contain a leaflet inside display:none need a size kick
+    # when they become visible — otherwise leaflet computes its initial
+    # tile layout against a 0x0 container and renders empty space when
+    # the tab is finally shown. Triggering ANY leafletProxy call after
+    # the tab activates forces leaflet to re-measure the container.
+    observeEvent(input$analysis_nav, {
+      if (!identical(input$analysis_nav, "map")) return()
+      pts <- peer_map_points()
+      if (is.null(pts) || !nrow(pts)) return()
+      leaflet::leafletProxy("peer_map", session) |>
+        leaflet::fitBounds(
+          lng1 = min(pts$longitud), lat1 = min(pts$latitude),
+          lng2 = max(pts$longitud), lat2 = max(pts$latitude))
+    }, ignoreInit = TRUE)
+
     # ---- Analytical surfaces tab strip -----------------------------------
     # Single navset_card_tab that holds every below-table analytical
     # lens. Tabs are visible side by side so users discover all
@@ -557,12 +703,12 @@ peerTableServer <- function(id, sidebar_state) {
             tabPanel(
               title = "Map",
               value = "map",
-              .placeholder(
-                "Geographic distribution",
-                paste("Leaflet map plotting every peer's primary campus,",
-                      "with the anchor distinguished by its own marker.",
-                      "Cluster + heatmap toggles match the Cohort Builder",
-                      "map controls."))
+              div(class = "peer-map-tab",
+                  p(class = "peer-tab-lede text-muted",
+                    tags$small("Peers in this search plotted on a US map. ",
+                                "Anchor school marked with a star. ",
+                                "Hover for the name; click for details.")),
+                  leaflet::leafletOutput(ns("peer_map"), height = "520px"))
             ),
 
             tabPanel(

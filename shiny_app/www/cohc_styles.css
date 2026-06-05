@@ -536,6 +536,60 @@ a:hover {
   font-style: normal;
 }
 
+/* "More analysis below" indicator — sits between the stats grid and
+ * the table so users discover the tab strip without scrolling. Clicks
+ * smooth-scroll to the analysis tab section. */
+.peer-analysis-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0.5rem 0 1rem 0;
+  padding: 0.55rem 0.85rem;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-left: 3px solid #1d3557;
+  border-radius: 4px;
+  color: #1d3557;
+  font-size: 0.88rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.peer-analysis-indicator:hover, .peer-analysis-indicator:focus {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  border-left-color: #1d3557;
+}
+
+.peer-analysis-indicator .peer-ai-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  background: #1d3557;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.peer-analysis-indicator .peer-ai-text strong {
+  color: #0d1b2a;
+}
+
+/* Map tab — keep the map flush in the tab body, leave a small lede above. */
+.peer-map-tab .peer-tab-lede {
+  margin: 0 0 0.6rem 0;
+}
+
+.peer-map-tab .leaflet-container {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
 /* Below-table analytical surfaces tab strip. Built with shiny's
  * tabsetPanel rather than a bslib navset for max portability across
  * bslib versions; styled here to read like the rest of the app. */
