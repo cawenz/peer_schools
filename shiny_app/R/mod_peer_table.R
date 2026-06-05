@@ -166,12 +166,126 @@ peerTableServer <- function(id, sidebar_state) {
       res <- peer_result()
       if (is.null(res)) return(NULL)
       tagList(
-        h5(sprintf("Top %d peers (click a row to compare)",
-                   nrow(res$peers))),
+        div(class = "peer-results-header",
+            h5(sprintf("Top %d peers (click a row to compare)",
+                       nrow(res$peers))),
+            actionLink(ns("about_table_btn"),
+                       label = tagList(tags$span(class = "glyphicon",
+                                                  style = "margin-right:0.25em",
+                                                  HTML("&#9432;")),
+                                       "About this table"),
+                       class = "peer-results-about")),
         p(class = "text-muted",
           tags$small("Sorted by distance ascending. Click any column ",
                      "header to re-sort."))
       )
+    })
+
+    # ---- About-this-table modal ------------------------------------------
+    # Explains every column in the peer table, including the three external
+    # rankings (USN, WM, Forbes) and what the Distance metric represents.
+    # Triggered from the link rendered next to the "Top N peers" heading.
+    observeEvent(input$about_table_btn, {
+      showModal(modalDialog(
+        title = "About the peer search results table",
+        size  = "l",
+        easyClose = TRUE,
+        footer = modalButton("Close"),
+        div(class = "peer-about-body",
+          p("Each row is one candidate peer, ordered by similarity to ",
+            "the anchor school. Lower ", tags$em("Distance"),
+            " values are more similar."),
+          tags$h6("Columns"),
+          tags$dl(class = "peer-about-dl",
+            tags$dt("Rank"),
+            tags$dd("Position in this search's peer ranking. 1 = most ",
+                    "similar candidate to the anchor on the weighted ",
+                    "Euclidean distance over the chosen variables."),
+
+            tags$dt("School"),
+            tags$dd("Institution name from IPEDS. Click any row to load ",
+                    "this school into the Side-by-Side tab for a direct ",
+                    "anchor-vs-peer comparison."),
+
+            tags$dt("Class."),
+            tags$dd("US News classification — the published category the ",
+                    "school is grouped in (National Liberal Arts College, ",
+                    "Regional University–North, etc.). Source: US News ",
+                    "Academic Insights ", tags$code("schools/undergraduate"),
+                    " endpoint."),
+
+            tags$dt("USN Rank"),
+            tags$dd("US News & World Report ", tags$em("overall rank"),
+                    " within the school's classification. Blank for ",
+                    "unranked schools (US News only ranks schools that ",
+                    "appear in the published list). Source: Academic ",
+                    "Insights metric_id 24, latest available year. ",
+                    "Different categories are NOT directly comparable — ",
+                    "a rank of #5 in Liberal Arts is not equivalent to ",
+                    "#5 in National Universities."),
+
+            tags$dt("WM Rank"),
+            tags$dd("Washington Monthly College Guide rank. Format is ",
+                    tags$code("rank (category)"), " where category is one ",
+                    "of LA (Liberal Arts), Bacc (Bachelor's), Mas ",
+                    "(Master's), or Nat (National Universities). ",
+                    "Washington Monthly weights social mobility, ",
+                    "research, and public service — a methodological ",
+                    "complement to US News. Source: ",
+                    tags$code("washingtonmonthly.com/<year>-college-guide/"),
+                    "."),
+
+            tags$dt("Forbes Rank"),
+            tags$dd("Forbes ", tags$em("America's Top Colleges"),
+                    " overall rank. Forbes publishes a single combined ",
+                    "list of the top 500 schools (no category split). ",
+                    "Forbes emphasizes salary outcomes, low debt, and ",
+                    "leader-list alumni. Blank for any school outside ",
+                    "the top 500. Source: ",
+                    tags$code("forbes.com/top-colleges/"), "."),
+
+            tags$dt("Sector"),
+            tags$dd("Institutional control: ", tags$em("public"), " or ",
+                    tags$em("private not-for-profit"), ". For-profit ",
+                    "schools are excluded from the pool universe by ",
+                    "default. Source: IPEDS HD survey, ", tags$code("control"),
+                    "."),
+
+            tags$dt("State"),
+            tags$dd("Two-letter postal code of the institution's primary ",
+                    "campus. Source: IPEDS HD survey, ", tags$code("stabbr"),
+                    "."),
+
+            tags$dt("Distance"),
+            tags$dd("Weighted Euclidean distance from the anchor school ",
+                    "on the chosen clustering variables, computed in ",
+                    "z-score space so each variable contributes on the ",
+                    "same scale. Variable weights come from the theme ",
+                    "weights set in the sidebar. Lower = more similar. ",
+                    "Distance is comparable within a single search but ",
+                    "not across searches with different pool filters ",
+                    "or theme weights — the z-score normalization is ",
+                    "computed on the candidate pool, so changing the ",
+                    "pool changes the scale.")
+          ),
+          tags$h6("How a peer search works"),
+          tags$ol(
+            tags$li("Pool: the universe is filtered by your sidebar ",
+                     "(classification, sector, state, religious ",
+                     "tradition, ranked-only, etc.)."),
+            tags$li("Variables: each variable's value is z-scored over ",
+                     "the pool, then weighted by the theme weights you ",
+                     "set."),
+            tags$li("Distance: Euclidean distance between each candidate ",
+                     "and the anchor in the weighted z-space."),
+            tags$li("Rank: candidates sorted ascending by distance.")
+          ),
+          tags$p(class = "text-muted",
+                 tags$small("Methodology details and variable definitions ",
+                            "are on the ", tags$strong("Variables"),
+                            " and ", tags$strong("Help"), " tabs."))
+        )
+      ))
     })
 
     # -------------------------------------------------------------------------
@@ -210,6 +324,10 @@ peerTableServer <- function(id, sidebar_state) {
         rep("", nrow(df))
       }
 
+      # Religious-affiliation column was retired here — same information
+      # is available on the Side-by-Side tab's classifications block when
+      # the user wants it. Keeping it out reduces visual noise and the
+      # column was empty for the majority of schools.
       display_df <- data.frame(
         Rank          = df$rank,
         School        = df$instnm,
@@ -219,8 +337,6 @@ peerTableServer <- function(id, sidebar_state) {
         `Forbes Rank` = forbes_rank_disp,
         Sector        = .prettify_control(df$control_grp),
         State         = df$stabbr,
-        Religious     = ifelse(is.na(df$religious_affiliation), "",
-                               df$religious_affiliation),
         Distance      = round(df$distance, 3),
         check.names = FALSE,
         stringsAsFactors = FALSE

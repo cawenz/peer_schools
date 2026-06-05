@@ -330,6 +330,73 @@ a {
   overflow-x: auto;
 }
 
+/* Header row: "Top N peers..." title on the left, "About this table"
+ * link on the right. Wraps gracefully on narrow widths. */
+.peer-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.25rem;
+
+  h5 { margin: 0; }
+}
+
+.peer-results-about {
+  font-size: 0.85rem;
+  color: #1d3557;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover, &:focus { text-decoration: underline; color: #0d1b2a; }
+
+  .glyphicon { font-style: normal; font-weight: 700; }
+}
+
+/* Modal content: definition-list typography for the per-column
+ * explanations. Terms in deep blue, definitions indented with
+ * comfortable line height. */
+.peer-about-body {
+  h6 {
+    color: #1d3557;
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  h6:first-child { margin-top: 0; }
+
+  ol li { margin-bottom: 0.35rem; }
+
+  code {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 0.88em;
+    color: #1d3557;
+  }
+}
+
+.peer-about-dl {
+  margin: 0;
+
+  dt {
+    font-weight: 700;
+    color: #1d3557;
+    margin-top: 0.6rem;
+    font-size: 0.95rem;
+
+    &:first-child { margin-top: 0; }
+  }
+  dd {
+    margin: 0.15rem 0 0 1rem;
+    color: #334155;
+    line-height: 1.5;
+  }
+}
+
 /* ---------- Side-by-Side comparison ---------- */
 .compare-controls {
   display: grid;
