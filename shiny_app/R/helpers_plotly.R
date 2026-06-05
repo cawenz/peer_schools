@@ -114,7 +114,10 @@ cohc_value_token <- function(fmt, axis = "y") {
   switch(
     as.character(fmt) %||% "",
     currency   = sprintf("$%s:,.0f%s", ax, ax_close),
-    percentage = sprintf("%s:.1f%s%%%%", ax, ax_close),
+    # sprintf %% -> literal %; produces "%{y:.1f}%" in the plotly token.
+    # plotly hovertemplate is NOT d3-escaped — `%%` would render two
+    # literal percent signs, not one. Single % is correct.
+    percentage = sprintf("%s:.1f%s%%", ax, ax_close),
     count      = sprintf("%s:,.0f%s", ax, ax_close),
     ratio      = sprintf("%s:.2f%s", ax, ax_close),
     score      = sprintf("%s:,.0f%s", ax, ax_close),

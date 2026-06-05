@@ -732,7 +732,11 @@ compareServer <- function(id, peer_selection, peer_result) {
       x_hover_fmt <- switch(
         as.character(fmt) %||% "",
         currency   = "$%{x:,.0f}",
-        percentage = "%{x:.1f}%%",
+        # NB: plotly hovertemplate treats bare `%` as literal unless
+        # followed by `{`. Escaping with `%%` would render two literal
+        # percent signs in the tooltip (the historical d3-style escape
+        # does not apply here). One `%` is correct.
+        percentage = "%{x:.1f}%",
         count      = "%{x:,.0f}",
         ratio      = "%{x:.2f}",
         "%{x:.4g}"

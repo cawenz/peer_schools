@@ -1549,7 +1549,7 @@ cohortServer <- function(id) {
       x_hover_fmt <- switch(
         as.character(fmt) %||% "",
         currency   = "$%{x:,.0f}",
-        percentage = "%{x:.1f}%%",
+        percentage = "%{x:.1f}%",  # single % — plotly hovertemplate is not d3-escaped
         count      = "%{x:,.0f}",
         ratio      = "%{x:.2f}",
         "%{x:.4g}"

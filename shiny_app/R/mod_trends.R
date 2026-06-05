@@ -380,7 +380,7 @@ trendsServer <- function(id,
       yfmt <- switch(
         as.character(fmt) %||% "",
         currency   = "$%{y:,.0f}",
-        percentage = "%{y:.1f}%%",
+        percentage = "%{y:.1f}%",  # single % — plotly hovertemplate is not d3-escaped
         count      = "%{y:,.0f}",
         ratio      = "%{y:.2f}",
         "%{y:.4g}"
