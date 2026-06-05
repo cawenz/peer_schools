@@ -555,6 +555,136 @@ a {
   .peer-ai-text strong { color: #251230; }
 }
 
+/* Composition tab — 9 representation cards in a responsive grid. Each
+ * card shows the peer set's distribution across one categorical
+ * dimension, with the anchor's category starred and tinted. */
+.peer-composition-tab {
+  .peer-tab-lede { margin: 0 0 0.6rem 0; }
+}
+
+.peer-comp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.peer-comp-card {
+  background: #FFFFFF;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.peer-comp-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #602D89;
+  letter-spacing: 0.01em;
+}
+
+.peer-comp-card-anchor {
+  font-size: 0.75rem;
+  color: #475569;
+  display: flex;
+  gap: 0.35rem;
+  align-items: baseline;
+  border-left: 3px solid #602D89;
+  padding-left: 0.5rem;
+
+  .peer-comp-card-anchor-label {
+    font-weight: 700;
+    color: #251230;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.7rem;
+  }
+  .peer-comp-card-anchor-val {
+    color: #251230;
+    font-weight: 600;
+  }
+}
+
+.peer-comp-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.peer-comp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px minmax(0, 70px);
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  transition: background 0.15s ease;
+
+  &:hover { background: #f8f5f9; }
+}
+
+.peer-comp-row-anchor {
+  background: rgba(96, 45, 137, 0.08);
+  border-left: 2px solid #602D89;
+  padding-left: 0.5rem;
+
+  .peer-comp-row-label {
+    font-weight: 700;
+    color: #251230;
+  }
+
+  &:hover { background: rgba(96, 45, 137, 0.13); }
+}
+
+.peer-comp-row-label {
+  font-size: 0.82rem;
+  color: #251230;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.peer-comp-row-bar {
+  background: #F4EDEC;
+  border-radius: 2px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.peer-comp-row-bar-fill {
+  background: #602D89;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.peer-comp-row-anchor .peer-comp-row-bar-fill {
+  background: linear-gradient(90deg, #602D89 0%, #8B5BB5 100%);
+}
+
+.peer-comp-row-stats {
+  font-size: 0.78rem;
+  color: #475569;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.peer-comp-card-n {
+  font-size: 0.7rem;
+  color: #AC9E94;
+  text-align: right;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding-top: 0.25rem;
+  border-top: 1px dashed #F4EDEC;
+}
+
 /* Map tab — keep the map flush in the tab body, leave a small lede above. */
 .peer-map-tab {
   .peer-tab-lede {

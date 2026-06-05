@@ -1006,6 +1006,158 @@ peerTableServer <- function(id, sidebar_state) {
       div(class = "dash-grid", cards)
     })
 
+    # ---- Composition tab: 9 representation bars --------------------------
+    # For each categorical dimension, show the breakdown of the peer set
+    # as a stack of small horizontal bars (one per category). The anchor's
+    # own category is starred and tinted so the user sees at a glance
+    # "what camp does this peer set sit in vs. the anchor."
+    #
+    # Each dim entry is a list with:
+    #   label    : card title
+    #   accessor : function(.SCHOOLS row subset) -> character vector of
+    #              category keys (one per school, NA for missing)
+    #   labeler  : function(key) -> pretty label for display
+    .PEER_COMPOSITION_DIMS <- list(
+      list(label    = "US News classification",
+           accessor = function(df) df$usnews_classification,
+           labeler  = function(v) .prettify_classification(v)),
+      list(label    = "Sector / control",
+           accessor = function(df) df$control_grp,
+           labeler  = function(v) .prettify_control(v)),
+      list(label    = "Geographic region",
+           accessor = function(df) {
+             # First-match region key (mutually-exclusive top-level
+             # northeast/midwest/south/west buckets only — skip the
+             # finer-grained new_england/midatlantic for composition).
+             top <- c("northeast", "midwest", "south", "west")
+             vapply(df$stabbr, function(st) {
+               if (is.na(st)) return(NA_character_)
+               for (k in top) if (st %in% .REGIONS[[k]]) return(k)
+               NA_character_
+             }, character(1))
+           },
+           labeler  = function(v) {
+             out <- character(length(v))
+             m <- match(v, c("northeast","midwest","south","west"))
+             out <- c("Northeast","Midwest","South","West")[m]
+             ifelse(is.na(out), "(unknown)", out)
+           }),
+      list(label    = "Religious tradition",
+           accessor = function(df) {
+             v <- df$religious_tradition
+             ifelse(is.na(v) | !nzchar(v), "(none / secular)", v)
+           },
+           labeler  = identity),
+      list(label    = "Carnegie Institutional (2025)",
+           accessor = function(df) df$ic2025_label,
+           labeler  = identity),
+      list(label    = "Carnegie Setting (2025)",
+           accessor = function(df) df$setting2025_label,
+           labeler  = identity),
+      list(label    = "Carnegie Research Activity (2025)",
+           accessor = function(df) df$research2025_label,
+           labeler  = identity),
+      list(label    = "Carnegie SAEC (2025)",
+           accessor = function(df) df$saec2025_label,
+           labeler  = identity),
+      list(label    = "Athletics division",
+           accessor = function(df) {
+             if (!"athletics_division" %in% names(df))
+               return(rep(NA_character_, nrow(df)))
+             df$athletics_division
+           },
+           labeler  = function(v) {
+             out <- vapply(v, function(x) switch(as.character(x),
+                                                   D1 = "NCAA Division I",
+                                                   D2 = "NCAA Division II",
+                                                   D3 = "NCAA Division III",
+                                                   NAIA = "NAIA",
+                                                   if (is.na(x)) NA_character_ else x),
+                            character(1))
+             ifelse(is.na(out), "(no athletics)", out)
+           })
+    )
+
+    # Build a per-dimension breakdown for the current peer set.
+    # Returns a data.frame with $key, $label, $n, $pct, $is_anchor_cat.
+    .peer_dim_breakdown <- function(dim, peer_df, anchor_row) {
+      vals     <- dim$accessor(peer_df)
+      a_val    <- if (nrow(anchor_row)) dim$accessor(anchor_row)[1] else NA
+      # Replace NA with sentinel for grouping; show as "(missing)"
+      vals_for_tab <- ifelse(is.na(vals), "(missing)", as.character(vals))
+      n_total <- length(vals_for_tab)
+      tab <- as.data.frame(table(key = vals_for_tab,
+                                  stringsAsFactors = FALSE),
+                            stringsAsFactors = FALSE)
+      colnames(tab) <- c("key", "n")
+      tab <- tab[order(-tab$n), , drop = FALSE]
+      tab$pct <- tab$n / max(1, n_total)
+      tab$label <- vapply(tab$key, function(k) {
+        if (identical(k, "(missing)")) return("(missing)")
+        # Run the labeler on a single value and coerce to a single string
+        lbl <- tryCatch(dim$labeler(k), error = function(e) k)
+        if (length(lbl) != 1 || is.na(lbl) || !nzchar(lbl)) k else as.character(lbl)
+      }, character(1))
+      tab$is_anchor_cat <- tab$key == (if (is.na(a_val)) "" else as.character(a_val))
+      tab
+    }
+
+    # Render a single dimension card.
+    .peer_composition_card <- function(dim, peer_df, anchor_row) {
+      n_total <- nrow(peer_df)
+      brk <- .peer_dim_breakdown(dim, peer_df, anchor_row)
+      a_val <- if (nrow(anchor_row)) dim$accessor(anchor_row)[1] else NA
+      anchor_label <- if (is.na(a_val))
+                        "(anchor missing on this dimension)"
+                      else {
+                        l <- tryCatch(dim$labeler(as.character(a_val)),
+                                       error = function(e) as.character(a_val))
+                        if (length(l) != 1 || is.na(l) || !nzchar(l))
+                          as.character(a_val) else l
+                      }
+
+      rows <- lapply(seq_len(nrow(brk)), function(i) {
+        b <- brk[i, ]
+        bar_pct <- sprintf("%.0f%%", 100 * b$pct)
+        is_anchor <- isTRUE(b$is_anchor_cat)
+        tags$div(class = paste("peer-comp-row",
+                                if (is_anchor) "peer-comp-row-anchor" else ""),
+          tags$div(class = "peer-comp-row-label",
+            if (is_anchor) HTML("&#9733; ") else NULL,
+            b$label),
+          tags$div(class = "peer-comp-row-bar",
+            tags$div(class = "peer-comp-row-bar-fill",
+                     style = sprintf("width: %.1f%%;", 100 * b$pct))),
+          tags$div(class = "peer-comp-row-stats",
+                    sprintf("%d  (%s)", b$n, bar_pct))
+        )
+      })
+
+      tags$div(class = "peer-comp-card",
+        tags$div(class = "peer-comp-card-title", dim$label),
+        tags$div(class = "peer-comp-card-anchor",
+                  tags$span(class = "peer-comp-card-anchor-label", "Anchor:"),
+                  tags$span(class = "peer-comp-card-anchor-val",
+                             anchor_label)),
+        tags$div(class = "peer-comp-rows", rows),
+        tags$div(class = "peer-comp-card-n",
+                  sprintf("Based on %d peers", n_total))
+      )
+    }
+
+    output$peer_composition <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) return(NULL)
+      a_uid <- res$meta$anchor_unitid
+      peer_uids <- res$peers$unitid
+      peer_df    <- .SCHOOLS[match(peer_uids, .SCHOOLS$unitid), , drop = FALSE]
+      anchor_row <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
+
+      cards <- lapply(.PEER_COMPOSITION_DIMS, function(d)
+        .peer_composition_card(d, peer_df, anchor_row))
+      div(class = "peer-comp-grid", cards)
+    })
+
     # ---- Analytical surfaces tab strip -----------------------------------
     # Single navset_card_tab that holds every below-table analytical
     # lens. Tabs are visible side by side so users discover all
@@ -1039,13 +1191,12 @@ peerTableServer <- function(id, sidebar_state) {
             tabPanel(
               title = "Composition",
               value = "composition",
-              .placeholder(
-                "Composition of the peer set",
-                paste("Stacked bars summarizing how the peer set breaks",
-                      "down on the same nine categorical dimensions used",
-                      "in the Cohort Builder (region, sector, control,",
-                      "religious tradition, athletics division, etc.),",
-                      "with the anchor's category marked for comparison."))
+              div(class = "peer-composition-tab",
+                  p(class = "peer-tab-lede text-muted",
+                    tags$small("How the peer set breaks down on nine ",
+                                "categorical dimensions. Anchor's category ",
+                                "is starred (★) and highlighted in each card.")),
+                  uiOutput(ns("peer_composition")))
             ),
 
             tabPanel(
