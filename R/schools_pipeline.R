@@ -453,10 +453,14 @@ build_forbes <- function(cfg, id_lookup) {
     ov <- tibble::tibble(name = names(FORBES_OVERRIDES),
                           unitid = as.integer(FORBES_OVERRIDES))
     fmatch_ov <- forbes %>% inner_join(ov, by = "name")
+    remaining <- forbes %>% anti_join(fmatch_ov, by = "rank")
   } else {
-    fmatch_ov <- tibble()
+    # No overrides set — nothing matched yet, all rows still candidates.
+    # (Avoids anti_join() on an empty zero-column tibble, which errors
+    # because the `by` columns don't exist.)
+    fmatch_ov <- tibble(rank = integer(), unitid = integer())
+    remaining <- forbes
   }
-  remaining <- forbes %>% anti_join(fmatch_ov, by = "rank")
 
   # 2. Exact normalized match within state
   fmatch_x <- remaining %>%
