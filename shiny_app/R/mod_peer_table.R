@@ -1017,88 +1017,130 @@ peerTableServer <- function(id, sidebar_state) {
     #   accessor : function(.SCHOOLS row subset) -> character vector of
     #              category keys (one per school, NA for missing)
     #   labeler  : function(key) -> pretty label for display
+    # Defensive helper: pull a column as character; fall back to NA when
+    # the column is absent. Always returns length == nrow(df).
+    .col_or_na <- function(df, col) {
+      if (!col %in% names(df)) return(rep(NA_character_, nrow(df)))
+      as.character(df[[col]])
+    }
+
     .PEER_COMPOSITION_DIMS <- list(
       list(label    = "US News classification",
-           accessor = function(df) df$usnews_classification,
-           labeler  = function(v) .prettify_classification(v)),
+           accessor = function(df) .col_or_na(df, "usnews_classification"),
+           labeler  = function(v) {
+             out <- .prettify_classification(v)
+             if (length(out) != length(v)) v else as.character(out)
+           }),
       list(label    = "Sector / control",
-           accessor = function(df) df$control_grp,
-           labeler  = function(v) .prettify_control(v)),
+           accessor = function(df) .col_or_na(df, "control_grp"),
+           labeler  = function(v) {
+             out <- .prettify_control(v)
+             if (length(out) != length(v)) v else as.character(out)
+           }),
       list(label    = "Geographic region",
            accessor = function(df) {
-             # First-match region key (mutually-exclusive top-level
-             # northeast/midwest/south/west buckets only — skip the
-             # finer-grained new_england/midatlantic for composition).
              top <- c("northeast", "midwest", "south", "west")
-             vapply(df$stabbr, function(st) {
+             st_v <- .col_or_na(df, "stabbr")
+             vapply(st_v, function(st) {
                if (is.na(st)) return(NA_character_)
                for (k in top) if (st %in% .REGIONS[[k]]) return(k)
                NA_character_
-             }, character(1))
+             }, character(1), USE.NAMES = FALSE)
            },
            labeler  = function(v) {
-             out <- character(length(v))
-             m <- match(v, c("northeast","midwest","south","west"))
-             out <- c("Northeast","Midwest","South","West")[m]
+             keys <- c("northeast","midwest","south","west")
+             pretty <- c("Northeast","Midwest","South","West")
+             m <- match(v, keys)
+             out <- pretty[m]
              ifelse(is.na(out), "(unknown)", out)
            }),
       list(label    = "Religious tradition",
            accessor = function(df) {
-             v <- df$religious_tradition
-             ifelse(is.na(v) | !nzchar(v), "(none / secular)", v)
+             v <- .col_or_na(df, "religious_tradition")
+             # nzchar(NA) is NA in R; coerce explicitly.
+             empty <- is.na(v) | (nzchar(v) %in% FALSE)
+             ifelse(empty, "(none / secular)", v)
            },
-           labeler  = identity),
+           labeler  = function(v) as.character(v)),
       list(label    = "Carnegie Institutional (2025)",
-           accessor = function(df) df$ic2025_label,
-           labeler  = identity),
+           accessor = function(df) .col_or_na(df, "ic2025_label"),
+           labeler  = function(v) as.character(v)),
       list(label    = "Carnegie Setting (2025)",
-           accessor = function(df) df$setting2025_label,
-           labeler  = identity),
+           accessor = function(df) .col_or_na(df, "setting2025_label"),
+           labeler  = function(v) as.character(v)),
       list(label    = "Carnegie Research Activity (2025)",
-           accessor = function(df) df$research2025_label,
-           labeler  = identity),
+           accessor = function(df) .col_or_na(df, "research2025_label"),
+           labeler  = function(v) as.character(v)),
       list(label    = "Carnegie SAEC (2025)",
-           accessor = function(df) df$saec2025_label,
-           labeler  = identity),
+           accessor = function(df) .col_or_na(df, "saec2025_label"),
+           labeler  = function(v) as.character(v)),
       list(label    = "Athletics division",
-           accessor = function(df) {
-             if (!"athletics_division" %in% names(df))
-               return(rep(NA_character_, nrow(df)))
-             df$athletics_division
-           },
+           accessor = function(df) .col_or_na(df, "athletics_division"),
            labeler  = function(v) {
-             out <- vapply(v, function(x) switch(as.character(x),
-                                                   D1 = "NCAA Division I",
-                                                   D2 = "NCAA Division II",
-                                                   D3 = "NCAA Division III",
-                                                   NAIA = "NAIA",
-                                                   if (is.na(x)) NA_character_ else x),
-                            character(1))
-             ifelse(is.na(out), "(no athletics)", out)
+             vapply(v, function(x) {
+               if (is.na(x)) return("(no athletics)")
+               switch(as.character(x),
+                      D1 = "NCAA Division I",
+                      D2 = "NCAA Division II",
+                      D3 = "NCAA Division III",
+                      NAIA = "NAIA",
+                      as.character(x))
+             }, character(1), USE.NAMES = FALSE)
            })
     )
+
+    # Coerce a labeler return value into a single-string label, defensively.
+    # Returns the fallback (usually the raw key) when the labeler returns
+    # NULL, an empty vector, multiple values, NA, or an empty string.
+    .label_or_key <- function(labeler, key) {
+      lbl <- tryCatch(labeler(key), error = function(e) NULL)
+      if (is.null(lbl) || length(lbl) == 0) return(as.character(key))
+      lbl <- unname(lbl)[1]
+      if (is.na(lbl) || !nzchar(lbl)) return(as.character(key))
+      as.character(lbl)
+    }
 
     # Build a per-dimension breakdown for the current peer set.
     # Returns a data.frame with $key, $label, $n, $pct, $is_anchor_cat.
     .peer_dim_breakdown <- function(dim, peer_df, anchor_row) {
-      vals     <- dim$accessor(peer_df)
-      a_val    <- if (nrow(anchor_row)) dim$accessor(anchor_row)[1] else NA
-      # Replace NA with sentinel for grouping; show as "(missing)"
-      vals_for_tab <- ifelse(is.na(vals), "(missing)", as.character(vals))
+      vals_raw <- tryCatch(dim$accessor(peer_df),
+                            error = function(e) rep(NA_character_,
+                                                     nrow(peer_df)))
+      # Force character + length match, defensively
+      if (length(vals_raw) != nrow(peer_df)) {
+        vals_raw <- rep(NA_character_, nrow(peer_df))
+      }
+      vals <- as.character(vals_raw)
+
+      a_val_raw <- if (nrow(anchor_row))
+                     tryCatch(dim$accessor(anchor_row),
+                              error = function(e) NA_character_)
+                   else NA_character_
+      a_val <- if (length(a_val_raw) == 0) NA_character_
+               else as.character(a_val_raw[1])
+
+      vals_for_tab <- ifelse(is.na(vals), "(missing)", vals)
       n_total <- length(vals_for_tab)
-      tab <- as.data.frame(table(key = vals_for_tab,
-                                  stringsAsFactors = FALSE),
-                            stringsAsFactors = FALSE)
-      colnames(tab) <- c("key", "n")
+      if (!n_total) {
+        return(data.frame(key = character(0), n = integer(0),
+                          pct = numeric(0), label = character(0),
+                          is_anchor_cat = logical(0),
+                          stringsAsFactors = FALSE))
+      }
+      tab_raw <- as.data.frame(table(key = vals_for_tab,
+                                      stringsAsFactors = FALSE),
+                                stringsAsFactors = FALSE)
+      tab <- data.frame(key = as.character(tab_raw$key),
+                         n   = as.integer(tab_raw$Freq),
+                         stringsAsFactors = FALSE)
       tab <- tab[order(-tab$n), , drop = FALSE]
-      tab$pct <- tab$n / max(1, n_total)
+      tab$pct <- tab$n / n_total
       tab$label <- vapply(tab$key, function(k) {
         if (identical(k, "(missing)")) return("(missing)")
-        # Run the labeler on a single value and coerce to a single string
-        lbl <- tryCatch(dim$labeler(k), error = function(e) k)
-        if (length(lbl) != 1 || is.na(lbl) || !nzchar(lbl)) k else as.character(lbl)
+        .label_or_key(dim$labeler, k)
       }, character(1))
-      tab$is_anchor_cat <- tab$key == (if (is.na(a_val)) "" else as.character(a_val))
+      a_val_str <- if (is.na(a_val)) "" else as.character(a_val)
+      tab$is_anchor_cat <- tab$key == a_val_str
       tab
     }
 
@@ -1106,17 +1148,17 @@ peerTableServer <- function(id, sidebar_state) {
     .peer_composition_card <- function(dim, peer_df, anchor_row) {
       n_total <- nrow(peer_df)
       brk <- .peer_dim_breakdown(dim, peer_df, anchor_row)
-      a_val <- if (nrow(anchor_row)) dim$accessor(anchor_row)[1] else NA
+      a_val_raw <- if (nrow(anchor_row))
+                     tryCatch(dim$accessor(anchor_row),
+                              error = function(e) NA_character_)
+                   else NA_character_
+      a_val <- if (length(a_val_raw) == 0) NA_character_
+               else as.character(a_val_raw[1])
       anchor_label <- if (is.na(a_val))
                         "(anchor missing on this dimension)"
-                      else {
-                        l <- tryCatch(dim$labeler(as.character(a_val)),
-                                       error = function(e) as.character(a_val))
-                        if (length(l) != 1 || is.na(l) || !nzchar(l))
-                          as.character(a_val) else l
-                      }
+                      else .label_or_key(dim$labeler, a_val)
 
-      rows <- lapply(seq_len(nrow(brk)), function(i) {
+      rows <- if (nrow(brk)) lapply(seq_len(nrow(brk)), function(i) {
         b <- brk[i, ]
         bar_pct <- sprintf("%.0f%%", 100 * b$pct)
         is_anchor <- isTRUE(b$is_anchor_cat)
@@ -1131,7 +1173,8 @@ peerTableServer <- function(id, sidebar_state) {
           tags$div(class = "peer-comp-row-stats",
                     sprintf("%d  (%s)", b$n, bar_pct))
         )
-      })
+      }) else list(tags$div(class = "text-muted",
+                              tags$small("No data on this dimension.")))
 
       tags$div(class = "peer-comp-card",
         tags$div(class = "peer-comp-card-title", dim$label),
@@ -1153,8 +1196,19 @@ peerTableServer <- function(id, sidebar_state) {
       peer_df    <- .SCHOOLS[match(peer_uids, .SCHOOLS$unitid), , drop = FALSE]
       anchor_row <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
 
-      cards <- lapply(.PEER_COMPOSITION_DIMS, function(d)
-        .peer_composition_card(d, peer_df, anchor_row))
+      # Each card rendered under tryCatch so a single bad dimension shows
+      # a small error notice instead of blowing up the whole pane.
+      cards <- lapply(.PEER_COMPOSITION_DIMS, function(d) {
+        tryCatch(.peer_composition_card(d, peer_df, anchor_row),
+                 error = function(e) {
+                   tags$div(class = "peer-comp-card",
+                     tags$div(class = "peer-comp-card-title", d$label),
+                     tags$div(class = "text-muted",
+                       tags$small(sprintf("Could not render: %s",
+                                            conditionMessage(e))))
+                   )
+                 })
+      })
       div(class = "peer-comp-grid", cards)
     })
 
