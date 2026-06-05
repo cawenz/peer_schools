@@ -195,3 +195,31 @@ message(sprintf(
   "[shiny global] loaded: %d schools, %d variables, %d facts rows, %d wide cols.",
   nrow(.SCHOOLS), nrow(.VARIABLES), nrow(.FACTS), ncol(.WIDE_ALL) - 1
 ))
+
+# -----------------------------------------------------------------------------
+# Suppress a specific noisy Shiny warning:
+#   "The select input \"<id>\" contains a large number of options;
+#    consider using server-side selectize for massively improved
+#    performance. See the Details section of the ?selectizeInput help topic."
+#
+# We use client-side selectize for the school pickers deliberately. Server-side
+# mode buries obvious matches past `maxOptions: 50` whenever the user types a
+# common prefix (typing "Holy" returned matches in unitid order, with the
+# College of the Holy Cross sitting at position 284 — past the cap, invisible).
+# Client-side selectize uses Sifter's word-start ranking and surfaces the
+# right school immediately. The warning is Shiny telling us to revert to the
+# behavior we explicitly moved away from; muffle it so the console stays
+# readable.
+#
+# This is the narrowest possible silencer — only the exact selectize warning
+# is muffled; every other R warning still propagates normally.
+local({
+  selectize_warning_pat <-
+    "consider using server-side selectize for massively improved performance"
+  globalCallingHandlers(
+    warning = function(w) {
+      if (grepl(selectize_warning_pat, conditionMessage(w), fixed = TRUE)) {
+        invokeRestart("muffleWarning")
+      }
+    })
+})
