@@ -658,6 +658,188 @@ peerTableServer <- function(id, sidebar_state) {
           lng2 = max(pts$longitud), lat2 = max(pts$latitude))
     }, ignoreInit = TRUE)
 
+    # ---- Dashboard tab ---------------------------------------------------
+    # 11 headline metric cards. Each card pairs a small SVG strip
+    # (ranked-universe distribution + peer rug + anchor line) with a
+    # cohort-summary line beneath. Same visual conventions and CSS
+    # classes (.dash-card, .dash-strip, .dash-card-anchor, etc.) as the
+    # Cohort Builder dashboard so the two surfaces feel consistent.
+    .PEER_DASHBOARD_METRICS <- c(
+      "acceptance_rate",
+      "sat_mid50",
+      "student_faculty_ratio",
+      "avg_ft_faculty_salary",
+      "herd_avg",
+      "endowment_per_fte",
+      "grad_rate_6yr",
+      "pct_pell",
+      "pct_bipoc",
+      "undergraduate_enrollment",
+      "n_undergrad_programs"
+    )
+
+    # Action -> color for the per-school rug. Only two actions in this
+    # context: Peer (everyone in the peer set) + Anchor (drawn separately
+    # as a tall line, not a rug tick).
+    .PEER_DASH_ACTION_COLORS <- c("Anchor" = "#602D89", "Peer" = "#AC9E94")
+
+    # Universe baseline = full ranked universe, same as Cohort Builder.
+    peer_dashboard_universe <- reactive({
+      .SCHOOLS_WIDE[.SCHOOLS_WIDE$in_ranked_universe %in% TRUE, ,
+                     drop = FALSE]
+    })
+
+    # Tidy rug data.frame for a given metric: anchor row + every peer
+    # row from the current peer_result, with their action labels.
+    .peer_build_rug_data <- function(metric) {
+      res <- peer_result()
+      if (is.null(res) || !metric %in% names(.SCHOOLS_WIDE)) {
+        return(data.frame(unitid = integer(), action = character(),
+                          value = numeric(), instnm = character(),
+                          stringsAsFactors = FALSE))
+      }
+      a_uid     <- res$meta$anchor_unitid
+      peer_uids <- res$peers$unitid
+
+      anchor_meta <- .SCHOOLS[.SCHOOLS$unitid == a_uid, , drop = FALSE]
+      peer_meta   <- .SCHOOLS[match(peer_uids, .SCHOOLS$unitid), , drop = FALSE]
+
+      df <- data.frame(
+        unitid = c(a_uid, peer_uids),
+        action = c("Anchor", rep("Peer", length(peer_uids))),
+        instnm = c(if (nrow(anchor_meta)) anchor_meta$instnm[1] else "(anchor)",
+                    peer_meta$instnm),
+        stringsAsFactors = FALSE
+      )
+      df$value <- .SCHOOLS_WIDE[[metric]][match(df$unitid,
+                                                  .SCHOOLS_WIDE$unitid)]
+      df
+    }
+
+    # SVG strip — direct port of the cohort version, narrowed to the
+    # action palette this tab needs. Returns an HTML() string.
+    .peer_dashboard_strip_svg <- function(universe_vals, anchor_val,
+                                           rug_data = NULL,
+                                           width = 280, height = 48) {
+      uv <- universe_vals[is.finite(universe_vals)]
+      if (length(uv) < 5)
+        return(tags$div(class = "dash-strip-empty",
+                         "Insufficient data"))
+      q <- stats::quantile(uv, c(0.01, 0.99), na.rm = TRUE)
+      uv_min <- as.numeric(q[1]); uv_max <- as.numeric(q[2])
+      rng <- uv_max - uv_min
+      if (rng <= 0)
+        return(tags$div(class = "dash-strip-empty", "No variation"))
+
+      density_top    <- 4
+      density_bottom <- height - 14
+      rug_top        <- height - 10
+      rug_bottom     <- height - 2
+      density_h      <- density_bottom - density_top
+
+      dens <- stats::density(uv, from = uv_min, to = uv_max, n = 60)
+      max_dens <- max(dens$y); if (max_dens <= 0) max_dens <- 1
+      dens_y <- (dens$y / max_dens) * density_h
+      to_x <- function(v) {
+        ((pmin(pmax(v, uv_min), uv_max) - uv_min) / rng) * width
+      }
+      poly_x <- c(to_x(dens$x),
+                   to_x(dens$x[length(dens$x)]),
+                   to_x(dens$x[1]))
+      poly_y <- c(density_bottom - dens_y,
+                   rep(density_bottom, 2))
+      pts <- paste(sprintf("%.1f,%.1f", poly_x, poly_y), collapse = " ")
+
+      rug_str <- ""
+      if (!is.null(rug_data) && nrow(rug_data) > 0) {
+        rd <- rug_data[is.finite(rug_data$value) &
+                        rug_data$action != "Anchor", , drop = FALSE]
+        if (nrow(rd)) {
+          colors <- unname(.PEER_DASH_ACTION_COLORS[as.character(rd$action)])
+          colors[is.na(colors)] <- "#AC9E94"
+          rug_parts <- vapply(seq_len(nrow(rd)), function(i) {
+            x <- to_x(rd$value[i])
+            sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="%.1f" y2="%.1f" ',
+                            'stroke="%s" stroke-width="1.6" ',
+                            'stroke-opacity="0.85" stroke-linecap="round"/>'),
+                    x, x, rug_top, rug_bottom, colors[i])
+          }, character(1))
+          rug_str <- paste(rug_parts, collapse = "")
+        }
+      }
+      anchor_str <- if (is.finite(anchor_val)) {
+        ax <- to_x(anchor_val)
+        sprintf(paste0('<line x1="%.1f" x2="%.1f" y1="2" y2="%.1f" ',
+                        'stroke="#602D89" stroke-width="2.5"/>',
+                        '<circle cx="%.1f" cy="2" r="3.5" fill="#602D89"/>'),
+                ax, ax, rug_bottom, ax)
+      } else ""
+
+      HTML(sprintf(
+        paste0('<svg class="dash-strip" width="%d" height="%d" ',
+                'viewBox="0 0 %d %d" preserveAspectRatio="none">',
+                '<polygon points="%s" fill="#F4EDEC" stroke="#AC9E94" ',
+                'stroke-width="0.5"/>',
+                '%s%s',
+                '</svg>'),
+        width, height, width, height, pts, rug_str, anchor_str
+      ))
+    }
+
+    # Build a single card.
+    .peer_dashboard_card <- function(metric, anchor_val, rug_data,
+                                       universe_vals, display_name, fmt) {
+      cv  <- rug_data$value[rug_data$action != "Anchor" &
+                              is.finite(rug_data$value)]
+      n_c <- sum(rug_data$action != "Anchor")
+      n_r <- length(cv)
+
+      peer_line <- if (n_r > 0) {
+        sprintf("Peers: %s – %s   (median %s)",
+                .format_value(min(cv),           fmt),
+                .format_value(max(cv),           fmt),
+                .format_value(stats::median(cv), fmt))
+      } else "Peers: no data"
+
+      strip <- .peer_dashboard_strip_svg(universe_vals, anchor_val,
+                                          rug_data = rug_data)
+
+      tags$div(class = "dash-card",
+        `data-metric` = metric,
+        tags$div(class = "dash-card-title", display_name),
+        tags$div(class = "dash-card-anchor",
+          tags$span(class = "dash-card-anchor-label", "Anchor"),
+          tags$span(class = "dash-card-anchor-val",
+                     .format_value(anchor_val, fmt))
+        ),
+        strip,
+        tags$div(class = "dash-card-cohort", peer_line),
+        tags$div(class = "dash-card-n",
+                  sprintf("%d of %d reporting", n_r, n_c))
+      )
+    }
+
+    output$peer_dashboard <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) return(NULL)
+      a_uid <- res$meta$anchor_unitid
+      univ  <- peer_dashboard_universe()
+
+      cards <- lapply(.PEER_DASHBOARD_METRICS, function(m) {
+        if (!m %in% names(.SCHOOLS_WIDE)) return(NULL)
+        var_row <- .VARIABLES[.VARIABLES$metric == m, , drop = FALSE]
+        display_name <- if (nrow(var_row)) var_row$display_name[1] else m
+        fmt          <- if (nrow(var_row)) var_row$format[1] else NA
+        anchor_val <- .SCHOOLS_WIDE[[m]][match(a_uid, .SCHOOLS_WIDE$unitid)]
+        rug_data   <- .peer_build_rug_data(m)
+        univ_vals  <- univ[[m]]
+        .peer_dashboard_card(m, anchor_val, rug_data, univ_vals,
+                              display_name, fmt)
+      })
+      cards <- Filter(Negate(is.null), cards)
+      div(class = "dash-grid", cards)
+    })
+
     # ---- Analytical surfaces tab strip -----------------------------------
     # Single navset_card_tab that holds every below-table analytical
     # lens. Tabs are visible side by side so users discover all
@@ -714,14 +896,13 @@ peerTableServer <- function(id, sidebar_state) {
             tabPanel(
               title = "Dashboard",
               value = "dashboard",
-              .placeholder(
-                "Peer-set dashboard",
-                paste("11 metric cards summarizing the peer set's median",
-                      "values (enrollment, net price, graduation rate,",
-                      "endowment per FTE, etc.), each with an inline",
-                      "marker showing the anchor's position on the same",
-                      "scale. Same widget as the Cohort Builder dashboard,",
-                      "applied to this search result."))
+              div(class = "peer-dashboard-tab",
+                  p(class = "peer-tab-lede text-muted",
+                    tags$small("11 headline metrics for the peer set. ",
+                                "Each card shows the ranked-universe ",
+                                "distribution, every peer as a rug tick, ",
+                                "and the anchor as a tall purple line.")),
+                  uiOutput(ns("peer_dashboard")))
             ),
 
             tabPanel(
