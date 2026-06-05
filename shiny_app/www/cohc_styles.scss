@@ -555,6 +555,64 @@ a {
   .peer-ai-text strong { color: #251230; }
 }
 
+/* ---------- Sidebar: info button + label hints ---------- */
+/* "Ranked universe only" + a small info icon to its right. */
+.pool-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+
+  /* shiny's checkboxInput wraps in a .form-group with a margin we don't
+   * want next to the inline info icon. */
+  > .form-group {
+    margin-bottom: 0 !important;
+  }
+}
+
+.pool-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  color: #602D89;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none !important;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s ease;
+
+  &:hover, &:focus {
+    background: #F4EDEC;
+    color: #251230;
+  }
+}
+
+/* Italicized hint after a label, e.g. "(public vs. private nonprofit)". */
+.pool-label-hint {
+  display: inline;
+  margin-left: 0.35rem;
+  color: #AC9E94;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.78rem;
+}
+
+/* Modal body for the ranked-universe info modal. */
+.pool-info-body {
+  h6 {
+    color: #602D89;
+    margin-top: 1rem;
+    font-weight: 700;
+  }
+  ul { padding-left: 1.25rem; }
+  li { margin-bottom: 0.4rem; line-height: 1.5; }
+  p { line-height: 1.5; }
+}
+
 /* Composition tab — 9 representation cards in a responsive grid. Each
  * card shows the peer set's distribution across one categorical
  * dimension, with the anchor's category starred and tinted. */

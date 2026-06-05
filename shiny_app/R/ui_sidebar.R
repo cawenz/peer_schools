@@ -95,7 +95,13 @@ peerSearchSidebarUI <- function(id) {
 
     # ---------------- Candidate pool ----------------
     tags$h6("Candidate pool"),
-    checkboxInput(ns("pool_ranked"), "Ranked universe only", value = TRUE),
+    tags$div(class = "pool-checkbox-row",
+      checkboxInput(ns("pool_ranked"), "Ranked universe only", value = TRUE),
+      actionLink(ns("ranked_info_btn"),
+                  label = HTML("&#9432;"),
+                  class = "pool-info-btn",
+                  title = "What is the ranked universe?")
+    ),
 
     tags$div(
       tags$label("US News classification"),
@@ -106,7 +112,9 @@ peerSearchSidebarUI <- function(id) {
     ),
 
     tags$div(
-      tags$label("Sector / control"),
+      tags$label("Institution type",
+                  tags$small(class = "pool-label-hint",
+                             "(public vs. private nonprofit)")),
       checkboxInput(ns("pool_control_same"), "Same as anchor", value = TRUE),
       selectInput(ns("pool_control"), label = NULL,
                   choices = NULL, multiple = TRUE,
@@ -335,6 +343,83 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
       } else {
         shinyjs::enable("pool_control")
       }
+    })
+
+    # --- Default values when "Same as anchor" is unchecked ----------------
+    # Unchecking shouldn't drop the user into an empty multi-select. Set
+    # sensible defaults so the picker is immediately useful: "All US News
+    # Classifications" sentinel for classification, both sectors for
+    # control. observeEvent with ignoreInit avoids firing on app start.
+    observeEvent(input$pool_class_same, {
+      if (isFALSE(input$pool_class_same) &&
+          !length(isolate(input$pool_class))) {
+        updateSelectInput(session, "pool_class",
+                          selected = .USNEWS_SENTINEL_ALL)
+      }
+    }, ignoreInit = TRUE)
+    observeEvent(input$pool_control_same, {
+      if (isFALSE(input$pool_control_same) &&
+          !length(isolate(input$pool_control))) {
+        updateSelectInput(session, "pool_control",
+                          selected = c("public", "private_nfp"))
+      }
+    }, ignoreInit = TRUE)
+
+    # --- Ranked-universe info modal ---------------------------------------
+    observeEvent(input$ranked_info_btn, {
+      showModal(modalDialog(
+        title = "About the ranked universe",
+        size = "m",
+        easyClose = TRUE,
+        footer = modalButton("Close"),
+        div(class = "pool-info-body",
+          p("US News publishes numeric overall ranks for three ",
+            "categories of institutions:"),
+          tags$ul(
+            tags$li(tags$strong("National Universities"),
+                    " — research universities with a full range of ",
+                    "undergrad and graduate programs."),
+            tags$li(tags$strong("National Liberal Arts Colleges"),
+                    " — bachelor's-focused colleges drawing students ",
+                    "nationally."),
+            tags$li(tags$strong("Regional Universities"),
+                    " — master's-granting institutions, ranked within ",
+                    "four geographic regions (North / South / Midwest / West).")
+          ),
+          tags$p(
+            tags$strong("Ranked universe only"),
+            " (the default) restricts the candidate pool to schools in ",
+            "these three categories. This is usually what you want for ",
+            "peer comparison: it keeps the pool to schools US News ",
+            "actively benchmarks."),
+
+          tags$h6("What you'd add by unchecking"),
+          tags$ul(
+            tags$li(tags$strong("Regional Colleges"),
+                    " — bachelor's-focused regional schools. US News ",
+                    "classifies them but doesn't publish a numeric overall ",
+                    "rank for this group."),
+            tags$li(tags$strong("Schools outside US News' coverage"),
+                    " — some institutions don't appear in their data feed ",
+                    "at all (mostly small specialty schools and some ",
+                    "for-profits, which are filtered out elsewhere).")
+          ),
+
+          tags$h6("Effect on the results table"),
+          tags$ul(
+            tags$li("The ", tags$strong("Class."),
+                    " column shows the published category for each row ",
+                    "(blank when the school has no classification at all)."),
+            tags$li("The ", tags$strong("USN Rank"),
+                    " column is blank for any school US News didn't ",
+                    "assign a numeric rank — including all Regional ",
+                    "Colleges and any uncategorized schools."),
+            tags$li("Categories are not directly comparable: rank #5 ",
+                    "in National Liberal Arts is not equivalent to rank ",
+                    "#5 in National Universities or Regional Universities.")
+          )
+        )
+      ))
     })
 
     # --- Preset buttons update the theme sliders ---
