@@ -419,9 +419,41 @@ FORBES_OVERRIDES <- c(
 
 .forbes_normalize <- function(s) {
   s <- tolower(s %||% "")
+  # Strip punctuation BEFORE any keyword passes
   s <- gsub("[[:punct:]]+", " ", s)
-  s <- gsub("\\s+university\\s*$|\\s+college\\s*$", "", s)
+  s <- gsub("\\s+", " ", s)
+  s <- trimws(s)
+
+  # ---- IPEDS-side suffixes we know cause misses ----
+  # "-Main Campus" appears on many multi-campus state systems (Pitt,
+  # UVA, Georgia Tech, etc.).
+  s <- gsub("\\s+main campus\\s*$", "", s)
+  # Columbia in IPEDS is "Columbia University in the City of New York".
+  s <- gsub("\\s+in the city of new york\\s*$", "", s)
+  # Cooper Union etc. have very long formal names — drop trailing
+  # "for the advancement of ..." style. Conservative: only after a
+  # bare "of/for the".
+  s <- gsub("\\s+for the advancement of.*$", "", s)
+  # "X-Columbia" / "X-Seattle" campus suffix on flagship state schools
+  # (e.g., "University of South Carolina-Columbia",
+  # "University of Washington-Seattle Campus") — strip the trailing
+  # hyphenated city/campus. We already removed the hyphen via punct,
+  # so look for " <single-word> campus?" trailing tokens.
+  s <- gsub("\\s+(seattle|columbia|austin|denver|el paso|dallas|norman|bothell|indianapolis|cincinnati|main|amherst|knoxville)( campus)?\\s*$", "", s)
+
+  # ---- Forbes-side patterns ----
+  # Trailing 2-letter state disambiguator: "trinity college ct" -> "trinity college"
+  s <- gsub("\\s+[a-z]{2}\\s*$", "", s)
+  # "CUNY, X" -> "x"  /  "X, SUNY" -> "x"  (system name carries no info
+  # after the campus-name token is identified)
+  s <- gsub("^cuny\\s+", "", s)
+  s <- gsub("\\s+suny\\s*$", "", s)
+  s <- gsub("^suny\\s+", "", s)
+  # Filler words
+  s <- gsub("^the\\s+", "", s)
   s <- gsub("\\s+the\\s+", " ", s)
+  s <- gsub("\\s+at\\s+", " ", s)
+
   s <- gsub("\\s+", " ", s)
   trimws(s)
 }
@@ -476,7 +508,10 @@ build_forbes <- function(cfg, id_lookup) {
     d <- as.integer(adist(fr$norm_name, pool$norm_name,
                            ignore.case = TRUE, partial = FALSE))
     j <- which.min(d)
-    if (length(j) && d[j] <= 4) {
+    # Allow slightly more slack here than before — normalize() already
+    # removes the easy collisions; remaining variation is mostly
+    # campus-name differences within the same state.
+    if (length(j) && d[j] <= 6) {
       fmatch_f[[length(fmatch_f) + 1]] <- tibble(
         rank = fr$rank, name = fr$name, state = fr$state,
         unitid = pool$unitid[j])
