@@ -1765,6 +1765,19 @@ a:hover {
   /* keep card heights even across titles */
 }
 
+/* Small year-window subtitle under the metric title — "snapshot (2024)",
+ * "5-yr avg", or similar. Lets users tell at a glance whether a value
+ * is a single-year reading or an averaged window. */
+.dash-card-years {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #AC9E94;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: -0.25rem;
+  margin-bottom: 0.5rem;
+}
+
 .dash-card-anchor {
   display: flex;
   align-items: baseline;

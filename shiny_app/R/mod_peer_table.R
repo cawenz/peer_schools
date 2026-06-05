@@ -683,6 +683,29 @@ peerTableServer <- function(id, sidebar_state) {
     # as a tall line, not a rug tick).
     .PEER_DASH_ACTION_COLORS <- c("Anchor" = "#602D89", "Peer" = "#AC9E94")
 
+    # Source pretty-print helpers (copy of mod_cohort.R locals — both
+    # surfaces want the same chip labels). Move to a shared helper file
+    # the next time we refactor.
+    .PEER_SOURCE_LABELS <- c(
+      ipeds          = "IPEDS",
+      ipeds_derived  = "IPEDS",
+      ccihe          = "Carnegie 2025 Data File",
+      cds_ai         = "Common Data Set",
+      cds_ai_derived = "Common Data Set",
+      scorecard      = "College Scorecard"
+    )
+    .PEER_COMPUTED_SOURCES <- c("ipeds_derived", "cds_ai_derived", "ccihe")
+    .simplify_source <- function(src) {
+      if (is.null(src) || is.na(src) || !nzchar(src))
+        return("Unknown source")
+      lbl <- .PEER_SOURCE_LABELS[[src]]
+      if (is.null(lbl)) src else lbl
+    }
+    .is_computed_source <- function(src) {
+      if (is.null(src) || is.na(src) || !nzchar(src)) return(FALSE)
+      src %in% .PEER_COMPUTED_SOURCES
+    }
+
     # Universe baseline = full ranked universe, same as Cohort Builder.
     peer_dashboard_universe <- reactive({
       .SCHOOLS_WIDE[.SCHOOLS_WIDE$in_ranked_universe %in% TRUE, ,
@@ -786,7 +809,8 @@ peerTableServer <- function(id, sidebar_state) {
       ))
     }
 
-    # Build a single card.
+    # Build a single card. Clicking sends the metric back via a custom
+    # input event so the modal observer can render the detail view.
     .peer_dashboard_card <- function(metric, anchor_val, rug_data,
                                        universe_vals, display_name, fmt) {
       cv  <- rug_data$value[rug_data$action != "Anchor" &
@@ -804,9 +828,22 @@ peerTableServer <- function(id, sidebar_state) {
       strip <- .peer_dashboard_strip_svg(universe_vals, anchor_val,
                                           rug_data = rug_data)
 
+      # Year-window label ("snapshot (2024)" / "5-yr avg" / etc.) from
+      # the .VAR_YEARS_LABEL lookup populated in global.R. Renders as a
+      # small subtitle under the metric name.
+      years_lbl <- .VAR_YEARS_LABEL[[metric]] %||% ""
+
       tags$div(class = "dash-card",
         `data-metric` = metric,
+        # Card click -> send {metric, t} to Shiny so the modal observer
+        # fires. `priority: 'event'` ensures repeat clicks on the same
+        # card always re-trigger.
+        onclick = sprintf(
+          "Shiny.setInputValue('%s', {metric: '%s', t: Date.now()}, {priority: 'event'});",
+          ns("peer_dash_card_click"), metric),
         tags$div(class = "dash-card-title", display_name),
+        if (nzchar(years_lbl))
+          tags$div(class = "dash-card-years", years_lbl),
         tags$div(class = "dash-card-anchor",
           tags$span(class = "dash-card-anchor-label", "Anchor"),
           tags$span(class = "dash-card-anchor-val",
@@ -818,6 +855,128 @@ peerTableServer <- function(id, sidebar_state) {
                   sprintf("%d of %d reporting", n_r, n_c))
       )
     }
+
+    # ---- Click-to-modal --------------------------------------------------
+    # Opens a modal with a larger strip + per-school value table for the
+    # clicked metric. Same visual conventions as the Cohort dashboard
+    # modal so the two surfaces stay consistent.
+    observeEvent(input$peer_dash_card_click, {
+      payload <- input$peer_dash_card_click
+      if (is.null(payload) || is.null(payload$metric)) return()
+      metric <- payload$metric
+      if (!metric %in% names(.SCHOOLS_WIDE)) return()
+      res <- peer_result(); req(res)
+
+      meta <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
+      dn   <- if (nrow(meta) && !is.na(meta$display_name)) meta$display_name
+              else metric
+      fmt  <- if (nrow(meta)) meta$format else NA
+
+      desc <- if (nrow(meta) && !is.na(meta$notes) && nzchar(meta$notes))
+                meta$notes
+              else if (nrow(meta) && !is.na(meta$coverage_note) &&
+                        nzchar(meta$coverage_note))
+                meta$coverage_note
+              else "No description recorded for this variable."
+
+      chips <- tagList()
+      if (nrow(meta)) {
+        chip_specs <- list(
+          c("Source",   .simplify_source(meta$source)),
+          c("Category", if (!is.na(meta$category)) meta$category else ""),
+          c("Format",   if (!is.na(meta$format))   meta$format   else ""),
+          c("Years",    .VAR_YEARS_LABEL[[metric]] %||% "")
+        )
+        chips <- tagList(
+          lapply(chip_specs, function(p) {
+            if (!nzchar(p[2])) return(NULL)
+            tags$span(class = "dash-modal-chip",
+                      tags$strong(p[1], ":"), " ", p[2])
+          }),
+          if (.is_computed_source(meta$source))
+            tags$span(class = "dash-modal-chip dash-modal-chip-computed",
+                      title = "This value is derived from one or more raw inputs.",
+                      "Computed")
+        )
+      }
+
+      a_uid    <- res$meta$anchor_unitid
+      anchor_v <- .SCHOOLS_WIDE[[metric]][.SCHOOLS_WIDE$unitid == a_uid][1]
+      rug      <- .peer_build_rug_data(metric)
+      univ     <- peer_dashboard_universe()
+
+      big_strip <- .peer_dashboard_strip_svg(univ[[metric]], anchor_v,
+                                              rug_data = rug,
+                                              width = 720, height = 80)
+
+      uv <- univ[[metric]]; uv <- uv[is.finite(uv)]
+      pct <- function(v) {
+        if (!is.finite(v) || !length(uv)) return(NA_real_)
+        100 * mean(uv < v)
+      }
+      tbl_rows <- rug
+      tbl_rows$state <- .SCHOOLS$stabbr[match(tbl_rows$unitid, .SCHOOLS$unitid)]
+      tbl_rows$value_fmt <- vapply(tbl_rows$value,
+                                    function(v) .format_value(v, fmt),
+                                    character(1))
+      tbl_rows$pct     <- vapply(tbl_rows$value, pct, numeric(1))
+      tbl_rows$pct_fmt <- ifelse(is.na(tbl_rows$pct), "—",
+                                  sprintf("%.0f", tbl_rows$pct))
+
+      # Anchor first; peers sorted by descending value
+      anchor_ix   <- which(tbl_rows$action == "Anchor")
+      other_ix    <- setdiff(seq_len(nrow(tbl_rows)), anchor_ix)
+      other_order <- other_ix[order(-tbl_rows$value[other_ix])]
+      tbl_rows    <- tbl_rows[c(anchor_ix, other_order), , drop = FALSE]
+
+      table_tag <- tags$table(class = "dash-modal-table",
+        tags$thead(tags$tr(
+          tags$th("Status"),
+          tags$th("School"),
+          tags$th(class = "dt-center", "State"),
+          tags$th(class = "dt-right",  "Value"),
+          tags$th(class = "dt-right",  "Pct.")
+        )),
+        tags$tbody(lapply(seq_len(nrow(tbl_rows)), function(i) {
+          a <- as.character(tbl_rows$action[i])
+          slug <- tolower(gsub(" ", "-", a))
+          tags$tr(
+            tags$td(tags$span(class = sprintf("cohort-action-badge cohort-badge-%s",
+                                                slug), a)),
+            tags$td(tbl_rows$instnm[i]),
+            tags$td(class = "dt-center", tbl_rows$state[i]),
+            tags$td(class = "dt-right", tbl_rows$value_fmt[i]),
+            tags$td(class = "dt-right", tbl_rows$pct_fmt[i])
+          )
+        }))
+      )
+
+      showModal(modalDialog(
+        title = tagList(
+          tags$div(class = "dash-modal-title", dn),
+          tags$div(class = "dash-modal-chips", chips)
+        ),
+        size = "l",
+        easyClose = TRUE,
+        fade = TRUE,
+        footer = modalButton("Close"),
+        div(class = "dash-modal-body",
+          tags$p(class = "dash-modal-desc", desc),
+          tags$div(class = "dash-modal-strip-wrap", big_strip),
+          tags$div(class = "dash-modal-legend",
+            lapply(names(.PEER_DASH_ACTION_COLORS), function(a) {
+              tags$span(class = "dash-modal-legend-item",
+                tags$span(class = "dash-modal-legend-swatch",
+                          style = sprintf("background: %s;",
+                                           unname(.PEER_DASH_ACTION_COLORS[a]))),
+                a)
+            })
+          ),
+          tags$h6("Per-school values"),
+          table_tag
+        )
+      ))
+    })
 
     output$peer_dashboard <- renderUI({
       res <- peer_result()
