@@ -1127,8 +1127,13 @@ peerTableServer <- function(id, sidebar_state) {
                           is_anchor_cat = logical(0),
                           stringsAsFactors = FALSE))
       }
-      tab_raw <- as.data.frame(table(key = vals_for_tab,
-                                      stringsAsFactors = FALSE),
+      # NB: stringsAsFactors is NOT a table() argument — table() treats
+      # every named ... as another variable to cross-tabulate, so passing
+      # stringsAsFactors=FALSE there made R try to tabulate vals_for_tab
+      # (length N) against FALSE (length 1), triggering "all arguments
+      # must have the same length". stringsAsFactors only goes on the
+      # outer as.data.frame() call.
+      tab_raw <- as.data.frame(table(key = vals_for_tab),
                                 stringsAsFactors = FALSE)
       tab <- data.frame(key = as.character(tab_raw$key),
                          n   = as.integer(tab_raw$Freq),
