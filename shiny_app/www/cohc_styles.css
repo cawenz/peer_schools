@@ -536,6 +536,32 @@ a:hover {
   font-style: normal;
 }
 
+/* Below-table analytical surfaces tab strip. Sits inside a bslib
+ * navset_card_tab; the wrapper styles below mostly polish what
+ * bslib already gives us. */
+.peer-tab-placeholder {
+  background: #FFFFFF;
+  border: 1px dashed #cbd5e1;
+  border-radius: 6px;
+  padding: 1.5rem;
+  color: #475569;
+}
+
+.peer-tab-placeholder h6 {
+  color: #1d3557;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+}
+
+.peer-tab-placeholder p {
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.peer-tab-placeholder p:last-child {
+  margin-bottom: 0;
+}
+
 /* Anchor row in the peer table — soft tint + bold school name so the
  * user can tell at a glance which row is the reference. */
 .peer-results-table table tr.peer-anchor-row {

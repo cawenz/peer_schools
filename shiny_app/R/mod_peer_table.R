@@ -31,19 +31,16 @@ peerTableUI <- function(id) {
     div(class = "peer-results-table",
         DT::DTOutput(ns("peer_table"))),
 
-    # ---- Follow-up sections that consume the just-run peer result ----
-    # Aspirant: filter the top K to those that beat the anchor on chosen
-    # metrics. Stratified: re-run compute_peers per value of a chosen
-    # classification dimension. Both share the sidebar's anchor + pool +
-    # theme weights, so the user doesn't reconfigure.
-    uiOutput(ns("aspirant_refine_section")),
-    uiOutput(ns("stratified_expand_section")),
-
-    # ---- Reference: diagnostics ----
-    # Collapsed by default so the headline result + the action sections
-    # above stay uncluttered. The diagnostics matter when interpreting
-    # the result but the user can ignore them most of the time.
-    uiOutput(ns("diagnostics_accordion"))
+    # ---- Analytical surfaces tab strip ----
+    # Below the table, every analytical lens on the peer set lives in
+    # its own tab so users see all six options at once and can switch
+    # between them with one click. The legacy inline sections
+    # (Aspirant refine, Stratified expand, Diagnostics) are surfaced
+    # via uiOutput from the same renderUI bindings as before — only
+    # the wrapping container changes. Three new tabs scaffold the
+    # cohort-style lenses (Composition / Map / Dashboard) added in
+    # subsequent phases. Whole strip only renders once a search exists.
+    uiOutput(ns("analysis_tabs"))
   )
 }
 
@@ -505,21 +502,106 @@ peerTableServer <- function(id, sidebar_state) {
     # interacting with the surrounding card_body, so this is intentionally
     # boring HTML.
     # -------------------------------------------------------------------------
-    # Wrap the diagnostics output in a collapsed bslib accordion at the
-    # bottom of the page, so the headline result + action sections above
-    # stay clean and the user only sees diagnostics on demand.
+    # Diagnostics content. Used to be wrapped in a collapsed accordion
+    # when this lived inline below the table; now it sits inside the
+    # Diagnostics tab of the analytical surfaces strip, so the user has
+    # already opted in by clicking the tab — no further hide/show needed.
     output$diagnostics_accordion <- renderUI({
       res <- peer_result()
       if (is.null(res)) return(NULL)
+      uiOutput(ns("diagnostics_ui"))
+    })
+
+    # ---- Analytical surfaces tab strip -----------------------------------
+    # Single navset_card_tab that holds every below-table analytical
+    # lens. Tabs are visible side by side so users discover all
+    # available views without scrolling. Each tab body just embeds the
+    # already-rendered uiOutput from the existing renderUI bindings —
+    # the wrapping container changes, not the section logic.
+    #
+    # Composition / Map / Dashboard are scaffold placeholders for now
+    # (Phase B2-B4); they tell the user what's coming so the feature
+    # plan is visible without yet building the full surfaces.
+    output$analysis_tabs <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) return(NULL)
+
+      .placeholder <- function(label, blurb) {
+        div(class = "peer-tab-placeholder",
+            tags$h6(label),
+            p(blurb),
+            p(class = "text-muted",
+              tags$small("Coming in a follow-up update. ",
+                          "Wired into the same peer set as the table above.")))
+      }
+
       tagList(
         tags$hr(class = "peer-refine-divider"),
-        accordion(
-          open = FALSE,
-          accordion_panel(
+        navset_card_tab(
+          id = ns("analysis_nav"),
+
+          # ---- Composition (representation bars) ----
+          nav_panel(
+            title = tagList(icon("chart-bar"), " Composition"),
+            value = "composition",
+            .placeholder(
+              "Composition of the peer set",
+              paste("Stacked bars summarizing how the peer set breaks",
+                    "down on the same nine categorical dimensions used",
+                    "in the Cohort Builder (region, sector, control,",
+                    "religious tradition, athletics division, etc.),",
+                    "with the anchor's category marked for comparison."))
+          ),
+
+          # ---- Map ----
+          nav_panel(
+            title = tagList(icon("map-location-dot"), " Map"),
+            value = "map",
+            .placeholder(
+              "Geographic distribution",
+              paste("Leaflet map plotting every peer's primary campus,",
+                    "with the anchor distinguished by its own marker.",
+                    "Cluster + heatmap toggles match the Cohort Builder",
+                    "map controls."))
+          ),
+
+          # ---- Dashboard ----
+          nav_panel(
+            title = tagList(icon("table-columns"), " Dashboard"),
+            value = "dashboard",
+            .placeholder(
+              "Peer-set dashboard",
+              paste("11 metric cards summarizing the peer set's median",
+                    "values (enrollment, net price, graduation rate,",
+                    "endowment per FTE, etc.), each with an inline",
+                    "marker showing the anchor's position on the same",
+                    "scale. Same widget as the Cohort Builder dashboard,",
+                    "applied to this search result."))
+          ),
+
+          # ---- Refine: Aspirant ----
+          # Body is the existing uiOutput which already self-hides when
+          # the user hasn't opted into aspirant refinement.
+          nav_panel(
+            title = tagList(icon("arrow-up-right-dots"),
+                             " Refine: Aspirant"),
+            value = "aspirant",
+            uiOutput(ns("aspirant_refine_section"))
+          ),
+
+          # ---- Refine: Stratified ----
+          nav_panel(
+            title = tagList(icon("layer-group"), " Refine: Stratified"),
+            value = "stratified",
+            uiOutput(ns("stratified_expand_section"))
+          ),
+
+          # ---- Diagnostics ----
+          nav_panel(
             title = tagList(icon("magnifying-glass-chart"),
-                             " Search diagnostics"),
+                             " Diagnostics"),
             value = "diagnostics",
-            uiOutput(ns("diagnostics_ui"))
+            uiOutput(ns("diagnostics_accordion"))
           )
         )
       )
