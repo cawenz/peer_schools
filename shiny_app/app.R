@@ -66,15 +66,6 @@ ui <- page_navbar(
   ),
 
   nav_panel(
-    "Cohort Builder",
-    layout_sidebar(
-      sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
-                        cohortSidebarUI("cohort")),
-      cohortUI("cohort")
-    )
-  ),
-
-  nav_panel(
     "Saved Searches",
     sessionUI("session")
   ),
@@ -121,14 +112,12 @@ server <- function(input, output, session) {
   # from R/mod_stratified.R (still sourced at app start even though the
   # nav_panel and server bindings are gone).
 
-  # Cohort Builder page (returns reactives that other tabs consume)
-  cohort_module <- cohortServer("cohort")
-
-  # Trends page (consumes peer_result and the cohort module's state)
+  # Cohort Builder lives in a sibling app (cohort_app/) — Trends still
+  # accepts cohort_state / cohort_anchor_uid args, but they default to
+  # reactive(NULL) which the module handles gracefully (the "Cohort
+  # Builder cohort" comparison option just reads "(none yet)").
   trendsServer("trends",
-               peer_result       = peer_table_state$result,
-               cohort_state      = cohort_module$cohort_state,
-               cohort_anchor_uid = cohort_module$anchor_uid)
+               peer_result = peer_table_state$result)
 
   # Saved Searches page. Returns a `saved_by` reactive populated from
   # the "Working as" text input (and seeded from browser localStorage).
