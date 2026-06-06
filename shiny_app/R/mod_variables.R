@@ -115,18 +115,12 @@ variablesUI <- function(id) {
       )
     ),
 
-    # ---- DEBUG: minimal table that must render if DT is wired correctly ----
-    tags$div(style = "background:#fef2cd; padding:0.5rem 1rem; margin-bottom:0.5rem; border:1px dashed #b58900;",
-      tags$strong("DEBUG table (should always render with 3 rows): "),
-      DT::DTOutput(ns("debug_table"))),
-
-    # WRAPPED var_table — bright cyan container so we can SEE whether
-    # the container itself is even reaching the DOM. If you see a cyan
-    # box with no table inside, the container is there but DT didnt
-    # paint into it. If you dont see the cyan box at all, the UI body
-    # truncated before DTOutput.
-    tags$div(style = "background:#dbf3ff; padding:0.5rem; border:2px dashed #1666b3; min-height:300px;",
-      tags$strong("MAIN table container (cyan border) — table should appear below:"),
+    # DTOutput wrapped in a plain div. Without this wrapper, DTs JS
+    # initializer didnt have a container element to paint into and the
+    # table never rendered — even though renderDT was firing and
+    # producing a valid widget on every reactive cycle. The wrapping
+    # div gives DT a stable DOM target.
+    tags$div(class = "var-table-wrap",
       DT::DTOutput(ns("var_table")))
   )
 }
@@ -302,34 +296,8 @@ variablesServer <- function(id) {
       df
     })
 
-    # DEBUG: minimal 3-row table. If this DOESNT render, DT itself is
-    # broken on the Variables tab (CSS / layout / asset path issue). If
-    # this DOES render but var_table doesnt, the bug is in the real
-    # table-build path below.
-    output$debug_table <- DT::renderDT({
-      message("[debug-table] render firing")
-      DT::datatable(
-        data.frame(A = 1:3, B = c("x", "y", "z")),
-        rownames = FALSE,
-        options = list(dom = "t"))
-    })
-
     output$var_table <- DT::renderDT({
-      message("[var-table] render firing")
-      df <- tryCatch(filtered_df(),
-                     error = function(e) {
-                       message("[var-table] filtered_df ERROR: ",
-                               conditionMessage(e))
-                       NULL
-                     })
-      if (is.null(df)) {
-        return(DT::datatable(
-          data.frame(Error = "filtered_df errored — check R console",
-                     check.names = FALSE),
-          rownames = FALSE))
-      }
-      message("[var-table] got ", nrow(df), " rows, cols: ",
-              paste(names(df), collapse = ","))
+      df <- filtered_df()
       if (!nrow(df)) {
         return(DT::datatable(data.frame(
           Variable = character(),
@@ -359,27 +327,25 @@ variablesServer <- function(id) {
         check.names = FALSE
       )
 
-      message("[var-table] display_df built: ", nrow(display_df),
-              " rows, ", ncol(display_df), " cols")
-      message("[var-table] display_df classes: ",
-              paste(vapply(display_df, function(x) class(x)[1], character(1)),
-                    collapse = ","))
-      # MINIMAL version — strip all the options. If THIS doesnt render
-      # but the debug table does, the issue is the data itself (a special
-      # character, a list-column, an NA encoding, etc.). If THIS renders
-      # but the prior version didnt, the issue is in the options.
-      tryCatch(
-        DT::datatable(
-          display_df,
-          rownames = FALSE,
-          options = list(dom = "ftip", pageLength = 25)),
-        error = function(e) {
-          message("[var-table] datatable() ERROR: ", conditionMessage(e))
-          DT::datatable(
-            data.frame(Error = paste("DT failed:", conditionMessage(e)),
-                       check.names = FALSE),
-            rownames = FALSE)
-        })
+      DT::datatable(
+        display_df,
+        rownames = FALSE,
+        selection = list(mode = "single", target = "row"),
+        options = list(
+          pageLength = 25,
+          dom = "ftip",   # search box + table + info + pagination
+          order = list(list(1, "asc"), list(0, "asc")),
+          columnDefs = list(
+            list(width = "20%", targets = 0),
+            list(width = "15%", targets = 1),
+            list(width = "10%", targets = 2),
+            list(width = "15%", targets = 3),
+            list(width = "12%", targets = 4),
+            list(width = "28%", targets = 5)
+          )
+        ),
+        class = "compact stripe hover"
+      )
     })
 
     # ---- Row click -> variable detail modal ----
