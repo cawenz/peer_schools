@@ -301,27 +301,29 @@ peerTableServer <- function(id, sidebar_state) {
       # hasn't moved. Solve it manually: walk up looking for the first
       # ancestor whose scrollHeight > clientHeight (the actually-scrolling
       # one), then set its scrollTop directly.
+      # JS notes:
+      # - Target the inner div.peer-analysis-tabs (the element the user
+      #   actually wants in view) rather than the 0-height uiOutput
+      #   placeholder #peer_table-analysis_tabs, which sits at a
+      #   negative layout position inside the flex container.
+      # - Walk up looking for the first scrollable ancestor whose box
+      #   actually CONTAINS the target (positive relative offset). The
+      #   bslib layout_sidebar's .main bslib-gap-spacing div is what
+      #   ends up scrolling.
+      # - Math.max(0, ...) guards against any leftover negative offset.
       scroll_js <- sprintf(
         paste0(
           "(function(){",
-          # The uiOutput placeholder #%s is a 0-height wrapper that sits at
-          # an unexpected layout position. Prefer the inner element that
-          # actually paints the tabs — div.peer-analysis-tabs lives inside.
           "  var t=document.querySelector('.peer-analysis-tabs');",
           "  if(!t){t=document.getElementById('%s');}",
-          "  if(!t){console.warn('[analysis-indicator] no target');return;}",
-          "  console.log('[analysis-indicator] target',t,'rectTop',",
-          "    t.getBoundingClientRect().top);",
-          # Walk up looking for a scrollable ancestor whose box ACTUALLY
-          # contains the target with positive relative position. Otherwise
-          # fall back to the window.
+          "  if(!t)return;",
           "  var c=t.parentElement;",
           "  while(c&&c!==document.body){",
           "    var s=getComputedStyle(c);",
           "    var oy=s.overflowY;",
           "    if((oy==='auto'||oy==='scroll')&&c.scrollHeight>c.clientHeight){",
           "      var rt=t.getBoundingClientRect().top-c.getBoundingClientRect().top;",
-          "      if(rt>=0){break;}",
+          "      if(rt>=0)break;",
           "    }",
           "    c=c.parentElement;",
           "  }",
@@ -329,11 +331,9 @@ peerTableServer <- function(id, sidebar_state) {
           "    var rect=t.getBoundingClientRect();",
           "    var crect=c.getBoundingClientRect();",
           "    var top=c.scrollTop+(rect.top-crect.top)-12;",
-          "    console.log('[analysis-indicator] scrolling container',c,'to',top);",
           "    c.scrollTo({top:Math.max(0,top),behavior:'smooth'});",
           "  }else{",
           "    var y=Math.max(0,window.pageYOffset+t.getBoundingClientRect().top-12);",
-          "    console.log('[analysis-indicator] scrolling window to',y);",
           "    window.scrollTo({top:y,behavior:'smooth'});",
           "  }",
           "})();"),
