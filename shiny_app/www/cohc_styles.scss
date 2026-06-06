@@ -555,6 +555,96 @@ a {
   .peer-ai-text strong { color: #251230; }
 }
 
+/* ---------- Variables tab: instructions + glossary block ---------- */
+.var-instructions {
+  background: #F4EDEC;
+  border-left: 4px solid #602D89;
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin: 0.5rem 0 1.25rem 0;
+  color: #251230;
+
+  h6 {
+    color: #602D89;
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+  h6:first-child { margin-top: 0; }
+}
+
+.var-instructions-steps {
+  margin: 0 0 0.5rem 1.25rem;
+  padding-left: 0;
+  color: #251230;
+
+  li { margin-bottom: 0.4rem; line-height: 1.5; font-size: 0.92rem; }
+  li:last-child { margin-bottom: 0; }
+  strong { color: #602D89; }
+}
+
+.var-glossary {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  column-gap: 1rem;
+  row-gap: 0.4rem;
+
+  dt {
+    color: #602D89;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding-top: 0.1rem;
+  }
+  dd {
+    margin: 0;
+    color: #251230;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+  strong { color: #602D89; }
+  em     { font-style: italic; color: #602D89; }
+}
+
+.var-instructions-foot {
+  margin: 0.75rem 0 0 0;
+  border-top: 1px dashed #AC9E94;
+  padding-top: 0.6rem;
+}
+
+/* Variables modal body — clearer hierarchy than the generic dash modal. */
+.var-modal-body {
+  h6 {
+    color: #602D89;
+    margin-top: 1.25rem;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+  }
+  h6:first-of-type { margin-top: 0.75rem; }
+}
+
+.var-modal-human {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #251230;
+  margin: 0 0 0.5rem 0;
+}
+
+.var-modal-tech {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #475569;
+}
+
+.var-modal-note {
+  margin-top: 0.5rem;
+  border-left: 2px solid #AC9E94;
+  padding-left: 0.6rem;
+}
+
 /* ---------- Sidebar: info button + label hints ---------- */
 /* "Ranked universe only" + a small info icon to its right. */
 .pool-checkbox-row {

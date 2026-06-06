@@ -17,9 +17,77 @@ variablesUI <- function(id) {
     h4("Variables"),
     p(class = "section-intro",
       "Every variable the app surfaces, with the source, format, and role ",
-      "in the peer-distance calculation. Filter by category or source, ",
-      "search the names or descriptions, and click any row for the full ",
-      "definition."),
+      "in the peer-distance calculation."),
+
+    # ---- Instructions block --------------------------------------------
+    div(class = "var-instructions",
+      tags$h6("How to use this page"),
+      tags$ol(class = "var-instructions-steps",
+        tags$li(tags$strong("Filter"),
+                " by Category, Source, or Role (the three pickers above ",
+                "the table) to narrow the list. The pickers cascade — ",
+                "choices in Source and Role only show options that ",
+                "actually appear given your Category selection."),
+        tags$li(tags$strong("Search"),
+                " the table's built-in search box (top right of the ",
+                "table) to look up variables by name."),
+        tags$li(tags$strong("Click any row"),
+                " to open the full definition: what the variable ",
+                "measures, the data source, caveats, and how it's computed.")
+      ),
+
+      tags$h6("What the columns mean"),
+      tags$dl(class = "var-glossary",
+        tags$dt("Category"),
+        tags$dd("The analytical theme — Selectivity & Admissions, ",
+                 "Enrollment, Resources, Finance, Outcomes, Financial Aid, ",
+                 "Athletics. Used to group similar variables and to wire ",
+                 "the theme-weight sliders in the Peer Search sidebar."),
+
+        tags$dt("Source"),
+        tags$dd("Where the underlying data comes from: ",
+                 tags$strong("IPEDS"), " (the federal survey, mandatory ",
+                 "for any institution receiving Title IV funds), ",
+                 tags$strong("Carnegie"), " (institutional classifications), ",
+                 tags$strong("Common Data Set"), " (voluntary survey, ",
+                 "~45% response rate), ",
+                 tags$strong("College Scorecard"), " (federal student ",
+                 "outcomes), or ",
+                 tags$strong("EADA"), " (Equity in Athletics Disclosure Act). ",
+                 "Computed sources are derived from one or more raw inputs."),
+
+        tags$dt("Format"),
+        tags$dd("How values are rendered: ",
+                 tags$em("count"), " (whole numbers), ",
+                 tags$em("percentage"), " (0–100), ",
+                 tags$em("currency"), " (dollars), or ",
+                 tags$em("ratio"), " (unbounded numeric)."),
+
+        tags$dt("Role"),
+        tags$dd(tags$strong("Used in peer distance"),
+                 " variables feed the weighted Euclidean similarity ",
+                 "calculation. ",
+                 tags$strong("Descriptive only"),
+                 " variables are shown on Side-by-Side, dashboards, ",
+                 "and the inspector but do not influence which peers ",
+                 "get returned. ",
+                 tags$strong("Exploratory"),
+                 " variables are tracked but flagged as work-in-progress."),
+
+        tags$dt("Notes"),
+        tags$dd("Short description shown inline. Full plain-English ",
+                 "definitions, caveats, and computation details ",
+                 "appear in the click-to-open modal.")
+      ),
+
+      p(class = "var-instructions-foot text-muted",
+        tags$small(
+          "Plain-English descriptions live in ",
+          tags$code("data/variables_descriptions.csv"),
+          " — edit that file to expand or revise them. Variables ",
+          "without an entry fall back to the technical coverage_note ",
+          "from the pipeline."))
+    ),
 
     # Compact filter bar above the table.
     tags$div(class = "var-filter-bar",
@@ -112,18 +180,53 @@ variablesServer <- function(id) {
       unname(out)
     }
 
+    # ---- Hand-curated plain-English description lookup ------------------
+    # data/variables_descriptions.csv has shape (metric, description) and
+    # is editable in Excel/etc. so non-developers can extend it. Missing
+    # entries fall back to coverage_note from the pipeline.
+    .desc_lookup <- {
+      desc_path <- file.path(
+        if (exists(".DATA_DIR")) .DATA_DIR
+        else file.path(.PROJECT_ROOT, "data"),
+        "variables_descriptions.csv")
+      if (file.exists(desc_path)) {
+        d <- suppressMessages(readr::read_csv(desc_path,
+                                               show_col_types = FALSE))
+        setNames(d$description, d$metric)
+      } else {
+        character(0)
+      }
+    }
+    .human_description <- function(metric) {
+      if (metric %in% names(.desc_lookup)) {
+        v <- unname(.desc_lookup[[metric]])
+        if (!is.na(v) && nzchar(v)) return(v)
+      }
+      NA_character_
+    }
+
     # Build a working frame with pretty labels.
     vars_df <- reactive({
       df <- .VARIABLES
       df$category_pretty <- .category_label(df$category)
       df$source_pretty   <- .source_label(df$source)
       df$role_pretty     <- .role_label(df$use_type)
-      df$description     <- vapply(seq_len(nrow(df)), function(i) {
+
+      # Two description streams:
+      #   human_desc : from data/variables_descriptions.csv (preferred)
+      #   tech_desc  : pipeline notes / coverage_note (fallback)
+      df$human_desc <- vapply(df$metric, .human_description, character(1))
+      df$tech_desc  <- vapply(seq_len(nrow(df)), function(i) {
         if (!is.na(df$notes[i]) && nzchar(df$notes[i])) df$notes[i]
         else if (!is.na(df$coverage_note[i]) && nzchar(df$coverage_note[i]))
           df$coverage_note[i]
         else NA_character_
       }, character(1))
+
+      # Combined description shown inline in the table (truncated). Prefer
+      # human; fall back to technical.
+      df$description <- ifelse(!is.na(df$human_desc),
+                                df$human_desc, df$tech_desc)
       df
     })
 
@@ -276,12 +379,42 @@ variablesServer <- function(id) {
         ),
         size = "l", easyClose = TRUE, fade = TRUE,
         footer = modalButton("Close"),
-        div(class = "asp-modal-body",
+        div(class = "asp-modal-body var-modal-body",
           tags$div(class = "dash-modal-chips", chips),
-          if (!is.na(row$description))
-            tags$p(class = "dash-modal-desc", row$description),
-          # Show the comparison-scope and (if present) the formula notes
-          # as a secondary detail block.
+
+          # ---- What this measures (hand-curated description first) ----
+          tags$h6("What this measures"),
+          if (!is.na(row$human_desc)) {
+            tags$p(class = "var-modal-human", row$human_desc)
+          } else if (!is.na(row$tech_desc)) {
+            tagList(
+              tags$p(class = "var-modal-tech", row$tech_desc),
+              tags$p(class = "var-modal-note text-muted",
+                     tags$small(
+                       "(No hand-curated description yet — this text is ",
+                       "from the pipeline's technical notes. Add an entry ",
+                       "for ", tags$code(row$metric),
+                       " in ", tags$code("data/variables_descriptions.csv"),
+                       " to replace it with plain-English text.")))
+          } else {
+            tags$p(class = "text-muted",
+                   tags$em("No description recorded yet. Add an entry for "),
+                   tags$code(row$metric),
+                   tags$em(" in "),
+                   tags$code("data/variables_descriptions.csv"),
+                   tags$em(" to write one."))
+          },
+
+          # ---- Caveats / coverage notes (only when distinct from main) ----
+          if (!is.na(row$human_desc) && !is.na(row$tech_desc) &&
+              row$human_desc != row$tech_desc) tagList(
+            tags$h6("Pipeline notes (technical)"),
+            tags$p(class = "var-modal-tech text-muted",
+                   tags$small(row$tech_desc))
+          ),
+
+          # ---- Technical detail block ----
+          tags$h6("Technical detail"),
           tags$dl(class = "var-detail-list",
             tags$dt("Comparison scope"),
             tags$dd(if (is.na(row$comparison_scope)) "—"
