@@ -521,21 +521,30 @@ a {
   align-items: center;
   gap: 0.65rem;
   margin: 0.5rem 0 1rem 0;
-  padding: 0.55rem 0.85rem;
-  background: #F4EDEC;
-  border: 1px solid #cbd5e1;
-  border-left: 3px solid #602D89;
-  border-radius: 4px;
+  padding: 0.65rem 1rem;
+  background: #FFFFFF;
+  border: 1px solid #602D89;
+  border-left: 4px solid #602D89;
+  border-radius: 6px;
   color: #602D89;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   cursor: pointer;
   user-select: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  /* Subtle drop shadow + transform on hover reads as "this is a button" */
+  box-shadow: 0 1px 2px rgba(96, 45, 137, 0.08);
+  transition: background 0.15s ease, border-color 0.15s ease,
+              box-shadow 0.15s ease, transform 0.1s ease;
 
-  &:hover, &:focus {
+  &:hover {
     background: #F4EDEC;
-    border-color: #AC9E94;
-    border-left-color: #602D89;
+    border-color: #602D89;
+    box-shadow: 0 2px 8px rgba(96, 45, 137, 0.18);
+    transform: translateY(-1px);
+  }
+  &:active { transform: translateY(0); }
+  &:focus-visible {
+    outline: 3px solid rgba(96, 45, 137, 0.35);
+    outline-offset: 1px;
   }
 
   .peer-ai-icon {
@@ -553,6 +562,18 @@ a {
   }
 
   .peer-ai-text strong { color: #251230; }
+
+  /* Trailing chevron telegraphs "this scrolls / navigates". Pure CSS,
+   * positioned after the text via flex auto-margin. */
+  &::after {
+    content: "›";
+    margin-left: auto;
+    font-size: 1.2rem;
+    color: #602D89;
+    font-weight: 700;
+    transition: transform 0.15s ease;
+  }
+  &:hover::after { transform: translateX(3px); }
 }
 
 /* ---------- Variables tab: instructions + glossary block ---------- */

@@ -289,10 +289,21 @@ peerTableServer <- function(id, sidebar_state) {
     output$analysis_indicator <- renderUI({
       res <- peer_result()
       if (is.null(res)) return(NULL)
+      # Rendered as a semantic button so screen readers and keyboard
+      # users get the right affordance. role + tabindex + Enter/Space
+      # keyboard activation mirror the click target.
       tags$div(
         class = "peer-analysis-indicator",
+        role = "button",
+        tabindex = "0",
         onclick = sprintf(
           "document.getElementById('%s').scrollIntoView({behavior:'smooth', block:'start'});",
+          ns("analysis_tabs")),
+        onkeydown = sprintf(
+          paste0("if(event.key==='Enter'||event.key===' ')",
+                 "{event.preventDefault();",
+                 "document.getElementById('%s').scrollIntoView(",
+                 "{behavior:'smooth', block:'start'});}"),
           ns("analysis_tabs")),
         title = "Jump to additional analytical views",
         tags$span(class = "peer-ai-icon", HTML("&#8595;")),
