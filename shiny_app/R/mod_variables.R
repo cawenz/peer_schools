@@ -354,26 +354,18 @@ variablesServer <- function(id) {
 
       message("[var-table] display_df built: ", nrow(display_df),
               " rows, ", ncol(display_df), " cols")
+      message("[var-table] display_df classes: ",
+              paste(vapply(display_df, function(x) class(x)[1], character(1)),
+                    collapse = ","))
+      # MINIMAL version — strip all the options. If THIS doesnt render
+      # but the debug table does, the issue is the data itself (a special
+      # character, a list-column, an NA encoding, etc.). If THIS renders
+      # but the prior version didnt, the issue is in the options.
       tryCatch(
         DT::datatable(
           display_df,
           rownames = FALSE,
-          selection = list(mode = "single", target = "row"),
-          options = list(
-            pageLength = 25,
-            dom = "ftip",
-            order = list(list(1, "asc"), list(0, "asc")),
-            columnDefs = list(
-              list(width = "20%", targets = 0),
-              list(width = "15%", targets = 1),
-              list(width = "10%", targets = 2),
-              list(width = "15%", targets = 3),
-              list(width = "12%", targets = 4),
-              list(width = "28%", targets = 5)
-            )
-          ),
-          class = "compact stripe hover"
-        ),
+          options = list(dom = "ftip", pageLength = 25)),
         error = function(e) {
           message("[var-table] datatable() ERROR: ", conditionMessage(e))
           DT::datatable(
