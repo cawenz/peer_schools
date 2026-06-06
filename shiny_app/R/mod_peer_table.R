@@ -240,8 +240,8 @@ peerTableServer <- function(id, sidebar_state) {
         tags$span(class = "peer-ai-icon", HTML("&#8595;")),
         tags$span(class = "peer-ai-text",
                    tags$strong("More analysis below:"),
-                   " Composition · Map · Dashboard · Aspirant · ",
-                   "Stratified · Diagnostics")
+                   " Composition · Map · Dashboard · Inspector · ",
+                   "Aspirant · Stratified · Diagnostics")
       )
     })
 
@@ -958,6 +958,9 @@ peerTableServer <- function(id, sidebar_state) {
         }))
       )
 
+      # Stash the metric for the Inspector hand-off below.
+      session$userData$peer_dash_modal_metric <- metric
+
       showModal(modalDialog(
         title = tagList(
           tags$div(class = "dash-modal-title", dn),
@@ -966,7 +969,13 @@ peerTableServer <- function(id, sidebar_state) {
         size = "l",
         easyClose = TRUE,
         fade = TRUE,
-        footer = modalButton("Close"),
+        footer = tagList(
+          actionButton(ns("peer_dash_open_inspector"),
+                        "Open in Inspector",
+                        icon = icon("chart-area"),
+                        class = "btn btn-outline-primary"),
+          modalButton("Close")
+        ),
         div(class = "dash-modal-body",
           tags$p(class = "dash-modal-desc", desc),
           tags$div(class = "dash-modal-strip-wrap", big_strip),
@@ -1004,6 +1013,367 @@ peerTableServer <- function(id, sidebar_state) {
       })
       cards <- Filter(Negate(is.null), cards)
       div(class = "dash-grid", cards)
+    })
+
+    # ---- Inspector tab ---------------------------------------------------
+    # Variable browser modeled on the Cohort Builder's inspector. Pick any
+    # variable in the catalog; the histogram shows the chosen comparison
+    # pool (ranked universe by default, optionally narrowed by US News
+    # classification and/or sector), with the anchor as a tall purple line
+    # and each peer as a rug marker. The per-school table below lists raw
+    # values + each row's percentile within the chosen pool.
+    #
+    # Reuses the cohort module's visual conventions (.distribution-stats,
+    # cohort-inspector-controls, etc.) so the two surfaces feel like the
+    # same widget.
+
+    # Variable choices grouped by category. Only metrics that exist in
+    # .SCHOOLS_WIDE and have a display_name are offered.
+    peer_inspector_choice_groups <- reactive({
+      vars_df <- .VARIABLES %>%
+        dplyr::filter(metric %in% names(.SCHOOLS_WIDE)) %>%
+        dplyr::filter(!is.na(display_name))
+      vars_df <- vars_df[order(vars_df$category, vars_df$display_name), ]
+      groups <- split(vars_df, vars_df$category)
+      lapply(groups, function(g) {
+        v <- g$metric
+        names(v) <- g$display_name
+        v
+      })
+    })
+
+    output$peer_inspector <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) {
+        return(div(class = "text-muted",
+                   tags$small("Run a peer search first; the inspector ",
+                                "highlights the peer set against a chosen ",
+                                "comparison pool.")))
+      }
+      groups <- peer_inspector_choice_groups()
+      class_choices <- {
+        cls <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
+        v <- cls
+        names(v) <- .prettify_classification(cls)
+        v
+      }
+      sector_choices <- c("Public" = "public",
+                          "Private (nonprofit)" = "private_nfp")
+
+      tagList(
+        p(class = "peer-tab-lede text-muted",
+          tags$small("Pick any variable to see how the peer set sits ",
+                      "against a chosen comparison pool. Anchor shown as ",
+                      "a tall purple line; peers as diamond markers along ",
+                      "the x-axis.")),
+
+        div(class = "cohort-inspector-controls",
+          div(class = "cohort-inspector-control-row",
+            selectizeInput(ns("peer_inspect_metric"),
+                           label = "Variable",
+                           choices = groups,
+                           selected = "total_enrollment_fall",
+                           width = "100%",
+                           options = list(placeholder = "Type to search variables"))
+          ),
+          div(class = "cohort-inspector-control-row cohort-pool-controls",
+            div(class = "cohort-pool-control",
+              selectizeInput(ns("peer_pool_classification"),
+                             label = "Pool: US News classification (multi-select)",
+                             choices = class_choices,
+                             selected = character(0),
+                             multiple = TRUE, width = "100%",
+                             options = list(
+                               placeholder = "(all classifications)",
+                               plugins = list("remove_button")
+                             ))
+            ),
+            div(class = "cohort-pool-control",
+              selectizeInput(ns("peer_pool_sector"),
+                             label = "Pool: Sector (multi-select)",
+                             choices = sector_choices,
+                             selected = character(0),
+                             multiple = TRUE, width = "100%",
+                             options = list(
+                               placeholder = "(both sectors)",
+                               plugins = list("remove_button")
+                             ))
+            )
+          ),
+          uiOutput(ns("peer_inspector_pool_description"))
+        ),
+
+        plotlyOutput(ns("peer_inspector_plot"), height = "420px"),
+        uiOutput(ns("peer_inspector_stats")),
+        h5("Per-school values"),
+        DT::DTOutput(ns("peer_inspector_table"))
+      )
+    })
+
+    # Comparison pool — ranked universe filtered by the inspector's class +
+    # sector multi-selects. Empty selection = no filter on that field.
+    peer_inspector_pool <- reactive({
+      pool <- .SCHOOLS_WIDE[.SCHOOLS_WIDE$in_ranked_universe %in% TRUE, ,
+                             drop = FALSE]
+      cls <- input$peer_pool_classification
+      sec <- input$peer_pool_sector
+      if (length(cls))
+        pool <- pool[pool$usnews_classification %in% cls, , drop = FALSE]
+      if (length(sec))
+        pool <- pool[pool$control_grp %in% sec, , drop = FALSE]
+      pool
+    })
+
+    output$peer_inspector_pool_description <- renderUI({
+      pool <- peer_inspector_pool()
+      cls <- input$peer_pool_classification
+      sec <- input$peer_pool_sector
+      parts <- c()
+      if (length(cls))
+        parts <- c(parts, sprintf("US News: %s",
+                                   paste(.prettify_classification(cls),
+                                         collapse = ", ")))
+      if (length(sec))
+        parts <- c(parts, sprintf("Sector: %s",
+                                   paste(.prettify_control(sec),
+                                         collapse = ", ")))
+      base <- if (length(parts))
+                sprintf("Pool: %s (%s schools)",
+                        paste(parts, collapse = " · "),
+                        format(nrow(pool), big.mark = ","))
+              else
+                sprintf("Pool: Ranked universe (%s schools)",
+                        format(nrow(pool), big.mark = ","))
+      tags$div(class = "cohort-inspector-pool-desc",
+        tags$small(base))
+    })
+
+    # Color palette — two categories only: Anchor + Peer.
+    .PEER_INSPECTOR_COLORS <- c("Anchor" = "#602D89",
+                                  "Peer"   = "#AC9E94")
+
+    # ---- Inspector plot ----
+    output$peer_inspector_plot <- renderPlotly({
+      res <- peer_result(); req(res)
+      metric <- input$peer_inspect_metric; req(metric)
+      req(metric %in% names(.SCHOOLS_WIDE))
+      a_uid     <- res$meta$anchor_unitid; req(a_uid)
+      peer_uids <- res$peers$unitid
+
+      pool_df   <- peer_inspector_pool()
+      pool_vals <- pool_df[[metric]]
+      pool_vals <- pool_vals[is.finite(pool_vals)]
+      validate(need(length(pool_vals) >= 5,
+                    "Not enough finite values to plot a distribution."))
+
+      a_val       <- .SCHOOLS_WIDE[[metric]][.SCHOOLS_WIDE$unitid == a_uid][1]
+      anchor_name <- .SCHOOLS$instnm[.SCHOOLS$unitid == a_uid][1]
+
+      meta_row <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
+      fmt <- if (nrow(meta_row)) meta_row$format else NA
+      x_label <- if (nrow(meta_row) && !is.na(meta_row$display_name))
+                   meta_row$display_name else metric
+
+      iqr <- diff(stats::quantile(pool_vals, c(0.25, 0.75),
+                                   na.rm = TRUE, names = FALSE))
+      bw  <- max(2 * iqr / length(pool_vals)^(1/3),
+                 diff(range(pool_vals)) / 40)
+
+      x_hover_fmt <- switch(
+        as.character(fmt) %||% "",
+        currency   = "$%{x:,.0f}",
+        percentage = "%{x:.1f}%",
+        count      = "%{x:,.0f}",
+        ratio      = "%{x:.2f}",
+        "%{x:.4g}"
+      )
+
+      pool_label <- if (length(input$peer_pool_classification) ||
+                         length(input$peer_pool_sector))
+                       "Selected pool" else "Ranked universe"
+
+      p <- plot_ly() %>%
+        add_histogram(
+          x    = pool_vals,
+          name = pool_label,
+          xbins = list(start = min(pool_vals),
+                       end   = max(pool_vals) + bw,
+                       size  = bw),
+          marker = list(color = "#F4EDEC",
+                        line  = list(color = "#AC9E94", width = 0.5)),
+          hovertemplate = paste0(
+            "<b>Pool bin</b><br>Around ", x_hover_fmt,
+            ": %{y} institutions<extra></extra>")
+        )
+
+      # Peer markers
+      peer_vals  <- .SCHOOLS_WIDE[[metric]][match(peer_uids,
+                                                    .SCHOOLS_WIDE$unitid)]
+      peer_names <- .SCHOOLS$instnm[match(peer_uids, .SCHOOLS$unitid)]
+      ok <- is.finite(peer_vals)
+      if (any(ok)) {
+        p <- p %>% add_markers(
+          x = peer_vals[ok],
+          y = rep(0, sum(ok)),
+          name = "Peer",
+          text = peer_names[ok],
+          marker = list(symbol = "diamond", size = 10,
+                        color = .PEER_INSPECTOR_COLORS[["Peer"]],
+                        line = list(color = "#FFFFFF", width = 1)),
+          hovertemplate = paste0("<b>%{text}</b><br>",
+                                  x_label, ": ", x_hover_fmt,
+                                  "<extra></extra>")
+        )
+      }
+
+      shapes <- list(); annots <- list()
+      if (is.finite(a_val)) {
+        shapes <- c(shapes, list(list(
+          type = "line", xref = "x", yref = "paper",
+          x0 = a_val, x1 = a_val, y0 = 0, y1 = 1,
+          line = list(color = "#602D89", width = 2.5)
+        )))
+        annots <- c(annots, list(list(
+          x = a_val, y = 1, xref = "x", yref = "paper",
+          yanchor = "bottom", xanchor = "left",
+          text = sprintf("<b>Anchor: %s (%s)</b>",
+                          anchor_name, .format_value(a_val, fmt)),
+          showarrow = FALSE,
+          bgcolor = "#251230", bordercolor = "#251230",
+          font = list(color = "#FFFFFF", size = 12),
+          xshift = 4, yshift = 2
+        )))
+      }
+
+      p %>%
+        layout(
+          xaxis  = list(title = x_label, gridcolor = "#F4EDEC",
+                        zeroline = FALSE),
+          yaxis  = list(title = "Number of institutions",
+                        gridcolor = "#F4EDEC"),
+          shapes = shapes,
+          annotations = annots
+        ) %>%
+        cohc_plotly_theme(hovermode = "closest") %>%
+        cohc_modebar(filename_root = "peer_inspector")
+    })
+
+    # ---- Inspector summary stats ----
+    output$peer_inspector_stats <- renderUI({
+      res <- peer_result(); req(res)
+      metric <- input$peer_inspect_metric; req(metric)
+      req(metric %in% names(.SCHOOLS_WIDE))
+      a_uid     <- res$meta$anchor_unitid
+      peer_uids <- res$peers$unitid
+
+      meta_row <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
+      fmt <- if (nrow(meta_row)) meta_row$format else NA
+
+      a_val      <- .SCHOOLS_WIDE[[metric]][.SCHOOLS_WIDE$unitid == a_uid][1]
+      pool_df    <- peer_inspector_pool()
+      pool_vals  <- pool_df[[metric]]; pool_vals <- pool_vals[is.finite(pool_vals)]
+      peer_vals  <- .SCHOOLS_WIDE[[metric]][match(peer_uids,
+                                                    .SCHOOLS_WIDE$unitid)]
+      peer_vals  <- peer_vals[is.finite(peer_vals)]
+
+      pct_anchor <- if (is.finite(a_val) && length(pool_vals))
+                       sprintf("%.0fth", 100 * mean(pool_vals < a_val))
+                     else "—"
+
+      tags$dl(class = "distribution-stats",
+        tags$dt("Anchor"),
+        tags$dd(sprintf("%s  (%s pct.)",
+                        .format_value(a_val, fmt), pct_anchor)),
+        tags$dt("Peer median"),
+        tags$dd(if (length(peer_vals))
+                  .format_value(stats::median(peer_vals), fmt) else "—"),
+        tags$dt("Peer range"),
+        tags$dd(if (length(peer_vals))
+                  sprintf("%s to %s",
+                          .format_value(min(peer_vals), fmt),
+                          .format_value(max(peer_vals), fmt))
+                else "—"),
+        tags$dt("Peer N reporting"),
+        tags$dd(sprintf("%d of %d", length(peer_vals), length(peer_uids))),
+        tags$dt("Pool N"),
+        tags$dd(format(length(pool_vals), big.mark = ","))
+      )
+    })
+
+    # ---- Inspector per-school table ----
+    output$peer_inspector_table <- DT::renderDT({
+      res <- peer_result(); req(res)
+      metric <- input$peer_inspect_metric; req(metric)
+      req(metric %in% names(.SCHOOLS_WIDE))
+      a_uid     <- res$meta$anchor_unitid
+      peer_uids <- res$peers$unitid
+
+      meta_row <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
+      fmt <- if (nrow(meta_row)) meta_row$format else NA
+
+      uids    <- c(a_uid, peer_uids)
+      actions <- c("Anchor", rep("Peer", length(peer_uids)))
+      names_v <- .SCHOOLS$instnm[match(uids, .SCHOOLS$unitid)]
+      states  <- .SCHOOLS$stabbr[match(uids, .SCHOOLS$unitid)]
+      raw_vals <- .SCHOOLS_WIDE[[metric]][match(uids, .SCHOOLS_WIDE$unitid)]
+
+      pool_df   <- peer_inspector_pool()
+      pool_vals <- pool_df[[metric]]; pool_vals <- pool_vals[is.finite(pool_vals)]
+      pct <- vapply(raw_vals, function(v) {
+        if (!is.finite(v) || !length(pool_vals)) return(NA_real_)
+        100 * mean(pool_vals < v)
+      }, numeric(1))
+
+      tbl <- data.frame(
+        Action      = actions,
+        School      = names_v,
+        State       = states,
+        Value       = vapply(raw_vals, function(v) .format_value(v, fmt),
+                              character(1)),
+        Percentile  = ifelse(is.na(pct), "—",
+                              sprintf("%.0f", pct)),
+        `_sort`     = ifelse(is.finite(raw_vals), raw_vals, -Inf),
+        stringsAsFactors = FALSE,
+        check.names = FALSE
+      )
+
+      DT::datatable(
+        tbl,
+        rownames = FALSE,
+        selection = "none",
+        options = list(
+          pageLength = 50,
+          dom = "tip",
+          order = list(list(5, "desc")),
+          columnDefs = list(
+            list(visible = FALSE, targets = 5),
+            list(className = "dt-right", targets = c(3, 4)),
+            list(className = "dt-center", targets = 2)
+          )
+        ),
+        class = "compact stripe hover"
+      ) %>%
+        DT::formatStyle(
+          "Action",
+          target = "cell",
+          color = DT::styleEqual(
+            c("Anchor", "Peer"),
+            c("#602D89", "#AC9E94")
+          ),
+          fontWeight = "600"
+        )
+    })
+
+    # ---- Dashboard modal "Open in inspector" hand-off --------------------
+    # Convenience: when the user is viewing a metric in the dashboard
+    # click-to-modal, give them a one-click jump to the Inspector tab
+    # with the metric pre-selected.
+    observeEvent(input$peer_dash_open_inspector, {
+      m <- session$userData$peer_dash_modal_metric
+      if (is.null(m)) return()
+      updateSelectizeInput(session, "peer_inspect_metric", selected = m)
+      updateTabsetPanel(session, "analysis_nav", selected = "inspector")
+      removeModal()
     })
 
     # ---- Composition tab: 9 representation bars --------------------------
@@ -1279,6 +1649,12 @@ peerTableServer <- function(id, sidebar_state) {
                                 "distribution, every peer as a rug tick, ",
                                 "and the anchor as a tall purple line.")),
                   uiOutput(ns("peer_dashboard")))
+            ),
+
+            tabPanel(
+              title = "Inspector",
+              value = "inspector",
+              uiOutput(ns("peer_inspector"))
             ),
 
             tabPanel(
