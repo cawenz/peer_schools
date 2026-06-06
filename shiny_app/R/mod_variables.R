@@ -115,6 +115,11 @@ variablesUI <- function(id) {
       )
     ),
 
+    # ---- DEBUG: minimal table that must render if DT is wired correctly ----
+    tags$div(style = "background:#fef2cd; padding:0.5rem 1rem; margin-bottom:0.5rem; border:1px dashed #b58900;",
+      tags$strong("DEBUG table (should always render with 3 rows): "),
+      DT::DTOutput(ns("debug_table"))),
+
     DT::DTOutput(ns("var_table"))
   )
 }
@@ -288,6 +293,18 @@ variablesServer <- function(id) {
       if (length(input$filter_role))
         df <- df[df$use_type %in% input$filter_role, ]
       df
+    })
+
+    # DEBUG: minimal 3-row table. If this DOESNT render, DT itself is
+    # broken on the Variables tab (CSS / layout / asset path issue). If
+    # this DOES render but var_table doesnt, the bug is in the real
+    # table-build path below.
+    output$debug_table <- DT::renderDT({
+      message("[debug-table] render firing")
+      DT::datatable(
+        data.frame(A = 1:3, B = c("x", "y", "z")),
+        rownames = FALSE,
+        options = list(dom = "t"))
     })
 
     output$var_table <- DT::renderDT({
