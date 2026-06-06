@@ -1,0 +1,158 @@
+division,wiki_school,conference,unitid,eada_name,method,rank
+D-I,State University of Iowa,Big Ten Conference,,,no_match,99.0
+D-I,State University of New York at Albany,America East Conference,,,no_match,99.0
+D-I,State University of New York at Buffalo,Mid-American Conference,,,no_match,99.0
+D-I,State University of New York at Stony Brook,Coastal Athletic Association,,,no_match,99.0
+D-I,Texas A&M University,Southeastern Conference,,,no_match,99.0
+D-I,The College of William and Mary in Virginia,Coastal Athletic Association,,,no_match,99.0
+D-I,The University of Vermont and State Agricultural College,America East Conference,,,no_match,99.0
+D-I,United States Air Force Academy,Mountain West Conference,,,explicit_skip,99.0
+D-I,United States Military Academy,Patriot League,,,explicit_skip,99.0
+D-I,United States Naval Academy,Patriot League,,,explicit_skip,99.0
+D-I,University of Hawaiʻi at Mānoa,Big West Conference,,,no_match,99.0
+D-I,"University of Maryland, College Park",Big Ten Conference,,,no_match,99.0
+D-I,University of Missouri–Columbia,Southeastern Conference,,,no_match,99.0
+D-I,University of Notre Dame du Lac,Atlantic Coast Conference,,,no_match,99.0
+D-I,University of Saint Thomas,Summit League,,,"ambiguous:['University of St Thomas', 'University of St Thomas']",99.0
+D-I,William Marsh Rice University,American Conference,,,no_match,99.0
+D-II,Anderson University,South Atlantic Conference,,,"ambiguous:['Anderson University', 'Anderson University']",99.0
+D-II,PennWest California,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,PennWest Clarion,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Commonwealth University-Bloomsburg,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Commonwealth University-Lock Haven,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Commonwealth University-Mansfield,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,East Stroudsburg University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,PennWest Edinboro,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Embry-Riddle Aeronautical University,Sunshine State Conference,,,no_match,99.0
+D-II,Hillsdale College,Great Midwest Athletic Conference,,,no_match,99.0
+D-II,Jessup University,Pacific West Conference,,,no_match,99.0
+D-II,Kutztown University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Lincoln University (MO),Great Lakes Valley Conference,,,no_match,99.0
+D-II,Lincoln University (PA),Central Intercollegiate Athletic Association,,,no_match,99.0
+D-II,Maryville University,Great Lakes Valley Conference,,,no_match,99.0
+D-II,Millersville University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Morehouse College,Southern Intercollegiate Athletic Conference,,,no_match,99.0
+D-II,Queens College,East Coast Conference,,,no_match,99.0
+D-II,Shippensburg University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,Slippery Rock University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-II,College of Staten Island,East Coast Conference,,,no_match,99.0
+D-II,Vanguard University,Pacific West Conference,,,no_match,99.0
+D-II,West Chester University,Pennsylvania State Athletic Conference,,,no_match,99.0
+D-III,Agnes Scott College,Collegiate Conference of the South,,,no_match,99.0
+D-III,Alfred State College,Allegheny Mountain Collegiate Conference,,,no_match,99.0
+D-III,Anderson University,Heartland Collegiate Athletic Conference,,,"ambiguous:['Anderson University', 'Anderson University']",99.0
+D-III,Baruch College,City University of New York Athletic Conference,,,no_match,99.0
+D-III,Bethany College,Presidents' Athletic Conference,,,"ambiguous:['Bethany College', 'Bethany College']",99.0
+D-III,Bethel University,Minnesota Intercollegiate Athletic Conference,,,"ambiguous:['Bethel University', 'Bethel University', 'Bethel University']",99.0
+D-III,Brooklyn College,City University of New York Athletic Conference,,,no_match,99.0
+D-III,Bryn Mawr College,Centennial Conference,,,no_match,99.0
+D-III,Buffalo State University,State University of New York Athletic Conference,,,no_match,99.0
+D-III,Cairn University,United East Conference,,,no_match,99.0
+D-III,City College of New York,City University of New York Athletic Conference,,,no_match,99.0
+D-III,"Claremont McKenna College, Harvey Mudd College, and Scripps College",Southern California Intercollegiate Athletic Conference,,,no_match,99.0
+D-III,Concordia College,Minnesota Intercollegiate Athletic Conference,,,no_match,99.0
+D-III,Edgewood University,Northern Athletics Collegiate Conference,,,no_match,99.0
+D-III,Elms College,Great Northeast Athletic Conference,,,no_match,99.0
+D-III,"Fairleigh Dickinson University, Florham",MAC Freedom,,,no_match,99.0
+D-III,Grove City College,Presidents' Athletic Conference,,,no_match,99.0
+D-III,Hampden–Sydney College,Old Dominion Athletic Conference,,,no_match,99.0
+D-III,Hobart College,Liberty League,,,no_match,99.0
+D-III,Hollins University,Old Dominion Athletic Conference,,,no_match,99.0
+D-III,Hunter College,City University of New York Athletic Conference,,,no_match,99.0
+D-III,John Jay College of Criminal Justice,City University of New York Athletic Conference,,,no_match,99.0
+D-III,Johnson & Wales University,Conference of New England,,,no_match,99.0
+D-III,Lehman College,City University of New York Athletic Conference,,,no_match,99.0
+D-III,Marian University,Northern Athletics Collegiate Conference,,,"ambiguous:['Marian University', 'Marian University']",99.0
+D-III,Medgar Evers College,City University of New York Athletic Conference,,,no_match,99.0
+D-III,Meredith College,USA South Athletic Conference,,,no_match,99.0
+D-III,Mount Holyoke College,New England Women's and Men's Athletic Conference,,,no_match,99.0
+D-III,State University of New York at Brockport,Empire 8,,,no_match,99.0
+D-III,State University of New York at Canton,State University of New York Athletic Conference,,,no_match,99.0
+D-III,State University of New York at Cobleskill,North Atlantic Conference,,,no_match,99.0
+D-III,State University of New York at Delhi,North Atlantic Conference,,,no_match,99.0
+D-III,State University of New York at Fredonia,State University of New York Athletic Conference,,,no_match,99.0
+D-III,State University of New York at Geneseo,Empire 8,,,no_match,99.0
+D-III,State University of New York Maritime College,Skyline Conference,,,no_match,99.0
+D-III,State University of New York at Morrisville,State University of New York Athletic Conference,,,no_match,99.0
+D-III,State University of New York Polytechnic Institute,Empire 8,,,no_match,99.0
+D-III,State University of New York at Old Westbury,Skyline Conference,,,no_match,99.0
+D-III,State University of New York at Oneonta,State University of New York Athletic Conference,,,no_match,99.0
+D-III,State University of New York at Potsdam,State University of New York Athletic Conference,,,no_match,99.0
+D-III,State University of New York at Purchase,Skyline Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Abington",United East Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Altoona",Allegheny Mountain Collegiate Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Berks College",United East Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Behrend",Allegheny Mountain Collegiate Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Brandywine",United East Conference,,,no_match,99.0
+D-III,"Pennsylvania State University, Harrisburg",United East Conference,,,no_match,99.0
+D-III,Pomona College and Pitzer College,Southern California Intercollegiate Athletic Conference,,,no_match,99.0
+D-III,Pratt Institute,Atlantic East Conference,,,no_match,99.0
+D-III,Ramapo College,New Jersey Athletic Conference,,,no_match,99.0
+D-III,College of Saint Benedict,Minnesota Intercollegiate Athletic Conference,,,no_match,99.0
+D-III,Saint Mary's College,Michigan Intercollegiate Athletic Association,,,no_match,99.0
+D-III,University of St. Thomas (Texas),Southern Collegiate Athletic Conference,,,no_match,99.0
+D-III,Salem College,USA South Athletic Conference,,,no_match,99.0
+D-III,Simmons University,Great Northeast Athletic Conference,,,no_match,99.0
+D-III,Smith College,New England Women's and Men's Athletic Conference,,,no_match,99.0
+D-III,Sweet Briar College,Old Dominion Athletic Conference,,,no_match,99.0
+D-III,United States Coast Guard Academy,New England Women's and Men's Athletic Conference,,,no_match,99.0
+D-III,Vermont State University–Castleton,Little East Conference,,,no_match,99.0
+D-III,Vermont State University–Johnson,North Atlantic Conference,,,no_match,99.0
+D-III,Vermont State University–Lyndon,North Atlantic Conference,,,no_match,99.0
+D-III,Wabash College,North Coast Athletic Conference,,,no_match,99.0
+D-III,Wesleyan College,Collegiate Conference of the South,,,no_match,99.0
+D-III,Westminster College,St. Louis Intercollegiate Athletic Conference,,,"ambiguous:['Westminster College', 'Westminster College']",99.0
+D-III,Westminster College,Presidents' Athletic Conference,,,"ambiguous:['Westminster College', 'Westminster College']",99.0
+D-III,William Paterson University,New Jersey Athletic Conference,,,no_match,99.0
+D-III,William Smith College,Liberty League,,,no_match,99.0
+D-III,"York College, City University of New York",City University of New York Athletic Conference,,,no_match,99.0
+NAIA,Benedictine University at Mesa,Great Southwest Athletic Conference,,,no_match,99.0
+NAIA,Bethany College,Kansas Collegiate Athletic Conference,,,"ambiguous:['Bethany College', 'Bethany College']",99.0
+NAIA,Bethel College (KS),Kansas Collegiate Athletic Conference,,,no_match,99.0
+NAIA,Bethel University (IN),Crossroads League,,,"ambiguous:['Bethel University', 'Bethel University', 'Bethel University']",99.0
+NAIA,Bethel University (TN),Mid-South Conference,,,no_match,99.0
+NAIA,Brewton–Parker Christian University,Southern States Athletic Conference,,,no_match,99.0
+NAIA,University of British Columbia*,Cascade Collegiate Conference,,,no_match,99.0
+NAIA,Bryan College,Appalachian Athletic Conference,,,no_match,99.0
+NAIA,Cal Poly Maritime Academy (Cal Maritime),California Pacific Conference,,,no_match,99.0
+NAIA,Calumet College of St. Joseph (CCSJ),Chicagoland Collegiate Athletic Conference,,,no_match,99.0
+NAIA,Central Methodist University,Heart of America Athletic Conference,,,no_match,99.0
+NAIA,Columbia College (MO),American Midwest Conference,,,no_match,99.0
+NAIA,Columbia College (SC),Appalachian Athletic Conference,,,no_match,99.0
+NAIA,Cottey College,American Midwest Conference,,,no_match,99.0
+NAIA,Doane College,Great Plains Athletic Conference,,,no_match,99.0
+NAIA,Grace College & Seminary,Crossroads League,,,no_match,99.0
+NAIA,Graceland University,Heart of America Athletic Conference,,,no_match,99.0
+NAIA,Indiana Institute of Technology (Indiana Tech),Wolverine–Hoosier Athletic Conference,,,no_match,99.0
+NAIA,Indiana University Columbus (IU Columbus),River States Conference,,,no_match,99.0
+NAIA,Indiana University East (IU East),River States Conference,,,no_match,99.0
+NAIA,Indiana University Kokomo (IU Kokomo),River States Conference,,,no_match,99.0
+NAIA,Indiana University Northwest (IU Northwest),Chicagoland Collegiate Athletic Conference,,,no_match,99.0
+NAIA,Indiana University South Bend (IU South Bend),Chicagoland Collegiate Athletic Conference,,,no_match,99.0
+NAIA,Indiana University Southeast (IU Southeast or IUS),River States Conference,,,no_match,99.0
+NAIA,Indiana Wesleyan University,Crossroads League,,,no_match,99.0
+NAIA,Keiser University,Sun Conference,,,no_match,99.0
+NAIA,Lawrence Technological University(Lawrence Tech),Wolverine–Hoosier Athletic Conference,,,no_match,99.0
+NAIA,Lindsey Wilson University,Mid-South Conference,,,no_match,99.0
+NAIA,Louisiana State University at Alexandria (LSU Alexandria),Red River Athletic Conference,,,no_match,99.0
+NAIA,Louisiana State University in Shreveport (LSU Shreveport),Red River Athletic Conference,,,no_match,99.0
+NAIA,Marian University,Crossroads League,,,"ambiguous:['Marian University', 'Marian University']",99.0
+NAIA,The Master's University,Great Southwest Athletic Conference,,,no_match,99.0
+NAIA,Montana Technological University(Montana Tech),Frontier Conference,,,no_match,99.0
+NAIA,University of Northwestern Ohio (UNOH),Wolverine–Hoosier Athletic Conference,,,no_match,99.0
+NAIA,Oregon Institute of Technology(Oregon Tech),Cascade Collegiate Conference,,,no_match,99.0
+NAIA,Ottawa University,Kansas Collegiate Athletic Conference,,,no_match,99.0
+NAIA,Ottawa University Arizona,Great Southwest Athletic Conference,,,no_match,99.0
+NAIA,Park University Gilbert,Great Southwest Athletic Conference,,,no_match,99.0
+NAIA,Rochester Christian University,Wolverine–Hoosier Athletic Conference,,,no_match,99.0
+NAIA,College of Saint Mary,Great Plains Athletic Conference,,,no_match,99.0
+NAIA,Saint Mary-of-the-Woods College (SMWC),River States Conference,,,no_match,99.0
+NAIA,Savannah College of Art and Design–Atlanta*,Appalachian Athletic Conference,,,no_match,99.0
+NAIA,Southern University at New Orleans (SUNO),HBCU Athletic Conference,,,no_match,99.0
+NAIA,Southwestern College,Kansas Collegiate Athletic Conference,,,"ambiguous:['Southwestern College', 'Southwestern College']",99.0
+NAIA,Stanton University,California Pacific Conference,,,no_match,99.0
+NAIA,University of Tennessee Southern (UT Southern),Southern States Athletic Conference,,,no_match,99.0
+NAIA,Texas A&M University–Victoria*,Red River Athletic Conference,,,no_match,99.0
+NAIA,Trinity Western University*,Cascade Collegiate Conference,,,no_match,99.0
+NAIA,University of Victoria*,Continental Athletic Conference,,,no_match,99.0
+NAIA,West Virginia University Institute of Technology (WVU Tech),River States Conference,,,no_match,99.0

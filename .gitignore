@@ -40,6 +40,16 @@ output/*.rds
 output/*.log
 output/previews/
 
+# Re-allow the curated CSVs the Shiny apps read from data/. These are
+# hand-edited reference files (not pipeline outputs), so they belong in
+# version control.
+!data/variables_descriptions.csv
+!data/neche_cohort.csv
+!data/stratum_descriptions.csv
+!data/eada_conferences.csv
+!data/eada_conferences_unmatched.csv
+!data/forbes_top_colleges_*.csv
+
 # Re-allow the bundled CSVs the Shiny app loads at startup: the NECHE
 # cohort and the stratum-description lookup.
 !shiny_app/data/*.csv
