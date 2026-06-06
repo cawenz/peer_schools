@@ -2010,15 +2010,26 @@ peerTableServer <- function(id, sidebar_state) {
       if (is.null(a_uid)) return(NULL)
 
       # Aspirant pool size: defaults to main K. When the user bumps the
-      # slider above the main K, fetch a wider candidate set via the
-      # cached peer compute (free if same args were used before).
+      # slider above the main K — or flips on the "Search wider universe"
+      # checkbox — fetch a wider candidate set via the cached peer
+      # compute (free if same args were used before).
+      #
+      # Universe mode REPLACES the sidebar's candidate_pool with
+      # `list(in_ranked_universe = TRUE)` so the result is drawn from
+      # every ranked institution rather than the user's narrower main
+      # search filters. The aspirant logic still applies on top.
       st     <- isolate(sidebar_state$state())
       pool_k <- input$aspirant_pool_k %||% nrow(res$peers)
-      if (is.finite(pool_k) && pool_k != nrow(res$peers)) {
+      universe <- isTRUE(input$aspirant_universe)
+      candidate_pool_used <- if (universe)
+                               list(in_ranked_universe = TRUE)
+                             else st$candidate_pool
+      if (universe ||
+          (is.finite(pool_k) && pool_k != nrow(res$peers))) {
         bigger <- tryCatch(
           compute_peers_cached(
             anchor_unitid   = a_uid,
-            candidate_pool  = st$candidate_pool,
+            candidate_pool  = candidate_pool_used,
             theme_weights   = st$theme_weights,
             distance_metric = if (isTRUE(st$mahalanobis)) "mahalanobis"
                               else (st$distance_metric %||% "euclidean"),
@@ -2123,8 +2134,18 @@ peerTableServer <- function(id, sidebar_state) {
             tags$div(class = "peer-refine-cell peer-refine-cell-narrow",
               sliderInput(ns("aspirant_pool_k"),
                           label = "Evaluate top N peers",
-                          min = 5, max = 100,
-                          value = main_k, step = 5, ticks = FALSE)
+                          min = 5, max = 1000,
+                          value = main_k, step = 5, ticks = FALSE),
+              checkboxInput(ns("aspirant_universe"),
+                            label = "Search wider universe",
+                            value = FALSE),
+              tags$small(class = "peer-refine-help text-muted",
+                "When checked, aspirants are drawn from the full ranked ",
+                "universe (ignoring this search's classification / sector ",
+                "/ state filters) so you can discover schools far outside ",
+                "your current peer pool. Use the slider to cap how many ",
+                "closest matches are evaluated for the aspirational ",
+                "comparison.")
             )
           )
         ),
