@@ -14,9 +14,17 @@ body {
   font-size: 16px;
 }
 
+/* Brand the native form controls app-wide. Shiny's checkboxInput /
+ * checkboxGroupInput / radioButtons render raw <input> elements rather
+ * than Bootstrap .form-check-input, so without this they fall back to the
+ * OS default accent (blue). Pin them to brand purple everywhere. */
+input[type="checkbox"], input[type="radio"] {
+  accent-color: #602D89;
+}
+
 /* ---------- Navbar / page header ----------
  *
- * Neutral white navbar — no bold fill. The deep-blue accent color is
+ * Neutral white navbar — no bold fill. The brand-purple accent color is
  * reserved for active-tab indicators and the brand text so the header
  * stays quiet and the main content takes the visual lead.
  *
@@ -26,13 +34,13 @@ body {
  * override that here.
  */
 .navbar {
-  /* Solid deep-blue fill — provides a clear visual band that separates
+  /* Solid brand-purple fill — provides a clear visual band that separates
    * the navbar from the white content area below. Darker bottom border
    * sharpens the boundary; soft shadow lifts the bar above the body. */
   background-color: #602D89 !important;
   border-bottom: 2px solid #251230;
   min-height: 48px;
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.18);
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.18);
   padding: 0 !important;
 
   > .container,
@@ -151,7 +159,7 @@ a {
 .card {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.05);
+  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.05);
   margin-bottom: 1.5rem;
   background-color: #FFFFFF;
 
@@ -474,7 +482,7 @@ a {
   &:hover, &:focus { text-decoration: underline; color: #251230; }
 }
 
-/* Prominent button styling for "About this table" — solid deep-blue
+/* Prominent button styling for "About this table" — solid brand-purple
  * fill with white text, info-circle icon. Reads as a real CTA, not a
  * link, so users notice it. */
 .peer-about-btn {
@@ -502,7 +510,7 @@ a {
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.25);
+    box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.25);
   }
 
   .peer-about-icon {
@@ -1048,7 +1056,7 @@ a {
 }
 
 /* Modal content: definition-list typography for the per-column
- * explanations. Terms in deep blue, definitions indented with
+ * explanations. Terms in brand purple, definitions indented with
  * comfortable line height. */
 .peer-about-body {
   h6 {
@@ -1101,7 +1109,7 @@ a {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   .compare-control {
     label {
@@ -1249,8 +1257,8 @@ a {
   tbody tr {
     border-bottom: 1px solid #F4EDEC;
     &:last-child { border-bottom: none; }
-    &.clustering-var { background: rgba(29, 53, 87, 0.04); }
-    &:hover { background: rgba(29, 53, 87, 0.08); }
+    &.clustering-var { background: rgba(96, 45, 137, 0.04); }
+    &:hover { background: rgba(96, 45, 137, 0.08); }
   }
 
   td {
@@ -1360,7 +1368,7 @@ a {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   .stratified-control label {
     display: block;
@@ -1377,7 +1385,7 @@ a {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
   label {
     display: block;
     font-weight: 500;
@@ -1389,7 +1397,7 @@ a {
 
 .stratum-card-anchor {
   border-left-width: 6px !important;
-  box-shadow: 0 3px 10px rgba(29, 53, 87, 0.18) !important;
+  box-shadow: 0 3px 10px rgba(96, 45, 137, 0.18) !important;
 }
 
 .anchor-badge {
@@ -1408,7 +1416,7 @@ a {
 }
 
 .stratum-table tbody tr.anchor-row {
-  background: rgba(29, 53, 87, 0.08);
+  background: rgba(96, 45, 137, 0.08);
   font-weight: 500;
   td { border-bottom: 2px solid #602D89; }
 }
@@ -1426,7 +1434,7 @@ a {
 .stratified-filter-mode {
   margin: -0.5rem 0 1rem 0;
   padding: 0.5rem 0.85rem;
-  background: rgba(29, 53, 87, 0.04);
+  background: rgba(96, 45, 137, 0.04);
   border-radius: 6px;
   font-size: 0.88rem;
   .checkbox, .form-check { margin: 0; }
@@ -1458,7 +1466,7 @@ a {
   background: #FFFFFF;
   padding: 1rem 1.25rem;
   margin-bottom: 1.75rem;          /* clear vertical separation */
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.07);
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.07);
 }
 
 .stratum-header {
@@ -1502,7 +1510,7 @@ a {
   tbody tr {
     border-bottom: 1px solid #F4EDEC;
     &:last-child { border-bottom: none; }
-    &:hover { background: rgba(29, 53, 87, 0.05); }
+    &:hover { background: rgba(96, 45, 137, 0.05); }
   }
   td {
     padding: 0.45rem 0.6rem;
@@ -1574,8 +1582,8 @@ a {
   tbody tr {
     border-bottom: 1px solid #F4EDEC;
     &:last-child { border-bottom: none; }
-    &.match { background: rgba(29, 53, 87, 0.05); }
-    &:hover { background: rgba(29, 53, 87, 0.10); }
+    &.match { background: rgba(96, 45, 137, 0.05); }
+    &:hover { background: rgba(96, 45, 137, 0.10); }
   }
   td {
     padding: 0.45rem 0.6rem;
@@ -1598,7 +1606,7 @@ a {
 /* ---------- Cohort Builder ---------- */
 .cohort-budget {
   padding: 0.6rem 0.85rem;
-  background: rgba(29, 53, 87, 0.05);
+  background: rgba(96, 45, 137, 0.05);
   border-radius: 6px;
   margin-bottom: 0.75rem;
 }
@@ -1638,7 +1646,7 @@ a {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
   .cohort-view-control label {
     display: block;
     font-weight: 500;
@@ -1677,7 +1685,7 @@ a {
 
   tbody tr {
     border-bottom: 1px solid #F4EDEC;
-    &:hover td { background-color: rgba(29, 53, 87, 0.05) !important; }
+    &:hover td { background-color: rgba(96, 45, 137, 0.05) !important; }
   }
   td {
     padding: 0.5rem 0.6rem;
@@ -1693,7 +1701,7 @@ a {
   }
 
   /* Per-action row tinting */
-  tr.cohort-action-anchor       td { background-color: rgba(29, 53, 87, 0.08); }
+  tr.cohort-action-anchor       td { background-color: rgba(96, 45, 137, 0.08); }
   tr.cohort-action-anchor       td { font-weight: 600; }
   tr.cohort-action-keep         td { background-color: rgba(46, 125, 50, 0.05); }
   tr.cohort-action-remove       td { background-color: rgba(181, 55, 55, 0.07); }
@@ -1702,7 +1710,7 @@ a {
   tr.cohort-action-remove .cohort-action-cell *
                                 { text-decoration: none; opacity: 1; }
   tr.cohort-action-maybe        td { background-color: rgba(148, 163, 184, 0.12); }
-  tr.cohort-action-proposed     td { background-color: rgba(29, 53, 87, 0.06); }
+  tr.cohort-action-proposed     td { background-color: rgba(96, 45, 137, 0.06); }
   tr.cohort-action-possible     td { background-color: rgba(117, 145, 179, 0.08); }
 }
 
@@ -1719,7 +1727,7 @@ a {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .cohort-inspector-control-row {
@@ -1815,13 +1823,13 @@ a {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
   cursor: pointer;
   transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
 
   &:hover {
     border-color: #602D89;
-    box-shadow: 0 2px 6px rgba(29, 53, 87, 0.15);
+    box-shadow: 0 2px 6px rgba(96, 45, 137, 0.15);
     transform: translateY(-1px);
   }
 
@@ -1941,7 +1949,7 @@ a {
   padding: 0.5rem 0;
 }
 
-/* Description block — white with deep-blue left accent. */
+/* Description block — white with brand-purple left accent. */
 .dash-modal-desc {
   font-size: 0.9rem;
   line-height: 1.45;
@@ -2002,7 +2010,7 @@ a {
     background: #F4EDEC;
     white-space: nowrap;
   }
-  tbody tr:hover td { background-color: rgba(29, 53, 87, 0.04); }
+  tbody tr:hover td { background-color: rgba(96, 45, 137, 0.04); }
   td {
     padding: 0.4rem 0.5rem;
     border-bottom: 1px solid #F4EDEC;
@@ -2044,7 +2052,7 @@ a {
   &:focus {
     outline: none;
     border-color: #602D89;
-    box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
+    box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
   }
 }
 
@@ -2106,13 +2114,13 @@ a {
   transition: background-color 0.12s, border-color 0.12s;
 
   &:hover {
-    background: rgba(29, 53, 87, 0.12);
+    background: rgba(96, 45, 137, 0.12);
     border-color: #b6cce2;
   }
   &:focus {
     outline: none;
     border-color: #602D89;
-    box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
+    box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
   }
 }
 
@@ -2151,7 +2159,7 @@ a {
   background: #FFFFFF;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.05);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.05);
 
   .ssc-header {
     border-bottom: 1px solid #F4EDEC;
@@ -2278,7 +2286,7 @@ ul, ol {
 
   &:focus {
     border-color: #602D89;
-    box-shadow: 0 0 0 0.2rem rgba(29, 53, 87, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(96, 45, 137, 0.25);
   }
 }
 
@@ -2438,7 +2446,7 @@ ul, ol {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   label {
     font-weight: 500;
@@ -2503,7 +2511,7 @@ ul, ol {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   label {
     font-weight: 500;
@@ -2588,7 +2596,7 @@ ul, ol {
 }
 
 /* Compact "what's the comparison" line above the plot. White bg + a
- * clear deep-blue left accent so it reads as "info callout" rather
+ * clear brand-purple left accent so it reads as "info callout" rather
  * than a tinted block. */
 .trend-compare-pill {
   padding: 0.5rem 0.85rem;
@@ -2719,7 +2727,7 @@ ul, ol {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   label {
     font-weight: 500;
@@ -2799,7 +2807,7 @@ ul, ol {
   background: rgba(255, 255, 255, 0.96) !important;
   border-radius: 6px !important;
   border: 1px solid #cbd5e1 !important;
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.12) !important;
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.12) !important;
 
   label {
     color: #251230;
@@ -2837,7 +2845,7 @@ ul, ol {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .cohort-map-control-block {
@@ -2906,7 +2914,7 @@ ul, ol {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 
   &.peer-strat-card-anchor {
     border-left: 4px solid #602D89;
