@@ -626,6 +626,24 @@ a:hover {
   font-size: 0.78rem;
 }
 
+/* "leave empty for all" hint — slightly stronger color so the
+ * recommendation registers, and breaks to a new line under the label
+ * on narrow sidebars rather than getting cut off. */
+.pool-label-empty-hint {
+  display: block;
+  margin-left: 0;
+  margin-top: 0.1rem;
+  color: #602D89;
+  font-size: 0.75rem;
+}
+
+/* Optional-block wrapper — a touch of vertical breathing room so the
+ * State/region and Religious tradition filters read as "extra refinement"
+ * rather than core, primary controls. */
+.pool-optional-block {
+  margin-top: 0.5rem;
+}
+
 /* Modal body for the ranked-universe info modal. */
 .pool-info-body h6 {
   color: #602D89;

@@ -130,15 +130,19 @@ peerSearchSidebarUI <- function(id) {
                   selectize = TRUE)
     ),
 
-    tags$div(
-      tags$label("State / region"),
+    tags$div(class = "pool-optional-block",
+      tags$label("State / region",
+                  tags$small(class = "pool-label-hint pool-label-empty-hint",
+                             "(leave empty for all states & regions)")),
       selectInput(ns("pool_state"), label = NULL,
                   choices = NULL, multiple = TRUE,
                   selectize = TRUE)
     ),
 
-    tags$div(
-      tags$label("Religious tradition"),
+    tags$div(class = "pool-optional-block",
+      tags$label("Religious tradition",
+                  tags$small(class = "pool-label-hint pool-label-empty-hint",
+                             "(leave empty to include all traditions)")),
       selectInput(ns("pool_religious"), label = NULL,
                   choices = NULL, multiple = TRUE,
                   selectize = TRUE)
