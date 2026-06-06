@@ -291,7 +291,21 @@ variablesServer <- function(id) {
     })
 
     output$var_table <- DT::renderDT({
-      df <- filtered_df()
+      message("[var-table] render firing")
+      df <- tryCatch(filtered_df(),
+                     error = function(e) {
+                       message("[var-table] filtered_df ERROR: ",
+                               conditionMessage(e))
+                       NULL
+                     })
+      if (is.null(df)) {
+        return(DT::datatable(
+          data.frame(Error = "filtered_df errored — check R console",
+                     check.names = FALSE),
+          rownames = FALSE))
+      }
+      message("[var-table] got ", nrow(df), " rows, cols: ",
+              paste(names(df), collapse = ","))
       if (!nrow(df)) {
         return(DT::datatable(data.frame(
           Variable = character(),
@@ -321,25 +335,35 @@ variablesServer <- function(id) {
         check.names = FALSE
       )
 
-      DT::datatable(
-        display_df,
-        rownames = FALSE,
-        selection = list(mode = "single", target = "row"),
-        options = list(
-          pageLength = 25,
-          dom = "ftip",   # search box + table + info + pagination
-          order = list(list(1, "asc"), list(0, "asc")),
-          columnDefs = list(
-            list(width = "20%", targets = 0),
-            list(width = "15%", targets = 1),
-            list(width = "10%", targets = 2),
-            list(width = "15%", targets = 3),
-            list(width = "12%", targets = 4),
-            list(width = "28%", targets = 5)
-          )
+      message("[var-table] display_df built: ", nrow(display_df),
+              " rows, ", ncol(display_df), " cols")
+      tryCatch(
+        DT::datatable(
+          display_df,
+          rownames = FALSE,
+          selection = list(mode = "single", target = "row"),
+          options = list(
+            pageLength = 25,
+            dom = "ftip",
+            order = list(list(1, "asc"), list(0, "asc")),
+            columnDefs = list(
+              list(width = "20%", targets = 0),
+              list(width = "15%", targets = 1),
+              list(width = "10%", targets = 2),
+              list(width = "15%", targets = 3),
+              list(width = "12%", targets = 4),
+              list(width = "28%", targets = 5)
+            )
+          ),
+          class = "compact stripe hover"
         ),
-        class = "compact stripe hover"
-      )
+        error = function(e) {
+          message("[var-table] datatable() ERROR: ", conditionMessage(e))
+          DT::datatable(
+            data.frame(Error = paste("DT failed:", conditionMessage(e)),
+                       check.names = FALSE),
+            rownames = FALSE)
+        })
     })
 
     # ---- Row click -> variable detail modal ----
