@@ -293,16 +293,40 @@ peerTableServer <- function(id, sidebar_state) {
       # users get the right affordance. The scroll target is the
       # analysis tab strip below the results table.
       target_id  <- ns("analysis_tabs")
-      # Robust scroll: log to the console + fall back to the tab strip's
-      # parent .peer-analysis-tabs class if the bare ID lookup misses.
+      # bslib layout_sidebar wraps the main content area in its own
+      # overflow:auto container. scrollIntoView() defaults to scrolling
+      # the nearest scrollable ancestor, but that path can no-op when
+      # the ancestor's overflow is set up so the element is technically
+      # "in view" of the container even though the visible viewport
+      # hasn't moved. Solve it manually: walk up looking for the first
+      # ancestor whose scrollHeight > clientHeight (the actually-scrolling
+      # one), then set its scrollTop directly.
       scroll_js <- sprintf(
         paste0(
           "(function(){",
           "  var t=document.getElementById('%s');",
           "  if(!t){t=document.querySelector('.peer-analysis-tabs');}",
-          "  console.log('[analysis-indicator] target:',t);",
-          "  if(t){t.scrollIntoView({behavior:'smooth',block:'start'});}",
-          "  else{console.warn('[analysis-indicator] no scroll target found');}",
+          "  if(!t){console.warn('[analysis-indicator] no target');return;}",
+          "  var c=t.parentElement;",
+          "  while(c&&c!==document.body){",
+          "    var s=getComputedStyle(c);",
+          "    var oy=s.overflowY;",
+          "    if((oy==='auto'||oy==='scroll')&&c.scrollHeight>c.clientHeight){",
+          "      break;",
+          "    }",
+          "    c=c.parentElement;",
+          "  }",
+          "  var rect=t.getBoundingClientRect();",
+          "  if(c&&c!==document.body){",
+          "    var crect=c.getBoundingClientRect();",
+          "    var top=c.scrollTop+(rect.top-crect.top)-12;",
+          "    console.log('[analysis-indicator] scrolling container',c,'to',top);",
+          "    c.scrollTo({top:top,behavior:'smooth'});",
+          "  }else{",
+          "    var y=window.pageYOffset+rect.top-12;",
+          "    console.log('[analysis-indicator] scrolling window to',y);",
+          "    window.scrollTo({top:y,behavior:'smooth'});",
+          "  }",
           "})();"),
         target_id)
       tags$div(
