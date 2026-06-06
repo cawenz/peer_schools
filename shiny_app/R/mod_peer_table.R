@@ -530,7 +530,7 @@ peerTableServer <- function(id, sidebar_state) {
     # already opted in by clicking the tab — no further hide/show needed.
     output$diagnostics_accordion <- renderUI({
       res <- peer_result()
-      if (is.null(res)) return(NULL)
+      if (is.null(res)) return(.needs_search_notice("Diagnostics"))
       uiOutput(ns("diagnostics_ui"))
     })
 
@@ -994,9 +994,23 @@ peerTableServer <- function(id, sidebar_state) {
       ))
     })
 
+    # Small reusable "needs-a-search" notice for the tabs that genuinely
+    # require a peer result before they have anything to show.
+    .needs_search_notice <- function(label) {
+      div(class = "peer-tab-placeholder",
+          tags$h6(label),
+          p("This view summarizes the peer set. Run a search ",
+            "in the sidebar — results will appear here automatically."),
+          p(class = "text-muted",
+            tags$small("The ", tags$strong("Inspector"),
+                       " tab works standalone in the meantime; pick a ",
+                       "variable to explore distributions against any ",
+                       "comparison pool.")))
+    }
+
     output$peer_dashboard <- renderUI({
       res <- peer_result()
-      if (is.null(res)) return(NULL)
+      if (is.null(res)) return(.needs_search_notice("Dashboard"))
       a_uid <- res$meta$anchor_unitid
       univ  <- peer_dashboard_universe()
 
@@ -1042,14 +1056,23 @@ peerTableServer <- function(id, sidebar_state) {
       })
     })
 
+    # Resolve the anchor unitid from either:
+    #   - the latest search result (preferred — implies an active search),
+    #   - or the sidebar's current anchor picker (lets the Inspector work
+    #     before any search has been run).
+    peer_inspector_anchor_uid <- reactive({
+      res <- peer_result()
+      if (!is.null(res) && !is.null(res$meta$anchor_unitid))
+        return(res$meta$anchor_unitid)
+      st <- tryCatch(sidebar_state$state(), error = function(e) NULL)
+      if (!is.null(st) && !is.null(st$anchor_unitid))
+        return(st$anchor_unitid)
+      .DEFAULT_ANCHOR_UNITID
+    })
+
     output$peer_inspector <- renderUI({
       res <- peer_result()
-      if (is.null(res)) {
-        return(div(class = "text-muted",
-                   tags$small("Run a peer search first; the inspector ",
-                                "highlights the peer set against a chosen ",
-                                "comparison pool.")))
-      }
+      no_search <- is.null(res)
       groups <- peer_inspector_choice_groups()
       class_choices <- {
         cls <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
@@ -1060,12 +1083,23 @@ peerTableServer <- function(id, sidebar_state) {
       sector_choices <- c("Public" = "public",
                           "Private (nonprofit)" = "private_nfp")
 
-      tagList(
+      lede <- if (no_search) {
+        p(class = "peer-tab-lede text-muted",
+          tags$small(tags$strong("Standalone mode."),
+                     " No peer search has run yet — the Inspector is ",
+                     "showing the sidebar's anchor against the comparison ",
+                     "pool. Run a search to overlay the peer set as ",
+                     "diamond markers."))
+      } else {
         p(class = "peer-tab-lede text-muted",
           tags$small("Pick any variable to see how the peer set sits ",
                       "against a chosen comparison pool. Anchor shown as ",
                       "a tall purple line; peers as diamond markers along ",
-                      "the x-axis.")),
+                      "the x-axis."))
+      }
+
+      tagList(
+        lede,
 
         div(class = "cohort-inspector-controls",
           div(class = "cohort-inspector-control-row",
@@ -1154,11 +1188,11 @@ peerTableServer <- function(id, sidebar_state) {
 
     # ---- Inspector plot ----
     output$peer_inspector_plot <- renderPlotly({
-      res <- peer_result(); req(res)
       metric <- input$peer_inspect_metric; req(metric)
       req(metric %in% names(.SCHOOLS_WIDE))
-      a_uid     <- res$meta$anchor_unitid; req(a_uid)
-      peer_uids <- res$peers$unitid
+      a_uid <- peer_inspector_anchor_uid(); req(a_uid)
+      res <- peer_result()
+      peer_uids <- if (!is.null(res)) res$peers$unitid else integer(0)
 
       pool_df   <- peer_inspector_pool()
       pool_vals <- pool_df[[metric]]
@@ -1260,11 +1294,11 @@ peerTableServer <- function(id, sidebar_state) {
 
     # ---- Inspector summary stats ----
     output$peer_inspector_stats <- renderUI({
-      res <- peer_result(); req(res)
       metric <- input$peer_inspect_metric; req(metric)
       req(metric %in% names(.SCHOOLS_WIDE))
-      a_uid     <- res$meta$anchor_unitid
-      peer_uids <- res$peers$unitid
+      a_uid <- peer_inspector_anchor_uid(); req(a_uid)
+      res <- peer_result()
+      peer_uids <- if (!is.null(res)) res$peers$unitid else integer(0)
 
       meta_row <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
       fmt <- if (nrow(meta_row)) meta_row$format else NA
@@ -1302,11 +1336,11 @@ peerTableServer <- function(id, sidebar_state) {
 
     # ---- Inspector per-school table ----
     output$peer_inspector_table <- DT::renderDT({
-      res <- peer_result(); req(res)
       metric <- input$peer_inspect_metric; req(metric)
       req(metric %in% names(.SCHOOLS_WIDE))
-      a_uid     <- res$meta$anchor_unitid
-      peer_uids <- res$peers$unitid
+      a_uid <- peer_inspector_anchor_uid(); req(a_uid)
+      res <- peer_result()
+      peer_uids <- if (!is.null(res)) res$peers$unitid else integer(0)
 
       meta_row <- .VARIABLES[match(metric, .VARIABLES$metric), , drop = FALSE]
       fmt <- if (nrow(meta_row)) meta_row$format else NA
@@ -1565,7 +1599,7 @@ peerTableServer <- function(id, sidebar_state) {
 
     output$peer_composition <- renderUI({
       res <- peer_result()
-      if (is.null(res)) return(NULL)
+      if (is.null(res)) return(.needs_search_notice("Composition"))
       a_uid <- res$meta$anchor_unitid
       peer_uids <- res$peers$unitid
       peer_df    <- .SCHOOLS[match(peer_uids, .SCHOOLS$unitid), , drop = FALSE]
@@ -1598,8 +1632,11 @@ peerTableServer <- function(id, sidebar_state) {
     # (Phase B2-B4); they tell the user what's coming so the feature
     # plan is visible without yet building the full surfaces.
     output$analysis_tabs <- renderUI({
-      res <- peer_result()
-      if (is.null(res)) return(NULL)
+      # Tab strip is always rendered. The Inspector tab is usable
+      # standalone (uses the sidebar's anchor as the reference + the
+      # ranked universe as the comparison pool). Other tabs need a peer
+      # set; their bodies show a "run a search" placeholder via the
+      # individual renderUI/renderPlotly/renderDT bindings until then.
 
       .placeholder <- function(label, blurb) {
         div(class = "peer-tab-placeholder",
@@ -1884,7 +1921,7 @@ peerTableServer <- function(id, sidebar_state) {
 
     output$aspirant_refine_section <- renderUI({
       res <- peer_result()
-      if (is.null(res)) return(NULL)
+      if (is.null(res)) return(.needs_search_notice("Aspirant refinement"))
 
       asp_choices <- {
         v <- names(ASPIRANT_LABELS)
@@ -2111,7 +2148,7 @@ peerTableServer <- function(id, sidebar_state) {
 
     output$stratified_expand_section <- renderUI({
       res <- peer_result()
-      if (is.null(res)) return(NULL)
+      if (is.null(res)) return(.needs_search_notice("Stratified expansion"))
       if (!exists(".STRATIFY_DIMS", envir = globalenv()))
         return(NULL)   # safety: mod_stratified.R not sourced
 
