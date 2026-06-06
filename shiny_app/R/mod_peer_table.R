@@ -304,26 +304,35 @@ peerTableServer <- function(id, sidebar_state) {
       scroll_js <- sprintf(
         paste0(
           "(function(){",
-          "  var t=document.getElementById('%s');",
-          "  if(!t){t=document.querySelector('.peer-analysis-tabs');}",
+          # The uiOutput placeholder #%s is a 0-height wrapper that sits at
+          # an unexpected layout position. Prefer the inner element that
+          # actually paints the tabs — div.peer-analysis-tabs lives inside.
+          "  var t=document.querySelector('.peer-analysis-tabs');",
+          "  if(!t){t=document.getElementById('%s');}",
           "  if(!t){console.warn('[analysis-indicator] no target');return;}",
+          "  console.log('[analysis-indicator] target',t,'rectTop',",
+          "    t.getBoundingClientRect().top);",
+          # Walk up looking for a scrollable ancestor whose box ACTUALLY
+          # contains the target with positive relative position. Otherwise
+          # fall back to the window.
           "  var c=t.parentElement;",
           "  while(c&&c!==document.body){",
           "    var s=getComputedStyle(c);",
           "    var oy=s.overflowY;",
           "    if((oy==='auto'||oy==='scroll')&&c.scrollHeight>c.clientHeight){",
-          "      break;",
+          "      var rt=t.getBoundingClientRect().top-c.getBoundingClientRect().top;",
+          "      if(rt>=0){break;}",
           "    }",
           "    c=c.parentElement;",
           "  }",
-          "  var rect=t.getBoundingClientRect();",
           "  if(c&&c!==document.body){",
+          "    var rect=t.getBoundingClientRect();",
           "    var crect=c.getBoundingClientRect();",
           "    var top=c.scrollTop+(rect.top-crect.top)-12;",
           "    console.log('[analysis-indicator] scrolling container',c,'to',top);",
-          "    c.scrollTo({top:top,behavior:'smooth'});",
+          "    c.scrollTo({top:Math.max(0,top),behavior:'smooth'});",
           "  }else{",
-          "    var y=window.pageYOffset+rect.top-12;",
+          "    var y=Math.max(0,window.pageYOffset+t.getBoundingClientRect().top-12);",
           "    console.log('[analysis-indicator] scrolling window to',y);",
           "    window.scrollTo({top:y,behavior:'smooth'});",
           "  }",
