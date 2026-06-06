@@ -527,14 +527,12 @@ peerTableServer <- function(id, sidebar_state) {
       }, character(1))
 
       # ---- Build per-row Remove action ----
-      action_html <- vapply(df$unitid, function(uid) {
-        sprintf(paste0(
-          '<a href="#" class="peer-remove-btn" title="Remove from main list" ',
-          'onclick="event.stopPropagation();Shiny.setInputValue(',
-          "'%s', {unitid: %d, t: Date.now()}, {priority: 'event'}",
-          ');return false;">&#10005;</a>'),
-          ns("peer_remove_click"), as.integer(uid))
-      }, character(1))
+      # The actual click handler lives at the table level via the
+      # input$peer_table_cell_clicked observer below (inline onclicks
+      # get consumed by DTs row-selection event before they can fire).
+      action_html <- rep(
+        '<span class="peer-remove-btn" title="Remove from main list">&#10005;</span>',
+        nrow(df))
 
       # Religious-affiliation column was retired here — same information
       # is available on the Side-by-Side tab's classifications block.
@@ -620,11 +618,27 @@ peerTableServer <- function(id, sidebar_state) {
         DT::formatRound("Distance", digits = 3)
     })
 
-    # ---- Remove-from-main click observer --------------------------------
-    observeEvent(input$peer_remove_click, {
-      payload <- input$peer_remove_click
-      if (is.null(payload) || is.null(payload$unitid)) return()
-      .remove_school_from_main(payload$unitid)
+    # ---- Main peer table cell click: discriminate Remove vs row-select --
+    # Inline onclick handlers don't fire reliably inside DT cells because
+    # DT row-selection consumes the event first. We use cell_clicked
+    # instead and check whether the clicked cell contained the
+    # peer-remove-btn span; if so, the click is a Remove. Otherwise let
+    # the row-selection update Side-by-Side as usual.
+    observeEvent(input$peer_table_cell_clicked, {
+      payload <- input$peer_table_cell_clicked
+      if (is.null(payload) || is.null(payload$row)) return()
+      val <- payload$value %||% ""
+      if (!grepl("peer-remove-btn", val, fixed = TRUE)) return()
+      uids <- peer_display_uids()
+      r <- payload$row
+      if (r < 1 || r > length(uids)) return()
+      uid <- uids[r]
+      message(sprintf(
+        "[peer-remove] cell click row=%d uid=%d", r, uid))
+      .remove_school_from_main(uid)
+      # Clear row selection so the row click doesn't propagate as a
+      # Side-by-Side selection on the about-to-disappear row.
+      DT::dataTableProxy("peer_table") %>% DT::selectRows(NULL)
     })
 
     # ---- Add-to-main click observer (Aspirant + Stratified rows) -------
@@ -2181,25 +2195,15 @@ peerTableServer <- function(id, sidebar_state) {
     .aspirant_table <- function(df, asp_metrics, anchor_values,
                                   near_miss = FALSE) {
       if (!nrow(df)) return(NULL)
-      add_btns <- vapply(seq_len(nrow(df)), function(i) {
-        u <- as.integer(df$unitid[i])
-        d <- if (is.finite(df$distance[i])) as.numeric(df$distance[i]) else NA
-        sprintf(paste0(
-          '<a href="#" class="peer-add-btn" title="Add to main list" ',
-          'onclick="event.stopPropagation();Shiny.setInputValue(',
-          "'%s', {unitid: %d, source: 'Aspirant', ",
-          "distance: %s, t: Date.now()}, {priority: 'event'}",
-          ');return false;">+ Add</a>'),
-          ns("peer_add_click"), u,
-          if (is.na(d)) "null" else sprintf("%.6f", d))
-      }, character(1))
-
+      # Render the Add column as plain text "+ Add" — no inline onclick.
+      # The click handler lives at the table level via input$..._cell_clicked
+      # (cell_clicked is unaffected by row-selection swallowing the click).
       cols <- list(
         Rank     = df$rank,
         School   = df$instnm,
         State    = df$stabbr,
         Distance = round(df$distance, 3),
-        Add      = add_btns
+        Add      = rep('<span class="peer-add-btn">+ Add</span>', nrow(df))
       )
       if (near_miss) cols[["Missed"]] <- vapply(
         df$missed_metric,
@@ -2334,21 +2338,48 @@ peerTableServer <- function(id, sidebar_state) {
         div(class = "asp-modal-body", gap_rows)))
     }
 
-    observeEvent(input$aspirant_strict_tbl_rows_selected, {
+    # Aspirant table click discriminator.
+    #   - Clicking the Add cell -> push the school to the curated main list
+    #   - Clicking any other cell -> open the aspirational-gap modal
+    # cell_clicked fires reliably regardless of DT row-selection, where the
+    # row_selected event was being consumed by the gap-modal handler before
+    # our inline onclick could run.
+    .aspirant_cell_click <- function(source_tbl, payload, dfn) {
+      ar <- aspirant_filter(); req(ar, nrow(dfn) > 0)
+      if (is.null(payload) || is.null(payload$row)) return()
+      row <- payload$row
+      val <- payload$value %||% ""
+      if (grepl("peer-add-btn", val, fixed = TRUE)) {
+        rec  <- dfn[row, , drop = FALSE]
+        uid  <- as.integer(rec$unitid[1])
+        dist <- if (is.finite(rec$distance[1])) as.numeric(rec$distance[1])
+                else NA_real_
+        message(sprintf("[peer-add] aspirant click row=%d uid=%d dist=%s",
+                        row, uid, dist))
+        .add_school_to_main(uid, "Aspirant", dist)
+        showNotification(
+          tagList(tags$strong("Added: "),
+                  .SCHOOLS$instnm[match(uid, .SCHOOLS$unitid)],
+                  tags$br(),
+                  tags$small("Source: Aspirant")),
+          type = "message", duration = 3)
+      } else {
+        .open_aspirant_modal(dfn[row, , drop = FALSE],
+                              ar$anchor_values, ar$aspirant_metrics)
+      }
+      DT::dataTableProxy(source_tbl) %>% DT::selectRows(NULL)
+    }
+    observeEvent(input$aspirant_strict_tbl_cell_clicked, {
       ar <- aspirant_filter(); req(ar, nrow(ar$strict) > 0)
-      ix <- input$aspirant_strict_tbl_rows_selected
-      if (!length(ix)) return()
-      .open_aspirant_modal(ar$strict[ix, ],
-                            ar$anchor_values, ar$aspirant_metrics)
-      DT::dataTableProxy("aspirant_strict_tbl") %>% DT::selectRows(NULL)
+      .aspirant_cell_click("aspirant_strict_tbl",
+                            input$aspirant_strict_tbl_cell_clicked,
+                            ar$strict)
     })
-    observeEvent(input$aspirant_near_tbl_rows_selected, {
+    observeEvent(input$aspirant_near_tbl_cell_clicked, {
       ar <- aspirant_filter(); req(ar, nrow(ar$near_miss) > 0)
-      ix <- input$aspirant_near_tbl_rows_selected
-      if (!length(ix)) return()
-      .open_aspirant_modal(ar$near_miss[ix, ],
-                            ar$anchor_values, ar$aspirant_metrics)
-      DT::dataTableProxy("aspirant_near_tbl") %>% DT::selectRows(NULL)
+      .aspirant_cell_click("aspirant_near_tbl",
+                            input$aspirant_near_tbl_cell_clicked,
+                            ar$near_miss)
     })
 
     # =========================================================================
