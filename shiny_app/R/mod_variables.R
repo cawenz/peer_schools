@@ -80,13 +80,6 @@ variablesUI <- function(id) {
                  "appear in the click-to-open modal.")
       ),
 
-      p(class = "var-instructions-foot text-muted",
-        tags$small(
-          "Plain-English descriptions live in ",
-          tags$code("data/variables_descriptions.csv"),
-          " — edit that file to expand or revise them. Variables ",
-          "without an entry fall back to the technical coverage_note ",
-          "from the pipeline."))
     ),
 
     # Compact filter bar above the table.
@@ -198,11 +191,15 @@ variablesServer <- function(id) {
       }
     }
     .human_description <- function(metric) {
-      if (metric %in% names(.desc_lookup)) {
-        v <- unname(.desc_lookup[[metric]])
-        if (!is.na(v) && nzchar(v)) return(v)
-      }
-      NA_character_
+      if (length(metric) != 1 || is.na(metric)) return(NA_character_)
+      if (!metric %in% names(.desc_lookup)) return(NA_character_)
+      v <- unname(.desc_lookup[[metric]])
+      # Defensive coercion: lookup could return length 0 (missing) or
+      # length > 1 (duplicate key); collapse to a single string.
+      if (length(v) == 0) return(NA_character_)
+      v <- as.character(v[1])
+      if (is.na(v) || !nzchar(v)) return(NA_character_)
+      v
     }
 
     # Build a working frame with pretty labels.
