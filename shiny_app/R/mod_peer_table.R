@@ -530,7 +530,7 @@ peerTableServer <- function(id, sidebar_state) {
       action_html <- vapply(df$unitid, function(uid) {
         sprintf(paste0(
           '<a href="#" class="peer-remove-btn" title="Remove from main list" ',
-          'onclick="Shiny.setInputValue(',
+          'onclick="event.stopPropagation();Shiny.setInputValue(',
           "'%s', {unitid: %d, t: Date.now()}, {priority: 'event'}",
           ');return false;">&#10005;</a>'),
           ns("peer_remove_click"), as.integer(uid))
@@ -2186,7 +2186,7 @@ peerTableServer <- function(id, sidebar_state) {
         d <- if (is.finite(df$distance[i])) as.numeric(df$distance[i]) else NA
         sprintf(paste0(
           '<a href="#" class="peer-add-btn" title="Add to main list" ',
-          'onclick="Shiny.setInputValue(',
+          'onclick="event.stopPropagation();Shiny.setInputValue(',
           "'%s', {unitid: %d, source: 'Aspirant', ",
           "distance: %s, t: Date.now()}, {priority: 'event'}",
           ');return false;">+ Add</a>'),
@@ -2550,7 +2550,7 @@ peerTableServer <- function(id, sidebar_state) {
               add_btn <- sprintf(paste0(
                 "<a href='#' class='peer-add-btn peer-add-btn-mini' ",
                 "title='Add to main list' ",
-                "onclick=\"Shiny.setInputValue('%s', ",
+                "onclick=\"event.stopPropagation();Shiny.setInputValue('%s', ",
                 "{unitid: %d, source: '%s', distance: %s, t: Date.now()}, ",
                 "{priority: 'event'});return false;\">+</a>"),
                 ns("peer_add_click"), uid, src_tag_js, dist)
