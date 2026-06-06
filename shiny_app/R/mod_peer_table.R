@@ -442,44 +442,50 @@ peerTableServer <- function(id, sidebar_state) {
       curated <- peer_curated_state()
 
       # ---- Filter excluded peers and append added schools ----
-      df_base   <- res$peers
+      df_base   <- tibble::as_tibble(res$peers)
       excluded  <- curated$excluded
       df_visible <- df_base[!(df_base$unitid %in% excluded), , drop = FALSE]
 
       added_uids <- as.integer(names(curated$added))
+      added_uids <- added_uids[!is.na(added_uids)]
       added_uids <- added_uids[!added_uids %in% df_visible$unitid]
       added_uids <- added_uids[!added_uids %in% excluded]
+
+      # Debug: log what's in curated state and what we're about to render.
+      message(sprintf(
+        "[peer-table] excluded=%d  added_total=%d  added_to_append=%d  visible_before=%d",
+        length(excluded), length(curated$added), length(added_uids),
+        nrow(df_visible)))
+
       if (length(added_uids)) {
         s <- .SCHOOLS[match(added_uids, .SCHOOLS$unitid), , drop = FALSE]
-        added_df <- data.frame(
+        added_df <- tibble::tibble(
           rank     = NA_integer_,
           unitid   = added_uids,
           instnm   = s$instnm,
-          sector   = NA,
+          sector   = NA_integer_,
           usnews_classification = s$usnews_classification,
           stabbr   = s$stabbr,
           control_grp = s$control_grp,
           religious_affiliation = s$religious_affiliation,
           distance = vapply(added_uids, function(u) {
             d <- curated$added[[as.character(u)]]$distance
-            if (is.null(d) || !is.finite(d)) NA_real_ else d
-          }, numeric(1)),
-          stringsAsFactors = FALSE
+            if (is.null(d) || !is.finite(d)) NA_real_ else as.numeric(d)
+          }, numeric(1))
         )
-        # Pull the same external-rank columns when present
+        # Pull external-rank cols when present in both .SCHOOLS and the
+        # original result so the new rows show ranks consistently.
         for (col in c("usnews_rank", "wamo_rank", "wamo_category",
                        "forbes_rank")) {
           if (col %in% names(df_base) && col %in% names(s))
             added_df[[col]] <- s[[col]]
         }
-        # Use bind_rows-ish merge so any missing cols default to NA
-        common <- intersect(names(df_base), names(added_df))
-        for (col in setdiff(names(df_base), names(added_df)))
-          added_df[[col]] <- NA
-        for (col in setdiff(names(added_df), names(df_base)))
-          df_visible[[col]] <- NA
-        df_visible <- rbind(df_visible, added_df[, names(df_visible),
-                                                   drop = FALSE])
+        # dplyr::bind_rows handles tibble + data.frame column-fill +
+        # type promotion cleanly, unlike base rbind which can choke on
+        # tibble/data.frame mixes or differing column orders.
+        df_visible <- dplyr::bind_rows(df_visible, added_df)
+        message(sprintf("[peer-table] visible_after_append=%d",
+                        nrow(df_visible)))
       }
       df <- df_visible
 
@@ -627,8 +633,15 @@ peerTableServer <- function(id, sidebar_state) {
       if (is.null(payload) || is.null(payload$unitid)) return()
       d <- payload$distance
       if (is.null(d)) d <- NA_real_
+      message(sprintf(
+        "[peer-add] click payload: unitid=%s source=%s distance=%s",
+        payload$unitid, payload$source, d))
       .add_school_to_main(payload$unitid, payload$source,
                             as.numeric(d))
+      message(sprintf(
+        "[peer-add] state after add: %d excluded, %d added",
+        length(peer_curated_state()$excluded),
+        length(peer_curated_state()$added)))
       # Brief toast so users see the action register
       showNotification(
         tagList(tags$strong("Added: "),
