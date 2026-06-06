@@ -105,7 +105,12 @@ peerSearchSidebarUI <- function(id) {
 
     tags$div(
       tags$label("US News classification"),
-      checkboxInput(ns("pool_class_same"), "Same as anchor", value = TRUE),
+      # Default OFF: open pool across every published classification
+      # rather than narrowing to whatever the anchor happens to be. The
+      # picker is initialized below with the "All US News Classifications"
+      # sentinel pre-selected, so the user lands in a usable wide-open
+      # state and can narrow from there.
+      checkboxInput(ns("pool_class_same"), "Same as anchor", value = FALSE),
       selectInput(ns("pool_class"), label = NULL,
                   choices = NULL, multiple = TRUE,
                   selectize = TRUE)
@@ -255,7 +260,13 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     sentinel_choices <- setNames(sentinel_values, sentinel_labels)
 
     class_choices <- c(sentinel_choices, setNames(raw_classes, pretty))
-    updateSelectInput(session, "pool_class", choices = class_choices)
+    # Pre-select the "All US News Classifications" sentinel so the picker
+    # has a usable starting value when "Same as anchor" is off (its new
+    # default). The sentinel expands to the full classification list at
+    # search time via the .USNEWS_SENTINEL_ALL handler.
+    updateSelectInput(session, "pool_class",
+                      choices  = class_choices,
+                      selected = .USNEWS_SENTINEL_ALL)
 
     # Better display labels for control_grp. Names = labels users see,
     # values = the raw codes used to filter schools.csv.
