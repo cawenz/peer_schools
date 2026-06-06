@@ -525,7 +525,7 @@ peerTableServer <- function(id, sidebar_state) {
         sprintf(paste0(
           '<a href="#" class="peer-remove-btn" title="Remove from main list" ',
           'onclick="Shiny.setInputValue(',
-          "'%s', {unitid: %d, t: Date.now()}, {priority: \"event\"}",
+          "'%s', {unitid: %d, t: Date.now()}, {priority: 'event'}",
           ');return false;">&#10005;</a>'),
           ns("peer_remove_click"), as.integer(uid))
       }, character(1))
@@ -2154,7 +2154,7 @@ peerTableServer <- function(id, sidebar_state) {
           '<a href="#" class="peer-add-btn" title="Add to main list" ',
           'onclick="Shiny.setInputValue(',
           "'%s', {unitid: %d, source: 'Aspirant', ",
-          'distance: %s, t: Date.now()}, {priority: "event"}',
+          "distance: %s, t: Date.now()}, {priority: 'event'}",
           ');return false;">+ Add</a>'),
           ns("peer_add_click"), u,
           if (is.na(d)) "null" else sprintf("%.6f", d))
