@@ -78,8 +78,7 @@ variablesUI <- function(id) {
         tags$dd("Short description shown inline. Full plain-English ",
                  "definitions, caveats, and computation details ",
                  "appear in the click-to-open modal.")
-      ),
-
+      )
     ),
 
     # Compact filter bar above the table.
