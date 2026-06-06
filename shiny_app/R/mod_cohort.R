@@ -71,7 +71,13 @@
 # Path to the default cohort CSV. Auto-loaded into the tab on session
 # start so the user doesn't have to re-upload every session. The file
 # upload widget still works as a runtime override.
-.DEFAULT_COHORT_FILE <- "data/neche_cohort.csv"
+# Shared with cohort_app — file lives at the project root data/ dir so
+# both apps see the same seed. .OUTPUT_DIR is set in global.R; .DATA_DIR
+# wasn't in older versions, so derive it defensively.
+.DEFAULT_COHORT_FILE <- file.path(
+  if (exists(".DATA_DIR")) .DATA_DIR
+  else file.path(.PROJECT_ROOT, "data"),
+  "neche_cohort.csv")
 
 # Hand-curated descriptions for the cohort-metadata and school-metadata
 # columns that ship in the export. Variable columns are documented from

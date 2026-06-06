@@ -41,6 +41,26 @@ for (pkg in c("clustvarsel", "mclust")) {
 # Default anchor used by the cohort builder. HC = 166124.
 .DEFAULT_ANCHOR_UNITID <- 166124L
 
+# Region constants — Side-by-Side's classifications block computes a
+# region label for each institution from these state mappings.
+.REGIONS <- list(
+  northeast   = c("CT","ME","MA","NH","NJ","NY","PA","RI","VT"),
+  new_england = c("CT","ME","MA","NH","RI","VT"),
+  midatlantic = c("NJ","NY","PA"),
+  midwest     = c("IL","IN","IA","KS","MI","MN","MO","NE","ND","OH","SD","WI"),
+  south       = c("AL","AR","DE","DC","FL","GA","KY","LA","MD","MS","NC",
+                  "OK","SC","TN","TX","VA","WV"),
+  west        = c("AK","AZ","CA","CO","HI","ID","MT","NV","NM","OR","UT","WA","WY")
+)
+.REGION_LABELS <- c(
+  northeast   = "Region: Northeast",
+  new_england = "Region: New England",
+  midatlantic = "Region: Mid-Atlantic",
+  midwest     = "Region: Midwest",
+  south       = "Region: South",
+  west        = "Region: West"
+)
+
 # -----------------------------------------------------------------------------
 # Load data once at startup
 # -----------------------------------------------------------------------------

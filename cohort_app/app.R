@@ -1,10 +1,16 @@
 # =============================================================================
 # Cohort Builder — standalone Shiny app
 #
-# Lifted out of the main Peer Schools Explorer so cohort work can run on
-# its own deploy + URL while the main app handles peer search / side-by-side.
-# Shares the same output/ and data/ directories via .PROJECT_ROOT so a
-# refresh of R/schools_pipeline.R propagates to both apps.
+# Two tabs:
+#   - Cohort Builder : the same cohort_state-driven UI lifted from the
+#                       main app (table + dashboard + map + inspector +
+#                       download).
+#   - Side-by-Side   : pairwise comparison of any two institutions.
+#                      Untethered from peer_result here (the main app
+#                      passes a current search; this app stubs that out).
+#
+# Shares the project's output/ and data/ via .PROJECT_ROOT, so re-running
+# R/schools_pipeline.R refreshes both apps.
 #
 # Run from the project root with:
 #   shiny::runApp("cohort_app", launch.browser = TRUE)
@@ -20,20 +26,32 @@ suppressMessages({
 source("global.R", local = FALSE)
 
 # -----------------------------------------------------------------------------
-# UI: single page with a per-page sidebar for cohort controls.
+# UI: page_navbar with two tabs.
 # -----------------------------------------------------------------------------
-ui <- page_sidebar(
+ui <- page_navbar(
   title = "Cohort Builder",
   theme = cohc_bslib(),
-  fillable = FALSE,
-  # Holy Cross purple navbar — matches the main app's branding.
-  navbar_options = list(bg = "#602D89", theme = "dark"),
+  id    = "main_nav",
+  navbar_options = navbar_options(bg = "#602D89", theme = "dark"),
   header = useShinyjs(),
 
-  sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
-                    cohortSidebarUI("cohort")),
+  nav_panel(
+    "Cohort Builder",
+    layout_sidebar(
+      sidebar = sidebar(width = 340, open = "open", bg = "#F4EDEC",
+                        cohortSidebarUI("cohort")),
+      cohortUI("cohort")
+    )
+  ),
 
-  cohortUI("cohort")
+  nav_panel(
+    "Side-by-Side",
+    layout_sidebar(
+      sidebar = sidebar(width = 320, open = "open", bg = "#F4EDEC",
+                        compareSidebarUI("compare")),
+      compareUI("compare")
+    )
+  )
 )
 
 # -----------------------------------------------------------------------------
@@ -41,9 +59,16 @@ ui <- page_sidebar(
 # -----------------------------------------------------------------------------
 server <- function(input, output, session) {
   cohort_module <- cohortServer("cohort")
-  # Module returns reactives the main app used to consume (cohort_state,
-  # anchor_uid). Standalone deploy doesn't need them but keep the return
-  # to mirror the module's API.
+
+  # Side-by-Side normally accepts a peer_selection reactive (last clicked
+  # peer-table row) and a peer_result reactive (last computed search) so
+  # it can auto-sync to a search in progress. Standalone deploy has
+  # neither, so stub both as reactive(NULL); the module's UI still
+  # works — anchor + peer pickers are populated from .SCHOOLS directly.
+  compareServer("compare",
+                peer_selection = reactive(NULL),
+                peer_result    = reactive(NULL))
+
   invisible(cohort_module)
 }
 
