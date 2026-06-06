@@ -270,7 +270,8 @@ sessionUI <- function(id) {
 # -----------------------------------------------------------------------------
 # Server
 # -----------------------------------------------------------------------------
-sessionServer <- function(id, saved_searches, restore_signal = NULL) {
+sessionServer <- function(id, saved_searches, restore_signal = NULL,
+                            apply_curated = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -334,6 +335,11 @@ sessionServer <- function(id, saved_searches, restore_signal = NULL) {
             # observe fires even if the same state is restored twice.
             restore_signal(c(s$sidebar_state,
                              list(.restore_stamp = Sys.time())))
+            # Replay the curated additions / removals on top of the
+            # restored search. apply_curated is a callback into
+            # peerTableServer; defaults to NULL on older sessions.
+            if (!is.null(apply_curated))
+              apply_curated(s$curated_state %||% NULL)
             showNotification(sprintf("Loaded: %s", s$label),
                              type = "default", duration = 4)
           }

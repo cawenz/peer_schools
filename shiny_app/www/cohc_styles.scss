@@ -836,6 +836,84 @@ a {
   p:last-child { margin-bottom: 0; }
 }
 
+/* ---------- Peer-table curation: Status badges + Add/Remove buttons ---------- */
+.peer-status-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-right: 3px;
+  letter-spacing: 0.02em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.peer-status-original  { background: #F4EDEC; color: #602D89; border: 1px solid #AC9E94; }
+.peer-status-aspirant  { background: #602D89; color: #FFFFFF; border: 1px solid #602D89; }
+.peer-status-stratified, .peer-status-stratified-d1,
+.peer-status-stratified-d2, .peer-status-stratified-d3,
+.peer-status-stratified-naia,
+.peer-status-stratified-northeast, .peer-status-stratified-midwest,
+.peer-status-stratified-south, .peer-status-stratified-west,
+.peer-status-stratified-new-england, .peer-status-stratified-midatlantic
+  { background: #7591b3; color: #FFFFFF; border: 1px solid #7591b3; }
+[class*="peer-status-stratified-"] { background: #7591b3; color: #FFFFFF; border: 1px solid #7591b3; }
+.peer-status-manual    { background: #2e7d32; color: #FFFFFF; border: 1px solid #2e7d32; }
+.peer-status-anchor    { background: #251230; color: #FFFFFF; border: 1px solid #251230; }
+
+/* Remove button (red X) in the Actions column. */
+.peer-remove-btn {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.4rem;
+  text-align: center;
+  border-radius: 50%;
+  color: #AC9E94;
+  text-decoration: none !important;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover, &:focus {
+    background: #b53737;
+    color: #FFFFFF;
+  }
+}
+
+/* Add button — text-style "+ Add" pill for the Aspirant table, and a
+ * compact circular "+" for the Stratified mini-tables. */
+.peer-add-btn {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border: 1px solid #602D89;
+  background: #FFFFFF;
+  color: #602D89;
+  border-radius: 3px;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover, &:focus {
+    background: #602D89;
+    color: #FFFFFF;
+  }
+}
+
+.peer-add-btn-mini {
+  font-size: 0.95rem;
+  padding: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.4rem;
+  text-align: center;
+  border-radius: 50%;
+}
+
 /* Anchor row in the peer table — soft tint + bold school name so the
  * user can tell at a glance which row is the reference. */
 .peer-results-table {

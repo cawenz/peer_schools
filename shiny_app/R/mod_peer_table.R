@@ -59,6 +59,61 @@ peerTableServer <- function(id, sidebar_state) {
     # -------------------------------------------------------------------------
     peer_result <- reactiveVal(NULL)
 
+    # -------------------------------------------------------------------------
+    # Curated peer-set state — layered on top of peer_result().
+    #
+    #   excluded   : integer vector of unitids the user removed.
+    #   added      : list of (unitid -> list(source, distance)) records added
+    #                from Aspirant / Stratified / a manual picker. A school
+    #                can be BOTH in res$peers (original) AND in added (with
+    #                a source tag like "Aspirant") — the Status column will
+    #                stack both badges.
+    #
+    # Resets whenever peer_result() changes (new search clears the curation),
+    # except when the new value is being restored from a saved search that
+    # carries its own curated state. See the restore handler below.
+    # -------------------------------------------------------------------------
+    .empty_curated <- function() list(excluded = integer(0), added = list())
+    peer_curated_state <- reactiveVal(.empty_curated())
+    # NB: curation reset happens INSIDE the Run handler (see below)
+    # rather than via observeEvent(peer_result(), ...). That way a
+    # saved-search restore can repopulate peer_curated_state without
+    # being immediately wiped by an observer reacting to the same
+    # programmatic peer_result update.
+
+    # Helper: add a school to the curated list with a source tag.
+    .add_school_to_main <- function(unitid, source, distance = NA_real_) {
+      uid <- as.integer(unitid)
+      if (is.na(uid)) return(invisible())
+      st <- peer_curated_state()
+      # Drop from excluded if previously removed
+      st$excluded <- setdiff(st$excluded, uid)
+      key <- as.character(uid)
+      cur <- st$added[[key]]
+      if (is.null(cur)) {
+        st$added[[key]] <- list(sources = source, distance = distance)
+      } else {
+        # Already added — append the new source tag if not present
+        st$added[[key]]$sources <- unique(c(cur$sources, source))
+      }
+      peer_curated_state(st)
+    }
+
+    # Helper: remove a school from the main list.
+    .remove_school_from_main <- function(unitid) {
+      uid <- as.integer(unitid)
+      if (is.na(uid)) return(invisible())
+      st <- peer_curated_state()
+      # If it was a manual add, drop the add entirely. Otherwise mark
+      # the original peer as excluded.
+      key <- as.character(uid)
+      if (!is.null(st$added[[key]])) {
+        st$added[[key]] <- NULL
+      }
+      st$excluded <- unique(c(st$excluded, uid))
+      peer_curated_state(st)
+    }
+
     observeEvent(sidebar_state$run_trigger(), {
       st <- isolate(sidebar_state$state())
       req(st$anchor_unitid)
@@ -106,6 +161,9 @@ peerTableServer <- function(id, sidebar_state) {
             res$pool_unitids <- pool_df$unitid
             res$pool_filter  <- st$candidate_pool
           }
+          # Reset curation BEFORE pushing the new result so the user
+          # starts from a clean slate with each fresh search.
+          peer_curated_state(.empty_curated())
           peer_result(res)
         }
       )
@@ -381,15 +439,50 @@ peerTableServer <- function(id, sidebar_state) {
     output$peer_table <- DT::renderDT({
       res <- peer_result()
       req(res, nrow(res$peers) > 0)
-      df <- res$peers
+      curated <- peer_curated_state()
 
-      # External rankings — populated by the pipeline:
-      #   usnews_rank   : Academic Insights metric 24 (Overall Rank).
-      #   wamo_rank     : Washington Monthly category rank.
-      #   wamo_category : WM category short label (LA / Bacc / Mas / Nat).
-      #   forbes_rank   : Forbes America's Top Colleges overall rank.
-      # NA for unranked schools or for older schools.csv files that don't
-      # have these columns yet — display as blank in either case.
+      # ---- Filter excluded peers and append added schools ----
+      df_base   <- res$peers
+      excluded  <- curated$excluded
+      df_visible <- df_base[!(df_base$unitid %in% excluded), , drop = FALSE]
+
+      added_uids <- as.integer(names(curated$added))
+      added_uids <- added_uids[!added_uids %in% df_visible$unitid]
+      added_uids <- added_uids[!added_uids %in% excluded]
+      if (length(added_uids)) {
+        s <- .SCHOOLS[match(added_uids, .SCHOOLS$unitid), , drop = FALSE]
+        added_df <- data.frame(
+          rank     = NA_integer_,
+          unitid   = added_uids,
+          instnm   = s$instnm,
+          sector   = NA,
+          usnews_classification = s$usnews_classification,
+          stabbr   = s$stabbr,
+          control_grp = s$control_grp,
+          religious_affiliation = s$religious_affiliation,
+          distance = vapply(added_uids, function(u) {
+            d <- curated$added[[as.character(u)]]$distance
+            if (is.null(d) || !is.finite(d)) NA_real_ else d
+          }, numeric(1)),
+          stringsAsFactors = FALSE
+        )
+        # Pull the same external-rank columns when present
+        for (col in c("usnews_rank", "wamo_rank", "wamo_category",
+                       "forbes_rank")) {
+          if (col %in% names(df_base) && col %in% names(s))
+            added_df[[col]] <- s[[col]]
+        }
+        # Use bind_rows-ish merge so any missing cols default to NA
+        common <- intersect(names(df_base), names(added_df))
+        for (col in setdiff(names(df_base), names(added_df)))
+          added_df[[col]] <- NA
+        for (col in setdiff(names(added_df), names(df_base)))
+          df_visible[[col]] <- NA
+        df_visible <- rbind(df_visible, added_df[, names(df_visible),
+                                                   drop = FALSE])
+      }
+      df <- df_visible
+
       .rank_disp <- function(col) {
         if (col %in% names(df)) {
           ifelse(is.na(df[[col]]), "", as.character(df[[col]]))
@@ -411,13 +504,38 @@ peerTableServer <- function(id, sidebar_state) {
         rep("", nrow(df))
       }
 
+      # ---- Build Status badges ----
+      # For each row: which source tags apply.
+      original_uids <- df_base$unitid    # full original set (incl. excluded)
+      status_badges <- vapply(df$unitid, function(uid) {
+        tags <- c()
+        if (uid %in% original_uids) tags <- c(tags, "Original")
+        ad <- curated$added[[as.character(uid)]]
+        if (!is.null(ad)) tags <- c(tags, ad$sources)
+        if (!length(tags)) return("")
+        paste(vapply(tags, function(t) {
+          slug <- tolower(gsub("[^a-z0-9]+", "-", t))
+          sprintf('<span class="peer-status-badge peer-status-%s">%s</span>',
+                  slug, htmltools::htmlEscape(t))
+        }, character(1)), collapse = " ")
+      }, character(1))
+
+      # ---- Build per-row Remove action ----
+      action_html <- vapply(df$unitid, function(uid) {
+        sprintf(paste0(
+          '<a href="#" class="peer-remove-btn" title="Remove from main list" ',
+          'onclick="Shiny.setInputValue(',
+          "'%s', {unitid: %d, t: Date.now()}, {priority: \"event\"}",
+          ');return false;">&#10005;</a>'),
+          ns("peer_remove_click"), as.integer(uid))
+      }, character(1))
+
       # Religious-affiliation column was retired here — same information
-      # is available on the Side-by-Side tab's classifications block when
-      # the user wants it. Keeping it out reduces visual noise and the
-      # column was empty for the majority of schools.
+      # is available on the Side-by-Side tab's classifications block.
       display_df <- data.frame(
         Rank          = df$rank,
         School        = df$instnm,
+        Status        = status_badges,
         `Class.`      = .prettify_classification(df$usnews_classification),
         `USN Rank`    = usn_rank_disp,
         `WM Rank`     = wamo_disp,
@@ -425,14 +543,12 @@ peerTableServer <- function(id, sidebar_state) {
         Sector        = .prettify_control(df$control_grp),
         State         = df$stabbr,
         Distance      = round(df$distance, 3),
+        Actions       = action_html,
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
 
-      # Prepend the anchor school as row 1 so the user sees "this is
-      # what we're comparing against" before scrolling the peers. Rank
-      # is rendered as a dash; distance is 0 (anchor is zero from itself).
-      # Excluded from the click-to-select callback in selected_peer().
+      # ---- Prepend the anchor row (no actions, no badges) ----
       anchor_uid <- res$meta$anchor_unitid
       a <- if (!is.null(anchor_uid)) {
         .SCHOOLS[.SCHOOLS$unitid == anchor_uid, , drop = FALSE]
@@ -450,6 +566,7 @@ peerTableServer <- function(id, sidebar_state) {
         anchor_row_df <- data.frame(
           Rank          = 0L,
           School        = paste0("★ ", a$instnm, "  (anchor)"),
+          Status        = '<span class="peer-status-badge peer-status-anchor">Anchor</span>',
           `Class.`      = .prettify_classification(a$usnews_classification),
           `USN Rank`    = .one(a$usnews_rank),
           `WM Rank`     = a_wamo,
@@ -457,6 +574,7 @@ peerTableServer <- function(id, sidebar_state) {
           Sector        = .prettify_control(a$control_grp),
           State         = .one(a$stabbr),
           Distance      = 0,
+          Actions       = "",
           check.names = FALSE,
           stringsAsFactors = FALSE
         )
@@ -466,12 +584,9 @@ peerTableServer <- function(id, sidebar_state) {
       DT::datatable(
         display_df,
         rownames  = FALSE,
+        escape    = FALSE,  # allow HTML in Status + Actions columns
         selection = list(mode = "single", target = "row"),
         options = list(
-          # pageLength generous enough to hold the maximum K (100) plus
-          # the prepended anchor row + a little headroom — single page
-          # is the right UX so users see everything at once and the
-          # in-DT sort applies across the whole result set.
           pageLength = 150,
           dom        = "tip",
           order      = list(list(0, "asc")),
@@ -480,17 +595,15 @@ peerTableServer <- function(id, sidebar_state) {
                                                        "USN Rank",
                                                        "WM Rank",
                                                        "Forbes Rank")),
-            list(className = "dt-center", targets = "State"),
-            # Render rank 0 (anchor) as an em-dash so it doesn't read as
-            # an actual rank position.
+            list(className = "dt-center", targets = c("State", "Actions")),
             list(targets = "Rank",
                  render = DT::JS(
                    "function(data, type, row) {",
                    "  if (type === 'display' && data === 0) return '\\u2014';",
+                   "  if (type === 'display' && data === null) return '+';",
                    "  return data;",
                    "}"))
           ),
-          # Tag the anchor row with a class so SCSS can highlight it.
           rowCallback = DT::JS(
             "function(row, data) {",
             "  if (data[0] === 0) $(row).addClass('peer-anchor-row');",
@@ -501,20 +614,75 @@ peerTableServer <- function(id, sidebar_state) {
         DT::formatRound("Distance", digits = 3)
     })
 
+    # ---- Remove-from-main click observer --------------------------------
+    observeEvent(input$peer_remove_click, {
+      payload <- input$peer_remove_click
+      if (is.null(payload) || is.null(payload$unitid)) return()
+      .remove_school_from_main(payload$unitid)
+    })
+
+    # ---- Add-to-main click observer (Aspirant + Stratified rows) -------
+    observeEvent(input$peer_add_click, {
+      payload <- input$peer_add_click
+      if (is.null(payload) || is.null(payload$unitid)) return()
+      d <- payload$distance
+      if (is.null(d)) d <- NA_real_
+      .add_school_to_main(payload$unitid, payload$source,
+                            as.numeric(d))
+      # Brief toast so users see the action register
+      showNotification(
+        tagList(tags$strong("Added: "),
+                .SCHOOLS$instnm[match(as.integer(payload$unitid),
+                                       .SCHOOLS$unitid)],
+                tags$br(),
+                tags$small(sprintf("Source: %s", payload$source))),
+        type = "message", duration = 3)
+    })
+
     # -------------------------------------------------------------------------
     # Selected peer row → exposed reactive for the Side-by-Side tab
     # -------------------------------------------------------------------------
+    # Track the unitids in the currently-displayed table so clicks can
+    # be resolved back to a school regardless of curation state (excluded
+    # peers removed, added schools appended).
+    peer_display_uids <- reactive({
+      res <- peer_result()
+      if (is.null(res)) return(integer(0))
+      curated <- peer_curated_state()
+      base_uids <- res$peers$unitid[!res$peers$unitid %in% curated$excluded]
+      added_uids <- as.integer(names(curated$added))
+      added_uids <- added_uids[!added_uids %in% base_uids &
+                                  !added_uids %in% curated$excluded]
+      c(res$meta$anchor_unitid, base_uids, added_uids)
+    })
+
     selected_peer <- reactive({
       res <- peer_result()
       sel <- input$peer_table_rows_selected
       if (is.null(res) || !length(sel)) return(NULL)
-      # Anchor row is prepended at display position 1 (which DT reports
-      # as input row 1, 1-indexed). Subtract one to map back to the
-      # peers tibble row. Clicking the anchor itself (sel == 1) is a
-      # no-op for Side-by-Side — return NULL so the comparison view
-      # doesn't try to set the anchor as its own peer.
-      if (sel == 1L) return(NULL)
-      res$peers[sel - 1L, , drop = FALSE]
+      uids <- peer_display_uids()
+      if (sel < 1 || sel > length(uids)) return(NULL)
+      uid <- uids[sel]
+      # Clicking the anchor row (always row 1) is a no-op for Side-by-Side
+      if (identical(uid, res$meta$anchor_unitid)) return(NULL)
+      # Prefer the row in res$peers (original peer with computed distance);
+      # fall back to a synthesized row from .SCHOOLS for added schools.
+      hit <- res$peers[res$peers$unitid == uid, , drop = FALSE]
+      if (nrow(hit) == 1) return(hit)
+      s <- .SCHOOLS[.SCHOOLS$unitid == uid, , drop = FALSE]
+      if (!nrow(s)) return(NULL)
+      data.frame(
+        rank     = NA_integer_,
+        unitid   = uid,
+        instnm   = s$instnm,
+        sector   = NA,
+        usnews_classification = s$usnews_classification,
+        stabbr   = s$stabbr,
+        control_grp = s$control_grp,
+        religious_affiliation = s$religious_affiliation,
+        distance = NA_real_,
+        stringsAsFactors = FALSE
+      )
     })
 
     # -------------------------------------------------------------------------
@@ -1979,11 +2147,25 @@ peerTableServer <- function(id, sidebar_state) {
     .aspirant_table <- function(df, asp_metrics, anchor_values,
                                   near_miss = FALSE) {
       if (!nrow(df)) return(NULL)
+      add_btns <- vapply(seq_len(nrow(df)), function(i) {
+        u <- as.integer(df$unitid[i])
+        d <- if (is.finite(df$distance[i])) as.numeric(df$distance[i]) else NA
+        sprintf(paste0(
+          '<a href="#" class="peer-add-btn" title="Add to main list" ',
+          'onclick="Shiny.setInputValue(',
+          "'%s', {unitid: %d, source: 'Aspirant', ",
+          'distance: %s, t: Date.now()}, {priority: "event"}',
+          ');return false;">+ Add</a>'),
+          ns("peer_add_click"), u,
+          if (is.na(d)) "null" else sprintf("%.6f", d))
+      }, character(1))
+
       cols <- list(
         Rank     = df$rank,
         School   = df$instnm,
         State    = df$stabbr,
-        Distance = round(df$distance, 3)
+        Distance = round(df$distance, 3),
+        Add      = add_btns
       )
       if (near_miss) cols[["Missed"]] <- vapply(
         df$missed_metric,
@@ -2027,7 +2209,7 @@ peerTableServer <- function(id, sidebar_state) {
                        order = list(list(0, "asc")),
                        columnDefs = list(
                          list(className = "dt-right",  targets = c(0, 3)),
-                         list(className = "dt-center", targets = 2),
+                         list(className = "dt-center", targets = c(2, 4)),
                          list(className = "asp-metric-cell",
                               targets = target_cols))),
         class = "compact stripe hover"
@@ -2320,18 +2502,35 @@ peerTableServer <- function(id, sidebar_state) {
         body <- if (identical(s$status, "ok") && !is.null(s$peers) &&
                     nrow(s$peers) > 0) {
           peers_df <- s$peers
+          # Source tag for "Add" — "Stratified: <label>" e.g. "Stratified: D1"
+          src_tag <- sprintf("Stratified: %s",
+                              if (is.na(s$label)) as.character(s$value)
+                              else as.character(s$label))
+          # Escape single quotes in src_tag for inlined JS (defensive)
+          src_tag_js <- gsub("'", "\\\\'", src_tag, fixed = TRUE)
           rows_html <- paste(
             vapply(seq_len(nrow(peers_df)), function(i) {
-              sprintf("<tr><td>%d</td><td>%s</td><td class='dt-center'>%s</td><td class='dt-right'>%.3f</td></tr>",
+              uid <- as.integer(peers_df$unitid[i])
+              dist <- if (is.finite(peers_df$distance[i]))
+                        sprintf("%.6f", peers_df$distance[i]) else "null"
+              add_btn <- sprintf(paste0(
+                "<a href='#' class='peer-add-btn peer-add-btn-mini' ",
+                "title='Add to main list' ",
+                "onclick=\"Shiny.setInputValue('%s', ",
+                "{unitid: %d, source: '%s', distance: %s, t: Date.now()}, ",
+                "{priority: 'event'});return false;\">+</a>"),
+                ns("peer_add_click"), uid, src_tag_js, dist)
+              sprintf("<tr><td>%d</td><td>%s</td><td class='dt-center'>%s</td><td class='dt-right'>%.3f</td><td class='dt-center'>%s</td></tr>",
                       peers_df$rank[i],
                       htmltools::htmlEscape(peers_df$instnm[i]),
                       htmltools::htmlEscape(peers_df$stabbr[i]),
-                      peers_df$distance[i])
+                      peers_df$distance[i],
+                      add_btn)
             }, character(1)),
             collapse = ""
           )
           HTML(sprintf(
-            "<table class='peer-strat-card-table'><thead><tr><th>#</th><th>School</th><th class='dt-center'>State</th><th class='dt-right'>Dist.</th></tr></thead><tbody>%s</tbody></table>",
+            "<table class='peer-strat-card-table'><thead><tr><th>#</th><th>School</th><th class='dt-center'>State</th><th class='dt-right'>Dist.</th><th class='dt-center'>Add</th></tr></thead><tbody>%s</tbody></table>",
             rows_html))
         } else {
           tags$div(class = "peer-strat-empty-body",
@@ -2350,9 +2549,22 @@ peerTableServer <- function(id, sidebar_state) {
     # -------------------------------------------------------------------------
     # Exports
     # -------------------------------------------------------------------------
+    # When a saved search is restored, sessionServer pushes the curated
+    # state into restore_curated_signal; apply it AFTER the search re-runs.
+    # (See app.R for the wiring.)
+
     list(
-      result        = peer_result,
-      selected_peer = selected_peer
+      result          = peer_result,
+      selected_peer   = selected_peer,
+      curated_state   = peer_curated_state,
+      apply_curated   = function(curated) {
+        if (is.null(curated)) return(invisible())
+        # Defensive: normalize to the expected shape.
+        if (is.null(curated$excluded)) curated$excluded <- integer(0)
+        if (is.null(curated$added))    curated$added    <- list()
+        curated$excluded <- as.integer(curated$excluded)
+        peer_curated_state(curated)
+      }
     )
   })
 }

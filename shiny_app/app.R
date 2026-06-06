@@ -132,9 +132,12 @@ server <- function(input, output, session) {
 
   # Saved Searches page. Returns a `saved_by` reactive populated from
   # the "Working as" text input (and seeded from browser localStorage).
+  # apply_curated is a direct callback into peerTableServer that
+  # replays added/excluded schools on a saved-search restore.
   session_state <- sessionServer("session",
                                   saved_searches  = saved_searches,
-                                  restore_signal  = restore_signal)
+                                  restore_signal  = restore_signal,
+                                  apply_curated   = peer_table_state$apply_curated)
 
   # Variables reference tab (self-contained; reads .VARIABLES).
   variablesServer("variables")
@@ -150,6 +153,7 @@ server <- function(input, output, session) {
       return()
     }
     state <- isolate(sidebar_state$state())
+    curated <- isolate(peer_table_state$curated_state())
     sid <- format(Sys.time(), "ss_%Y%m%d_%H%M%OS3")
     sid <- gsub("[^A-Za-z0-9_]", "_", sid)
     record <- list(
@@ -157,14 +161,14 @@ server <- function(input, output, session) {
       version       = .SAVED_SEARCHES_VERSION,
       label         = .auto_label(res, state),
       saved_at      = Sys.time(),
-      # Human identity from the "Working as" field on the Saved Searches
-      # tab. Seeded from browser localStorage, so once the user types
-      # their name on a given browser it sticks. Without a name set the
-      # value reads "(unknown)" — fine but the user can fix attribution
-      # by setting their name and re-saving.
       saved_by      = session_state$saved_by(),
       sidebar_state = state,
-      peer_result   = res
+      peer_result   = res,
+      # Curated additions / removals on top of the original peer set —
+      # captures what the user manually added from Aspirant / Stratified
+      # searches and what they removed. Replayed on restore so the saved
+      # search reproduces the exact list the user was looking at.
+      curated_state = curated
     )
     current <- saved_searches()
     current[[sid]] <- record
