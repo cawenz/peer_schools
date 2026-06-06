@@ -290,21 +290,29 @@ peerTableServer <- function(id, sidebar_state) {
       res <- peer_result()
       if (is.null(res)) return(NULL)
       # Rendered as a semantic button so screen readers and keyboard
-      # users get the right affordance. role + tabindex + Enter/Space
-      # keyboard activation mirror the click target.
+      # users get the right affordance. The scroll target is the
+      # analysis tab strip below the results table.
+      target_id  <- ns("analysis_tabs")
+      # Robust scroll: log to the console + fall back to the tab strip's
+      # parent .peer-analysis-tabs class if the bare ID lookup misses.
+      scroll_js <- sprintf(
+        paste0(
+          "(function(){",
+          "  var t=document.getElementById('%s');",
+          "  if(!t){t=document.querySelector('.peer-analysis-tabs');}",
+          "  console.log('[analysis-indicator] target:',t);",
+          "  if(t){t.scrollIntoView({behavior:'smooth',block:'start'});}",
+          "  else{console.warn('[analysis-indicator] no scroll target found');}",
+          "})();"),
+        target_id)
       tags$div(
         class = "peer-analysis-indicator",
         role = "button",
         tabindex = "0",
-        onclick = sprintf(
-          "document.getElementById('%s').scrollIntoView({behavior:'smooth', block:'start'});",
-          ns("analysis_tabs")),
+        onclick  = scroll_js,
         onkeydown = sprintf(
-          paste0("if(event.key==='Enter'||event.key===' ')",
-                 "{event.preventDefault();",
-                 "document.getElementById('%s').scrollIntoView(",
-                 "{behavior:'smooth', block:'start'});}"),
-          ns("analysis_tabs")),
+          "if(event.key==='Enter'||event.key===' '){event.preventDefault();%s}",
+          scroll_js),
         title = "Jump to additional analytical views",
         tags$span(class = "peer-ai-icon", HTML("&#8595;")),
         tags$span(class = "peer-ai-text",
