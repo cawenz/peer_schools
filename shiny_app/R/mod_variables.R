@@ -120,7 +120,14 @@ variablesUI <- function(id) {
       tags$strong("DEBUG table (should always render with 3 rows): "),
       DT::DTOutput(ns("debug_table"))),
 
-    DT::DTOutput(ns("var_table"))
+    # WRAPPED var_table — bright cyan container so we can SEE whether
+    # the container itself is even reaching the DOM. If you see a cyan
+    # box with no table inside, the container is there but DT didnt
+    # paint into it. If you dont see the cyan box at all, the UI body
+    # truncated before DTOutput.
+    tags$div(style = "background:#dbf3ff; padding:0.5rem; border:2px dashed #1666b3; min-height:300px;",
+      tags$strong("MAIN table container (cyan border) — table should appear below:"),
+      DT::DTOutput(ns("var_table")))
   )
 }
 
