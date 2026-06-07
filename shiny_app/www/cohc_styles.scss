@@ -2827,9 +2827,9 @@ ul, ol {
   hr {
     border: none;
     border-top: 1px solid #AC9E94;
-    /* Tightened from 2rem to keep some breathing room around section
-     * dividers without leaving a huge gap on either side. */
-    margin: 1rem 0;
+    /* 0.5rem above + 0.5rem below = ~1rem combined breathing room.
+     * Keeps the rule legible as a divider without floating in space. */
+    margin: 0.5rem 0;
   }
 
   ul, ol {
