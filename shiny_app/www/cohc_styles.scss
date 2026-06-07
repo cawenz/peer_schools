@@ -468,10 +468,19 @@ a {
 
 /* ---------- Peer results table wrapper ---------- */
 .peer-results-table {
-  margin-bottom: 1.5rem;
+  /* Tight margin below the table — the next section (refine divider +
+   * analysis tabs) carries its own breathing room. */
+  margin-bottom: 0.25rem;
   /* DT's auto-width plus our scrollable card body can render odd cropping
    * if we don't normalize overflow. Let the table size itself naturally. */
   overflow-x: auto;
+
+  /* DataTables wraps the rendered table in .dataTables_wrapper which
+   * ships with margin-bottom: 1em by default — pile that on top of our
+   * own margin and the divider's margin-top, and the gap to the
+   * analysis tabs balloons to ~100px. Zero it out and let our wrapper
+   * own the spacing budget. */
+  .dataTables_wrapper { margin-bottom: 0; }
 }
 
 /* Header row: "Top N peers..." title on the left, "About this table"
@@ -1031,7 +1040,7 @@ a {
  * tabsetPanel rather than a bslib navset for max portability across
  * bslib versions; styled here to read like the rest of the app. */
 .peer-analysis-tabs {
-  margin-top: 1rem;
+  margin-top: 0.25rem;
 
   /* Tab row */
   > .tabbable > .nav-tabs {
@@ -3038,11 +3047,13 @@ ul, ol {
 /* ---------- Peer Search follow-up sections ---------- */
 
 /* Heavy divider between the main result and the follow-up sections, so
- * it's clear they're "after the search" tools. */
+ * it's clear they're "after the search" tools. Tight margins — the
+ * peer-results-table and peer-analysis-tabs neighbors already zero
+ * out their adjacent edges. */
 .peer-refine-divider {
   border: none;
   border-top: 2px solid #AC9E94;
-  margin: 2rem 0 1.25rem 0;
+  margin: 0.75rem 0 0.5rem 0;
 }
 
 .peer-refine-controls {
