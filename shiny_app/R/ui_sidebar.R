@@ -174,6 +174,33 @@ peerSearchSidebarUI <- function(id) {
                   step = 0.25, ticks = FALSE)
     }),
 
+    # ---- Advanced: per-variable weight overrides ----
+    # Collapsed by default. When expanded, lets the user pick specific
+    # clustering variables and assign them individual weights that
+    # override the theme default. Unpicked variables continue to use
+    # their theme weight unchanged.
+    accordion(
+      open = FALSE,
+      accordion_panel(
+        "Advanced: override individual variables",
+        helpText(tags$small(
+          "Pick one or more clustering variables to weight ",
+          "individually. Picked variables use the slider value below; ",
+          "unpicked variables continue to use their theme weight."
+        )),
+        selectizeInput(ns("var_override_picker"),
+                       label = "Variables to override",
+                       choices = NULL, multiple = TRUE,
+                       width = "100%",
+                       options = list(
+                         placeholder = "Type to search variables",
+                         plugins = list("remove_button"))),
+        uiOutput(ns("var_override_sliders")),
+        # Small footer with a Clear-all button when overrides exist
+        uiOutput(ns("var_override_footer"))
+      )
+    ),
+
     tags$hr(),
 
     # ---------------- K + advanced ----------------
@@ -233,6 +260,93 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                          choices  = anchor_choices,
                          selected = .DEFAULT_ANCHOR_UNITID,
                          server   = FALSE)
+
+    # ---- Per-variable override picker ----
+    # Populate with clustering-eligible variables grouped by theme/category.
+    # Display name as label, metric as value, with optgroups so the picker
+    # reads as "Selectivity & Admissions > Acceptance rate".
+    local({
+      vars_df <- .VARIABLES[!is.na(.VARIABLES$use_type) &
+                              .VARIABLES$use_type == "clustering", ,
+                              drop = FALSE]
+      vars_df <- vars_df[order(vars_df$category, vars_df$display_name), ]
+      groups  <- split(vars_df, vars_df$category)
+      group_choices <- lapply(groups, function(g) {
+        v <- g$metric
+        names(v) <- g$display_name
+        v
+      })
+      updateSelectizeInput(session, "var_override_picker",
+                           choices  = group_choices,
+                           selected = character(0),
+                           server   = FALSE)
+    })
+
+    # ---- Per-variable override weights state ----
+    # reactiveValues map of metric -> weight, surviving picker re-renders.
+    # When a variable is newly added the picker, it gets weight 1.0;
+    # when removed, the value is dropped.
+    var_override_weights <- reactiveValues()
+
+    # When the picker changes, drop any metrics no longer selected and
+    # default-init any newly added ones.
+    observeEvent(input$var_override_picker, {
+      picked <- input$var_override_picker %||% character(0)
+      existing <- names(reactiveValuesToList(var_override_weights))
+      for (m in setdiff(existing, picked)) {
+        var_override_weights[[m]] <- NULL
+      }
+      for (m in setdiff(picked, existing)) {
+        var_override_weights[[m]] <- 1.0
+      }
+    }, ignoreNULL = FALSE, ignoreInit = FALSE)
+
+    # Render one compact slider per picked variable. Slider IDs use
+    # ns("varw_<metric>"); their values are mirrored into
+    # var_override_weights via the observer below.
+    output$var_override_sliders <- renderUI({
+      picked <- input$var_override_picker %||% character(0)
+      if (!length(picked)) return(NULL)
+      vars_df <- .VARIABLES
+      labels  <- setNames(vars_df$display_name, vars_df$metric)
+      tagList(lapply(picked, function(m) {
+        cur <- var_override_weights[[m]] %||% 1.0
+        tags$div(class = "var-override-slider",
+          sliderInput(ns(paste0("varw_", m)),
+                      label = labels[[m]] %||% m,
+                      min = 0, max = 3, value = cur,
+                      step = 0.25, ticks = FALSE, width = "100%"))
+      }))
+    })
+
+    # Mirror each rendered slider's value into var_override_weights so it
+    # survives subsequent re-renders.
+    observe({
+      picked <- input$var_override_picker %||% character(0)
+      for (m in picked) {
+        v <- input[[paste0("varw_", m)]]
+        if (!is.null(v)) var_override_weights[[m]] <- v
+      }
+    })
+
+    # Footer: "N overrides set" + Clear-all link
+    output$var_override_footer <- renderUI({
+      picked <- input$var_override_picker %||% character(0)
+      if (!length(picked)) return(NULL)
+      tagList(
+        tags$div(class = "var-override-footer text-muted",
+          tags$small(sprintf("%d variable override%s set",
+                              length(picked),
+                              if (length(picked) == 1) "" else "s")),
+          actionLink(ns("clear_var_overrides"), "Clear all",
+                     class = "var-override-clear"))
+      )
+    })
+
+    observeEvent(input$clear_var_overrides, {
+      updateSelectizeInput(session, "var_override_picker",
+                           selected = character(0))
+    })
 
     # Pretty labels for usnews_classification (.prettify_classification
     # lives in R/helpers_format.R). Three sentinel "All" options at the
@@ -499,6 +613,19 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
           updateSliderInput(session, paste0("weight_", th),
                             value = state$theme_weights[[th]])
         }
+        # Variable overrides: hydrate the picker + reactiveValues store.
+        # The sliders themselves render after the picker fires its
+        # observer; sliderInput(value = cur) picks up the stored values.
+        var_w <- state$variable_weights %||% list()
+        for (m in names(reactiveValuesToList(var_override_weights))) {
+          var_override_weights[[m]] <- NULL
+        }
+        for (m in names(var_w)) {
+          var_override_weights[[m]] <- as.numeric(var_w[[m]])
+        }
+        updateSelectizeInput(session, "var_override_picker",
+                             selected = names(var_w))
+
         if (!is.null(state$k))
           updateSliderInput(session, "k", value = state$k)
         updateCheckboxInput(session, "mahalanobis",
@@ -590,13 +717,30 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         .THEMES
       )
 
+      # ---- Per-variable overrides ----
+      # Read each picked variable's slider value out of the reactiveValues
+      # store so a Run captures whatever the user currently has set —
+      # even if a slider was just nudged after picking.
+      picked <- input$var_override_picker %||% character(0)
+      variable_w <- if (length(picked)) {
+        setNames(
+          lapply(picked, function(m) {
+            v <- input[[paste0("varw_", m)]]
+            if (is.null(v)) var_override_weights[[m]] %||% 1.0 else v
+          }),
+          picked)
+      } else {
+        list()
+      }
+
       list(
-        anchor_unitid   = anchor_uid,
-        candidate_pool  = pool,
-        theme_weights   = theme_w,
-        k               = input$k,
-        distance_metric = if (isTRUE(input$mahalanobis)) "mahalanobis"
-                          else "euclidean"
+        anchor_unitid    = anchor_uid,
+        candidate_pool   = pool,
+        theme_weights    = theme_w,
+        variable_weights = variable_w,
+        k                = input$k,
+        distance_metric  = if (isTRUE(input$mahalanobis)) "mahalanobis"
+                           else "euclidean"
       )
     })
 

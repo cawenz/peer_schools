@@ -127,11 +127,12 @@ peerTableServer <- function(id, sidebar_state) {
         {
           res <- tryCatch(
             compute_peers_cached(
-              anchor_unitid   = st$anchor_unitid,
-              candidate_pool  = st$candidate_pool,
-              theme_weights   = st$theme_weights,
-              distance_metric = st$distance_metric,
-              k               = st$k
+              anchor_unitid    = st$anchor_unitid,
+              candidate_pool   = st$candidate_pool,
+              theme_weights    = st$theme_weights,
+              variable_weights = st$variable_weights %||% list(),
+              distance_metric  = st$distance_metric,
+              k                = st$k
             ),
             error = function(e) {
               showNotification(
@@ -2107,12 +2108,13 @@ peerTableServer <- function(id, sidebar_state) {
           (is.finite(pool_k) && pool_k != nrow(res$peers))) {
         bigger <- tryCatch(
           compute_peers_cached(
-            anchor_unitid   = a_uid,
-            candidate_pool  = candidate_pool_used,
-            theme_weights   = st$theme_weights,
-            distance_metric = if (isTRUE(st$mahalanobis)) "mahalanobis"
-                              else (st$distance_metric %||% "euclidean"),
-            k               = as.integer(pool_k)
+            anchor_unitid    = a_uid,
+            candidate_pool   = candidate_pool_used,
+            theme_weights    = st$theme_weights,
+            variable_weights = st$variable_weights %||% list(),
+            distance_metric  = if (isTRUE(st$mahalanobis)) "mahalanobis"
+                               else (st$distance_metric %||% "euclidean"),
+            k                = as.integer(pool_k)
           ),
           error = function(e) NULL
         )
@@ -2536,12 +2538,13 @@ peerTableServer <- function(id, sidebar_state) {
             # a signal. Errors still propagate to the tryCatch below.
             r <- tryCatch(
               suppressMessages(compute_peers_cached(
-                anchor_unitid   = a_uid,
-                candidate_pool  = pool,
-                theme_weights   = st$theme_weights,
-                distance_metric = if (isTRUE(st$mahalanobis))
-                                    "mahalanobis" else "euclidean",
-                k               = per_value_k
+                anchor_unitid    = a_uid,
+                candidate_pool   = pool,
+                theme_weights    = st$theme_weights,
+                variable_weights = st$variable_weights %||% list(),
+                distance_metric  = if (isTRUE(st$mahalanobis))
+                                     "mahalanobis" else "euclidean",
+                k                = per_value_k
               )),
               error = function(e) {
                 # Compress wordy errors into the meaningful clause.

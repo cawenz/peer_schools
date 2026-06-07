@@ -674,6 +674,44 @@ a {
   padding-left: 0.6rem;
 }
 
+/* ---------- Sidebar: per-variable weight override panel ---------- */
+.var-override-slider {
+  margin-bottom: 0.25rem;
+
+  /* Tighten the slider label (variable display name) */
+  label, .control-label {
+    font-size: 0.78rem;
+    color: #251230;
+    margin-bottom: 0.1rem;
+    line-height: 1.3;
+  }
+
+  /* shiny's irs slider widget has a healthy default vertical footprint;
+   * tighten it so 5+ overrides fit without runaway height. */
+  .irs--shiny {
+    margin-top: 0.1rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+.var-override-footer {
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px dashed #AC9E94;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.var-override-clear {
+  font-size: 0.78rem;
+  color: #602D89;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover, &:focus { color: #251230; }
+}
+
 /* ---------- Sidebar: info button + label hints ---------- */
 /* "Ranked universe only" + a small info icon to its right. */
 .pool-checkbox-row {
