@@ -136,6 +136,14 @@ summary_df <- data.frame(
   stringsAsFactors = FALSE
 )
 row.names(summary_df) <- NULL  # belt-and-suspenders against rowname leakage
+# Strip Unicode from Field + Value so pdflatex doesn't choke on
+# anything that snuck in via a pool-filter description (religious
+# tradition labels, ethnic group names, etc.).
+summary_df[] <- lapply(summary_df, function(x) {
+  if (is.character(x))
+    iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT", sub = "")
+  else x
+})
 
 kable(summary_df, format = "latex", booktabs = TRUE,
       col.names = c("", ""),
@@ -173,7 +181,11 @@ disp <- data.frame(
 
 if (nrow(anchor_row) == 1) {
   a_row <- data.frame(
-    Rank     = "★",
+    # pdflatex doesn't natively render Unicode glyphs like ★ (U+2605).
+    # The kable cell value goes straight into LaTeX source, so we use
+    # a plain asterisk here. The row's cohcblush background + bold
+    # styling already makes it visually distinct from peer rows.
+    Rank     = "*",
     School   = paste0(anchor_row$instnm, " (anchor)"),
     Class    = .un(.abbrev_class(.un(.prettify_classification(
                    anchor_row$usnews_classification)))),
@@ -187,6 +199,17 @@ if (nrow(anchor_row) == 1) {
   disp <- rbind(a_row, disp)
 }
 row.names(disp) <- NULL
+
+# pdflatex chokes on Unicode in cell values. School names are mostly
+# ASCII but iconv-translit defensively guards against curly quotes,
+# accented characters in future data, and any other non-ASCII glyphs
+# that might sneak in. The TRANSLIT flag swaps the closest ASCII
+# equivalent for known glyphs and drops unknown ones cleanly.
+disp[] <- lapply(disp, function(x) {
+  if (is.character(x))
+    iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT", sub = "")
+  else x
+})
 
 n_anchor <- if (nrow(anchor_row) == 1) 1 else 0
 
@@ -289,7 +312,11 @@ card_df <- do.call(rbind, lapply(dims, function(d) {
 }))
 
 card_df$category_lbl <- ifelse(card_df$is_anchor,
-                                paste0("★ ", card_df$category),
+                                # `*` instead of ★ so the default PDF
+                                # device doesn't emit the mbcsToSbcs
+                                # substitution warning. Visually
+                                # identical to what was rendering before.
+                                paste0("* ", card_df$category),
                                 card_df$category)
 # Truncate very long labels so bars stay readable inside the half-page card.
 card_df$category_lbl <- ifelse(nchar(card_df$category_lbl) > 32,
