@@ -314,7 +314,7 @@ ASPIRANT_LABELS <- list(
 #'
 #' @param anchor_unitid IPEDS unitid. Default 166124 (Holy Cross).
 #' @param candidate_pool Named list of filter conditions on schools.csv.
-#'                       Default in_ranked_universe = TRUE (~1,235 schools).
+#'                       Default in_ranked_universe = TRUE (~1,460 schools).
 #'                       Pass list() for no filter (full universe).
 #' @param theme_weights Named list of theme weight overrides. Default all 1.0.
 #'                       Themes: size, selectivity, resources, finance,

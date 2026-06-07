@@ -237,9 +237,17 @@ build_classification <- function(cfg) {
     filter(!is.na(ipeds_id)) %>%
     transmute(unitid = as.integer(ipeds_id), usnews_classification = classification) %>%
     distinct(unitid, .keep_all = TRUE) %>%
+    # PROVISIONAL value derived from classification membership. The
+    # authoritative override later in build_schools() sets this from
+    # !is.na(usnews_rank) once the rank table has been joined; this
+    # fallback is what we use when the rank metric is not configured.
+    # Includes regional-colleges-* because US News publishes numeric
+    # overall ranks for that group too — they belong in the ranked
+    # universe alongside the regional universities.
     mutate(in_ranked_universe =
              usnews_classification %in% cfg$ranked_classes |
-             grepl("^regional-universities-", usnews_classification))
+             grepl("^regional-universities-", usnews_classification) |
+             grepl("^regional-colleges-",      usnews_classification))
 }
 
 # =============================================================================
@@ -902,6 +910,15 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
   usn_rank <- build_usnews_rank(cfg)
   if (nrow(usn_rank)) {
     schools <- schools %>% left_join(usn_rank, by = "unitid")
+    # Authoritative definition: in_ranked_universe = does the school
+    # have a numeric US News overall rank? This is what the flag is
+    # meant to mean ("US News actively ranks this school"). The
+    # provisional classification-based value computed earlier is now
+    # superseded — most importantly, this correctly includes Regional
+    # Colleges (which DO have numeric ranks despite their classification
+    # being excluded from the earlier ranked_classes membership rule).
+    schools <- schools %>%
+      mutate(in_ranked_universe = !is.na(usnews_rank))
   }
 
   # Washington Monthly rankings (offline XLSX). Empty tibble when the

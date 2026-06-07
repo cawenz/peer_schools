@@ -286,10 +286,13 @@ and coverage — see the **Variables** tab.
 - **Aspirant peer** — an institution similar to the anchor in context
   (size, sector, classification) but better than the anchor on chosen
   growth metrics.
-- **Ranked universe** — the app's default population of ~1,233
-  four-year non-profit institutions that meet IPEDS reporting and
-  Carnegie classification thresholds. Excludes very small,
-  non-degree-granting, or data-thin institutions.
+- **Ranked universe** — the app's default population of ~1,460
+  four-year non-profit institutions for which US News publishes a
+  numeric overall rank. Covers National Universities, National Liberal
+  Arts Colleges, Regional Universities, and Regional Colleges. Excludes
+  schools US News doesn't rank (specialty schools, very small
+  institutions, and any institution that appears in IPEDS but isn't
+  ranked).
 - **In-cohort** — the schools in the Cohort Builder's left column:
   Anchor + Keep + Maybe + Proposed. Used by the variable inspector and
   the dashboard cards.

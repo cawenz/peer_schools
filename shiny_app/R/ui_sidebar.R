@@ -551,8 +551,10 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         easyClose = TRUE,
         footer = modalButton("Close"),
         div(class = "pool-info-body",
-          p("US News publishes numeric overall ranks for three ",
-            "categories of institutions:"),
+          p("The ", tags$strong("ranked universe"),
+            " is the set of institutions for which US News publishes a ",
+            "numeric overall rank. Across the four categories US News ",
+            "ranks, that covers four groups of schools:"),
           tags$ul(
             tags$li(tags$strong("National Universities"),
                     " — research universities with a full range of ",
@@ -562,39 +564,40 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                     "nationally."),
             tags$li(tags$strong("Regional Universities"),
                     " — master's-granting institutions, ranked within ",
-                    "four geographic regions (North / South / Midwest / West).")
+                    "four geographic regions (North / South / Midwest / West)."),
+            tags$li(tags$strong("Regional Colleges"),
+                    " — bachelor's-focused regional schools, also ranked ",
+                    "within the four geographic regions.")
           ),
           tags$p(
             tags$strong("Ranked universe only"),
-            " (the default) restricts the candidate pool to schools in ",
-            "these three categories. This is usually what you want for ",
-            "peer comparison: it keeps the pool to schools US News ",
-            "actively benchmarks."),
+            " (the default) restricts the candidate pool to schools with ",
+            "a published US News overall rank. This is usually what you ",
+            "want for peer comparison: it keeps the pool to schools US ",
+            "News actively benchmarks."),
 
           tags$h6("What you'd add by unchecking"),
           tags$ul(
-            tags$li(tags$strong("Regional Colleges"),
-                    " — bachelor's-focused regional schools. US News ",
-                    "classifies them but doesn't publish a numeric overall ",
-                    "rank for this group."),
-            tags$li(tags$strong("Schools outside US News' coverage"),
-                    " — some institutions don't appear in their data feed ",
-                    "at all (mostly small specialty schools and some ",
-                    "for-profits, which are filtered out elsewhere).")
+            tags$li(tags$strong("Schools that appear in IPEDS but aren't ranked"),
+                    " — institutions US News doesn't assign a numeric ",
+                    "overall rank to. This is a mixed group: some are ",
+                    "specialty schools (art, music, military), some are ",
+                    "very small, and some sit in US News categories that ",
+                    "aren't part of the ranked set at all.")
           ),
 
           tags$h6("Effect on the results table"),
           tags$ul(
             tags$li("The ", tags$strong("Class."),
-                    " column shows the published category for each row ",
-                    "(blank when the school has no classification at all)."),
+                    " column shows the published US News category for each ",
+                    "row (blank when the school has no classification at all)."),
             tags$li("The ", tags$strong("USN Rank"),
-                    " column is blank for any school US News didn't ",
-                    "assign a numeric rank — including all Regional ",
-                    "Colleges and any uncategorized schools."),
-            tags$li("Categories are not directly comparable: rank #5 ",
-                    "in National Liberal Arts is not equivalent to rank ",
-                    "#5 in National Universities or Regional Universities.")
+                    " column is blank only for schools US News didn't ",
+                    "assign a numeric overall rank to."),
+            tags$li("Categories are not directly comparable: rank #5 in ",
+                    "National Liberal Arts is not equivalent to rank #5 ",
+                    "in National Universities, Regional Universities, or ",
+                    "Regional Colleges.")
           )
         )
       ))

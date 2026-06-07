@@ -66,7 +66,7 @@ The data layer doesn't score, weight, or rank — it just acquires and tags. The
 
 **Universe**: IPEDS SECTOR 1 (public 4-year) + SECTOR 2 (private NFP 4-year). For-profits and 2-year institutions excluded by design. ~2,598 distinct institutions across panel years 2020-2024.
 
-**Ranked-universe flag**: `schools.csv` carries `in_ranked_universe` (TRUE for ~1,235 schools classified by US News as National Universities, National Liberal Arts Colleges, or Regional Universities). This is the default candidate pool for peer comparison.
+**Ranked-universe flag**: `schools.csv` carries `in_ranked_universe` (TRUE for ~1,460 schools — every institution for which US News publishes a numeric overall rank). Covers National Universities, National Liberal Arts Colleges, Regional Universities, and Regional Colleges. The flag is derived from `!is.na(usnews_rank)` in `R/schools_pipeline.R`, with a classification-membership fallback used when the rank metric is not configured. This is the default candidate pool for peer comparison.
 
 **Schools.csv classification simplifications:**
 - Schools that changed sector/classification during the panel get the most recent value; `latest_year` records when that snapshot was taken.
@@ -199,7 +199,7 @@ The analytical heart of the project. A configurable `compute_peers()` function t
 1. Load schools.csv and all 5 facts/variables
 2. Filter to clustering variables (+ 6 detail race vars at half weight)
 3. Compute 5-year average for multi-year variables; single value for snapshots
-4. Apply candidate_pool filter (default: `in_ranked_universe = TRUE` → ~1,235 schools)
+4. Apply candidate_pool filter (default: `in_ranked_universe = TRUE` → ~1,460 schools)
 5. Compute per-variable coverage within the candidate pool
 6. Drop variables below `coverage_threshold` (default 0.70)
 7. Apply log transforms to right-skewed variables (default: 23 currency/count/scale variables)
