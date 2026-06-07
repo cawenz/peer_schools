@@ -286,8 +286,23 @@ a {
 /* Section dividers inside the sidebar */
 .sidebar hr {
   border-top: 1px solid #AC9E94;
-  margin: 1.25rem 0;
+  /* 0.5rem each side + tightened neighbor margins below ≈ 1rem total
+   * combined whitespace around the rule, instead of the ~50px chunk we
+   * were leaving when 1.25rem collapsed with the surrounding h6/h2
+   * margins. */
+  margin: 0.5rem 0;
   opacity: 0.6;
+}
+
+/* CSS vertical margins collapse to the larger value, so even after
+ * tightening the <hr>'s own margin, an adjacent <h6> with its own top
+ * margin would still leave the divider floating in space. Squeeze the
+ * elements that immediately neighbour an <hr> inside the sidebar. */
+.sidebar hr + * {
+  margin-top: 0.5rem;
+}
+.sidebar *:has(+ hr) {
+  margin-bottom: 0.5rem;
 }
 
 /* ---------- Stat cards (helper component, used in diagnostics later) ---------- */
