@@ -397,5 +397,5 @@ run_admissions_module <- function(cfg = ADM_CONFIG) {
 #   Sys.setenv(ACADEMIC_INSIGHTS_API_KEY = "...")     # or via .Renviron
 #   source("R/schools_pipeline.R");      build_schools()
 #   source("R/admissions_module_pipeline.R")
-   res_adm <- run_admissions_module()
+#   res_adm <- run_admissions_module()
 # -----------------------------------------------------------------------------

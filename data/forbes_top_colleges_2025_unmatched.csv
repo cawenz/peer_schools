@@ -1,20 +1,8 @@
 rank,name,state,type,norm_name
-81,Virginia Tech,VA,Public,virginia tech
-90,"CUNY, Baruch College",NY,Public,baruch college
-141,"University of Texas, Dallas",TX,Public,university of texas
-157,Louisiana State University,LA,Public,louisiana state university
-166,"CUNY, The City College of New York",NY,Public,city college of new york
-176,University of Pittsburgh,PA,Public,university of pittsburgh
-179,University of Washington Bothell,WA,Public,university of washington
-180,Sewanee—University of the South,TN,Private not-for-profit,sewanee university of south
-217,The Citadel,SC,Public,citadel
+2,Columbia University,NY,Private not-for-profit,columbia university
+80,"Stony Brook University, SUNY",NY,Public,stony brook university
+143,"CUNY, Queens College",NY,Public,queens college
+210,"University at Albany, SUNY",NY,Public,university albany
 272,Saint Joseph's University (PA),PA,Private not-for-profit,saint joseph s university
-319,"Indiana University-Purdue University, Indianapolis",IN,Public,indiana university purdue university
-359,"University of Texas, El Paso",TX,Public,university of texas
-361,"SUNY, College at New Paltz",NY,Public,college new paltz
 420,Wheaton College (MA),MA,Private not-for-profit,wheaton college
-433,St. Joseph's College (NY),NY,Private not-for-profit,st joseph s college
-454,Montana Tech of the University of Montana,MT,Public,montana tech of university of montana
-477,SUNY College at Old Westbury,NY,Public,college old westbury
-495,SUNY Cortland,NY,Public,cortland
-496,"University of Colorado, Denver",CO,Public,university of colorado
+496,"University of Colorado, Denver",CO,Public,university of colorado denver

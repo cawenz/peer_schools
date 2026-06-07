@@ -419,5 +419,5 @@ run_enrollment_module <- function(cfg = ENR_CONFIG) {
 #   # Both are single 2024 snapshots, FAFSA-filer denominator.
 # -----------------------------------------------------------------------------
 #
-   res_enr <- run_enrollment_module()
+#   res_enr <- run_enrollment_module()
 # -----------------------------------------------------------------------------

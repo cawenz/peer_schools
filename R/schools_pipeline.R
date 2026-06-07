@@ -974,6 +974,6 @@ build_schools <- function(cfg = SCHOOLS_CONFIG) {
 # Usage:
 #   setwd("path/to/hc-peer")
 #   Sys.setenv(ACADEMIC_INSIGHTS_API_KEY = "...")
-   schools <- build_schools()
+#   schools <- build_schools()
 # Produces output/schools.csv and output/value_labels.csv.
 # -----------------------------------------------------------------------------

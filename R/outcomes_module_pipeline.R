@@ -489,6 +489,6 @@ run_outcomes_module <- function(cfg = OUTCOMES_CONFIG) {
 #   source("R/schools_pipeline.R");           build_schools()
 #   source("R/outcomes_module_pipeline.R")
 # -----------------------------------------------------------------------------
-   res_out <- run_outcomes_module()
+#   res_out <- run_outcomes_module()
 # All metric IDs are pre-set.
 # -----------------------------------------------------------------------------

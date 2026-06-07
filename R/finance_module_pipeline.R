@@ -669,6 +669,6 @@ run_finance_resources_module <- function(cfg = FIN_CONFIG) {
 #   search_ai_metrics(FIN_CONFIG, contains = "class size")
 #   FIN_CONFIG$ai_metric_ids$pct_classes_under_20 <- <id>
 #   FIN_CONFIG$ai_metric_ids$pct_classes_50plus   <- <id>
-
-  res_fin <- run_finance_resources_module()
+#
+#   res_fin <- run_finance_resources_module()
 # -----------------------------------------------------------------------------
