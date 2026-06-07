@@ -2827,7 +2827,9 @@ ul, ol {
   hr {
     border: none;
     border-top: 1px solid #AC9E94;
-    margin: 2rem 0;
+    /* Tightened from 2rem to keep some breathing room around section
+     * dividers without leaving a huge gap on either side. */
+    margin: 1rem 0;
   }
 
   ul, ol {
