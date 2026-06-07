@@ -66,15 +66,23 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
   balanced       = setNames(
                      lapply(.THEMES, .theme_default_weight),
                      .THEMES),
-  outcomes_heavy = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
-                        finance = 1.0, outcomes = 2.5, aid = 1.0,
-                        composition = 1.0, athletics = 0),
-  resources_heavy = list(scale = 1.0, selectivity = 1.0, resources = 2.0,
-                         finance = 1.5, outcomes = 1.0, aid = 1.0,
-                         composition = 1.0, athletics = 0),
-  mission_similar = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
-                         finance = 1.0, outcomes = 1.0, aid = 1.0,
-                         composition = 2.0, athletics = 0)
+  # Each non-balanced preset boosts exactly one theme to 2.5 and leaves
+  # the rest at 1.0 — symmetric, easy to reason about, and aid + selectivity
+  # both get their own preset so users can lean into either dimension.
+  # (Replaces the prior "mission_similar" preset, which boosted composition
+  # but had a misleading name for a Jesuit institution.)
+  outcomes_heavy    = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
+                           finance = 1.0, outcomes = 2.5, aid = 1.0,
+                           composition = 1.0, athletics = 0),
+  resources_heavy   = list(scale = 1.0, selectivity = 1.0, resources = 2.0,
+                           finance = 1.5, outcomes = 1.0, aid = 1.0,
+                           composition = 1.0, athletics = 0),
+  selectivity_heavy = list(scale = 1.0, selectivity = 2.5, resources = 1.0,
+                           finance = 1.0, outcomes = 1.0, aid = 1.0,
+                           composition = 1.0, athletics = 0),
+  aid_heavy         = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
+                           finance = 1.0, outcomes = 1.0, aid = 2.5,
+                           composition = 1.0, athletics = 0)
 )
 
 # -----------------------------------------------------------------------------
@@ -156,13 +164,15 @@ peerSearchSidebarUI <- function(id) {
     tags$h6("Theme weights"),
     tags$div(
       class = "d-flex flex-wrap gap-1 mb-2",
-      actionButton(ns("preset_balanced"),        "Balanced",
+      actionButton(ns("preset_balanced"),          "Balanced",
                    class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_outcomes_heavy"),  "Outcomes-heavy",
+      actionButton(ns("preset_outcomes_heavy"),    "Outcomes-heavy",
                    class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_resources_heavy"), "Resources-heavy",
+      actionButton(ns("preset_resources_heavy"),   "Resources-heavy",
                    class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_mission_similar"), "Mission-similar",
+      actionButton(ns("preset_selectivity_heavy"), "Selectivity-heavy",
+                   class = "btn btn-sm btn-outline-secondary"),
+      actionButton(ns("preset_aid_heavy"),         "Aid-heavy",
                    class = "btn btn-sm btn-outline-secondary")
     ),
 
@@ -594,10 +604,11 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         updateSliderInput(session, paste0("weight_", th), value = vals[[th]])
       }
     }
-    observeEvent(input$preset_balanced,        apply_preset("balanced"))
-    observeEvent(input$preset_outcomes_heavy,  apply_preset("outcomes_heavy"))
-    observeEvent(input$preset_resources_heavy, apply_preset("resources_heavy"))
-    observeEvent(input$preset_mission_similar, apply_preset("mission_similar"))
+    observeEvent(input$preset_balanced,          apply_preset("balanced"))
+    observeEvent(input$preset_outcomes_heavy,    apply_preset("outcomes_heavy"))
+    observeEvent(input$preset_resources_heavy,   apply_preset("resources_heavy"))
+    observeEvent(input$preset_selectivity_heavy, apply_preset("selectivity_heavy"))
+    observeEvent(input$preset_aid_heavy,         apply_preset("aid_heavy"))
 
     # --- Restore from a saved search ---
     # When sessionServer puts a saved sidebar_state into restore_signal,

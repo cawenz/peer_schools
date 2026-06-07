@@ -190,13 +190,15 @@ stratifiedSidebarUI <- function(id) {
           tags$small("Weights apply to every per-stratum compute_peers call. ",
                      "Default is balanced (all = 1.0).")),
         div(class = "d-flex flex-wrap gap-1 mb-2",
-            actionButton(ns("preset_balanced"),       "Balanced",
+            actionButton(ns("preset_balanced"),         "Balanced",
                          class = "btn btn-sm btn-outline-secondary"),
-            actionButton(ns("preset_outcomes_heavy"), "Outcomes-heavy",
+            actionButton(ns("preset_outcomes_heavy"),   "Outcomes-heavy",
                          class = "btn btn-sm btn-outline-secondary"),
-            actionButton(ns("preset_resources_heavy"),"Resources-heavy",
+            actionButton(ns("preset_resources_heavy"),  "Resources-heavy",
                          class = "btn btn-sm btn-outline-secondary"),
-            actionButton(ns("preset_mission_similar"),"Mission-similar",
+            actionButton(ns("preset_selectivity_heavy"),"Selectivity-heavy",
+                         class = "btn btn-sm btn-outline-secondary"),
+            actionButton(ns("preset_aid_heavy"),        "Aid-heavy",
                          class = "btn btn-sm btn-outline-secondary")
         ),
         lapply(.THEMES, function(th) {
@@ -263,25 +265,32 @@ stratifiedServer <- function(id) {
                    lapply(.THEMES, function(th)
                             if (th == "athletics") 0 else 1.0),
                    .THEMES),
-      outcomes_heavy = list(scale = 1, selectivity = 1, resources = 1,
-                            finance = 1, outcomes = 2.5, aid = 1,
-                            composition = 1, athletics = 0),
-      resources_heavy = list(scale = 1, selectivity = 1, resources = 2,
-                             finance = 1.5, outcomes = 1, aid = 1,
-                             composition = 1, athletics = 0),
-      mission_similar = list(scale = 1, selectivity = 1, resources = 1,
-                             finance = 1, outcomes = 1, aid = 1,
-                             composition = 2, athletics = 0)
+      # Each non-balanced preset boosts exactly one theme to 2.5 and leaves
+      # the rest at 1.0. Replaces the prior "mission_similar" preset, which
+      # boosted composition but had a misleading name for a Jesuit institution.
+      outcomes_heavy    = list(scale = 1, selectivity = 1,   resources = 1,
+                               finance = 1, outcomes = 2.5,  aid = 1,
+                               composition = 1, athletics = 0),
+      resources_heavy   = list(scale = 1, selectivity = 1,   resources = 2,
+                               finance = 1.5, outcomes = 1,  aid = 1,
+                               composition = 1, athletics = 0),
+      selectivity_heavy = list(scale = 1, selectivity = 2.5, resources = 1,
+                               finance = 1, outcomes = 1,    aid = 1,
+                               composition = 1, athletics = 0),
+      aid_heavy         = list(scale = 1, selectivity = 1,   resources = 1,
+                               finance = 1, outcomes = 1,    aid = 2.5,
+                               composition = 1, athletics = 0)
     )
     apply_preset <- function(p) {
       v <- .THEME_PRESETS_LOCAL[[p]]
       for (th in names(v))
         updateSliderInput(session, paste0("weight_", th), value = v[[th]])
     }
-    observeEvent(input$preset_balanced,        apply_preset("balanced"))
-    observeEvent(input$preset_outcomes_heavy,  apply_preset("outcomes_heavy"))
-    observeEvent(input$preset_resources_heavy, apply_preset("resources_heavy"))
-    observeEvent(input$preset_mission_similar, apply_preset("mission_similar"))
+    observeEvent(input$preset_balanced,          apply_preset("balanced"))
+    observeEvent(input$preset_outcomes_heavy,    apply_preset("outcomes_heavy"))
+    observeEvent(input$preset_resources_heavy,   apply_preset("resources_heavy"))
+    observeEvent(input$preset_selectivity_heavy, apply_preset("selectivity_heavy"))
+    observeEvent(input$preset_aid_heavy,         apply_preset("aid_heavy"))
 
     # -------------------------------------------------------------------------
     # Run the stratified search
