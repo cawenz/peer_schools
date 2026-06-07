@@ -230,10 +230,13 @@ kt <- kable(disp, format = "latex", booktabs = TRUE, longtable = TRUE,
   column_spec(6, width = "0.6in") |>
   row_spec(0, bold = TRUE, color = "#602D89")
 
-# Highlight the anchor row in COHC purple.
+# Highlight the anchor row in COHC purple. kableExtra passes the color
+# strings straight to xcolor's \cellcolor / \color macros, which need
+# the leading `#` on hex codes — without it, xcolor tries to resolve
+# them as named colors and errors with "Undefined color".
 if (n_anchor == 1) {
   kt <- kt |> row_spec(1, bold = TRUE,
-                       background = "F4EDEC",
+                       background = "#F4EDEC",
                        color      = "#251230")
 }
 
