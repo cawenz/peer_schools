@@ -244,6 +244,7 @@ peerSearchSidebarUI <- function(id) {
 # -----------------------------------------------------------------------------
 peerSearchSidebarServer <- function(id, restore_signal = NULL) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
 
     # --- Populate dynamic choices on startup from .SCHOOLS in global.R ---
     # Sorted alphabetically by label and shipped client-side so selectize's
