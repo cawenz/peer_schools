@@ -212,9 +212,10 @@ peerSearchSidebarUI <- function(id) {
       )
     ),
 
-    tags$hr(),
-
     # ---------------- Run / Save ----------------
+    # No <hr> here — the big primary "Run search" button is itself a
+    # strong visual break from the Advanced accordion above it, so a
+    # divider would just add noise.
     tags$div(
       class = "d-grid gap-2",
       actionButton(ns("run"), "Run search",
