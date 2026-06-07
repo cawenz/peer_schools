@@ -387,18 +387,105 @@ peerTableServer <- function(id, sidebar_state) {
         div(class = "peer-results-header",
             h5(sprintf("Top %d peers (click a row to compare)",
                        nrow(res$peers))),
-            actionButton(ns("about_table_btn"),
-                         label = tagList(
-                           tags$span(class = "peer-about-icon",
-                                      HTML("&#9432;")),
-                           "About this table"),
-                         class = "btn peer-about-btn")),
+            # Right-side action cluster: downloads + the About modal
+            # link. Downloads come first since they're the action users
+            # are most likely to take after reviewing the table.
+            div(class = "peer-results-actions",
+              downloadButton(ns("download_xlsx"),
+                             label = "Excel",
+                             class = "btn btn-sm peer-download-btn",
+                             icon  = icon("file-excel")),
+              downloadButton(ns("download_pdf"),
+                             label = "PDF",
+                             class = "btn btn-sm peer-download-btn",
+                             icon  = icon("file-pdf")),
+              actionButton(ns("about_table_btn"),
+                           label = tagList(
+                             tags$span(class = "peer-about-icon",
+                                        HTML("&#9432;")),
+                             "About this table"),
+                           class = "btn peer-about-btn"))),
         p(class = "text-muted",
           tags$small("Anchor school appears highlighted at the top. ",
                      "Peers below sorted by distance ascending. Click ",
                      "any column header to re-sort."))
       )
     })
+
+    # ---- Download handlers ------------------------------------------------
+    # Both bind to peer_result() / sidebar_state$state() so they always
+    # reflect the current search. Filenames embed the anchor name +
+    # timestamp so downloads don't collide in the user's Downloads folder.
+    .download_basename <- function(res, ext) {
+      anchor_name <- res$meta$anchor_name %||% "anchor"
+      safe <- gsub("[^A-Za-z0-9]+", "_", anchor_name)
+      safe <- substr(safe, 1, 40)
+      sprintf("peer_search_%s_%s.%s",
+              safe,
+              format(Sys.time(), "%Y%m%d_%H%M%S"),
+              ext)
+    }
+
+    output$download_xlsx <- downloadHandler(
+      filename = function() {
+        res <- peer_result()
+        if (is.null(res)) "peer_search.xlsx"
+        else .download_basename(res, "xlsx")
+      },
+      content = function(file) {
+        res <- peer_result()
+        st  <- sidebar_state$state()
+        if (is.null(res)) {
+          # Shouldn't happen — button only renders when results exist —
+          # but if it does, write an empty placeholder so the browser's
+          # download flow doesn't hang.
+          openxlsx::write.xlsx(
+            data.frame(message = "No search results to download."),
+            file)
+          return()
+        }
+        build_peer_xlsx(res, st, file)
+      },
+      contentType =
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+
+    output$download_pdf <- downloadHandler(
+      filename = function() {
+        res <- peer_result()
+        if (is.null(res)) "peer_search.pdf"
+        else .download_basename(res, "pdf")
+      },
+      content = function(file) {
+        res <- peer_result()
+        st  <- sidebar_state$state()
+        if (is.null(res)) {
+          writeLines("No search results to download.", file)
+          return()
+        }
+        # PDF render can take 30-60s on a cold tinytex install (it
+        # auto-fetches LaTeX packages); subsequent renders are fast.
+        # showNotification gives the user immediate feedback.
+        id <- showNotification("Building PDF report…",
+                               duration = NULL, type = "message")
+        on.exit(removeNotification(id), add = TRUE)
+        tryCatch(
+          build_peer_pdf(res, st, file),
+          error = function(e) {
+            removeNotification(id)
+            showNotification(
+              paste("PDF generation failed:", conditionMessage(e)),
+              duration = 10, type = "error")
+            # Write a one-line placeholder so the browser's download
+            # handshake completes — the notification surfaces the real
+            # error to the user.
+            writeLines(paste("PDF generation failed:",
+                              conditionMessage(e)), file)
+          }
+        )
+      },
+      contentType = "application/pdf"
+    )
 
     # ---- About-this-table modal ------------------------------------------
     # Explains every column in the peer table, including the three external

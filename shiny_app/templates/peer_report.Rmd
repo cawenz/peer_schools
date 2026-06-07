@@ -1,0 +1,255 @@
+---
+title: "Peer Search Report"
+output:
+  pdf_document:
+    toc: false
+    keep_tex: false
+geometry: margin=0.75in
+fontsize: 10pt
+# mainfont only works with xelatex/lualatex; we stick with the default
+# pdflatex for portability. Letter paper for the US institutional
+# research audience.
+classoption: letterpaper
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage[table]{xcolor}
+  - \definecolor{cohcpurple}{HTML}{602D89}
+  - \definecolor{cohcblush}{HTML}{F4EDEC}
+  - \definecolor{cohcaccent}{HTML}{AC9E94}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
+                      fig.align = "center", dev = "pdf")
+suppressPackageStartupMessages({
+  library(knitr)
+  library(ggplot2)
+  library(dplyr)
+  library(scales)
+})
+
+# kableExtra is optional — fall back to plain kable when absent so the
+# render doesn't hard-error on hosts without it.
+kableExtra_or_plain <- function(x) {
+  if (requireNamespace("kableExtra", quietly = TRUE)) {
+    kableExtra::kable_styling(x,
+      latex_options = c("hold_position", "striped"),
+      stripe_color = "cohcblush",
+      full_width   = FALSE,
+      position     = "left",
+      font_size    = 9)
+  } else {
+    x
+  }
+}
+
+# %||% is a Shiny/rlang infix that returns the LHS unless it's NULL.
+# Define a local fallback so this template renders even when no Shiny
+# context is active.
+if (!exists("%||%", mode = "function")) {
+  `%||%` <- function(a, b) if (is.null(a)) b else a
+}
+
+# The render envir has these injected:
+#   peer_result, state
+#   .SCHOOLS, .prettify_classification, .prettify_control, .describe_pool_filter
+# (See build_peer_pdf in shiny_app/R/download_helpers.R.)
+meta  <- peer_result$meta
+peers <- peer_result$peers
+anchor_uid <- meta$anchor_unitid
+anchor_row <- .SCHOOLS[.SCHOOLS$unitid == anchor_uid, , drop = FALSE]
+anchor_name <- meta$anchor_name %||% (if (nrow(anchor_row)) anchor_row$instnm else "Anchor")
+
+# Joined frame of anchor + peers used by the composition cards.
+peer_meta <- .SCHOOLS[.SCHOOLS$unitid %in% peers$unitid, , drop = FALSE]
+```
+
+\begin{center}
+{\color{cohcpurple}\Large\bfseries Peer Search Report}\\[2pt]
+{\color{cohcaccent}\small Anchor: `r anchor_name` ~~|~~ `r nrow(peers)` peers ~~|~~ Generated `r format(Sys.time(), '%Y-%m-%d %H:%M')`}
+\end{center}
+
+\vspace{-0.5em}
+
+## Search settings
+
+```{r summary-table, results="asis"}
+tw <- state$theme_weights %||% list()
+tw_lbl <- if (length(tw))
+  paste(sprintf("%s = %.2f", names(tw), unlist(tw)), collapse = "; ") else "(all default)"
+vw <- state$variable_weights %||% list()
+vw_lbl <- if (length(vw))
+  paste(sprintf("%s = %.2f", names(vw), unlist(vw)), collapse = "; ") else "(none)"
+
+summary_df <- data.frame(
+  Field = c("Candidate pool",
+            "Pool size after filter",
+            "Distance metric",
+            "Coverage threshold",
+            "Theme weights",
+            "Variable overrides"),
+  Value = c(.describe_pool_filter(state$candidate_pool),
+            as.character(meta$candidate_pool_size %||% ""),
+            meta$distance_metric %||% "weighted_euclidean",
+            sprintf("%.0f%%", 100 * (meta$coverage_threshold %||% NA)),
+            tw_lbl,
+            vw_lbl),
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+kable(summary_df, format = "latex", booktabs = TRUE,
+      col.names = c("", ""),
+      align = c("l", "l"), linesep = "") |>
+  kableExtra_or_plain()
+```
+
+## Ranked peer list
+
+```{r peer-table, results="asis"}
+# Anchor row at top, then peers in rank order. Distances formatted to 3 dp.
+disp <- data.frame(
+  Rank   = peers$rank,
+  School = peers$instnm,
+  Class  = .prettify_classification(peers$usnews_classification %||%
+                                      rep(NA_character_, nrow(peers))),
+  `USN Rank` = ifelse(is.na(peers$usnews_rank %||% rep(NA_real_, nrow(peers))),
+                       "", as.character(peers$usnews_rank %||% NA_real_)),
+  State    = peers$stabbr %||% rep("", nrow(peers)),
+  Distance = sprintf("%.3f", peers$distance),
+  check.names = FALSE,
+  stringsAsFactors = FALSE
+)
+
+if (nrow(anchor_row) == 1) {
+  a_row <- data.frame(
+    Rank   = "*",
+    School = paste0(anchor_row$instnm, " (anchor)"),
+    Class  = .prettify_classification(anchor_row$usnews_classification),
+    `USN Rank` = if (is.na(anchor_row$usnews_rank)) "" else
+                 as.character(anchor_row$usnews_rank),
+    State    = anchor_row$stabbr,
+    Distance = "0.000",
+    check.names = FALSE,
+    stringsAsFactors = FALSE
+  )
+  disp <- rbind(a_row, disp)
+}
+
+kable(disp, format = "latex", booktabs = TRUE, longtable = TRUE,
+      align = c("r", "l", "l", "r", "c", "r"),
+      linesep = "") |>
+  kableExtra_or_plain()
+```
+
+## Composition of the peer set
+
+```{r composition-cards, fig.width=6.8, fig.height=6, fig.pos="H"}
+# Reuse the same 5 dimensions the Composition tab shows. Replicated
+# here so the Rmd is self-contained — when these definitions change
+# in mod_peer_table.R, mirror them here.
+.col_or <- function(df, name) {
+  if (name %in% names(df)) df[[name]] else rep(NA_character_, nrow(df))
+}
+
+# Geographic region from state — mirrors .REGIONS in ui_sidebar.R but
+# we only need the top-level four buckets here.
+state_to_region <- function(stabbr) {
+  northeast <- c("CT","ME","MA","NH","NJ","NY","PA","RI","VT")
+  midwest   <- c("IL","IN","IA","KS","MI","MN","MO","NE","ND","OH","SD","WI")
+  south     <- c("AL","AR","DE","DC","FL","GA","KY","LA","MD","MS","NC",
+                 "OK","SC","TN","TX","VA","WV")
+  west      <- c("AK","AZ","CA","CO","HI","ID","MT","NV","NM","OR","UT","WA","WY")
+  out <- rep(NA_character_, length(stabbr))
+  out[stabbr %in% northeast] <- "Northeast"
+  out[stabbr %in% midwest]   <- "Midwest"
+  out[stabbr %in% south]     <- "South"
+  out[stabbr %in% west]      <- "West"
+  out
+}
+
+# Build a long frame: one row per (dimension, peer school, category value).
+dims <- list(
+  list(label = "US News classification",
+       vals  = .prettify_classification(.col_or(peer_meta, "usnews_classification")),
+       anchor_val = if (nrow(anchor_row)) .prettify_classification(anchor_row$usnews_classification) else NA),
+  list(label = "Institution size (Carnegie)",
+       vals  = as.character(.col_or(peer_meta, "ic2025size_label")),
+       anchor_val = if (nrow(anchor_row)) as.character(anchor_row$ic2025size_label %||% NA) else NA),
+  list(label = "Geographic region",
+       vals  = state_to_region(.col_or(peer_meta, "stabbr")),
+       anchor_val = if (nrow(anchor_row)) state_to_region(anchor_row$stabbr) else NA),
+  list(label = "Carnegie Research Activity",
+       vals  = as.character(.col_or(peer_meta, "research2025_label")),
+       anchor_val = if (nrow(anchor_row)) as.character(anchor_row$research2025_label %||% NA) else NA),
+  list(label = "Athletics division",
+       vals  = ifelse(is.na(.col_or(peer_meta, "athletics_division")),
+                       "(no athletics)",
+                       as.character(.col_or(peer_meta, "athletics_division"))),
+       anchor_val = if (nrow(anchor_row))
+                      ifelse(is.na(anchor_row$athletics_division %||% NA),
+                             "(no athletics)",
+                             as.character(anchor_row$athletics_division %||% NA))
+                    else NA)
+)
+
+card_df <- do.call(rbind, lapply(dims, function(d) {
+  tab <- table(d$vals, useNA = "no")
+  if (length(tab) == 0) return(NULL)
+  pct <- as.numeric(tab) / sum(tab) * 100
+  is_anchor <- names(tab) == d$anchor_val
+  data.frame(
+    dimension = d$label,
+    category  = names(tab),
+    n         = as.integer(tab),
+    pct       = pct,
+    is_anchor = is_anchor,
+    stringsAsFactors = FALSE
+  )
+}))
+
+# Star the anchor category in the bar label.
+card_df$category_lbl <- ifelse(card_df$is_anchor,
+                                paste0("★ ", card_df$category),
+                                card_df$category)
+# Truncate very long labels so the bars stay readable.
+card_df$category_lbl <- ifelse(nchar(card_df$category_lbl) > 40,
+                                paste0(substr(card_df$category_lbl, 1, 37), "..."),
+                                card_df$category_lbl)
+
+# Sort categories within each card by share descending so the longest
+# bar is on top of each subplot.
+card_df <- card_df[order(card_df$dimension, -card_df$pct), ]
+card_df$category_lbl <- factor(card_df$category_lbl,
+                                levels = rev(unique(card_df$category_lbl)))
+
+ggplot(card_df, aes(x = pct, y = category_lbl, fill = is_anchor)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = sprintf("%d (%d%%)", n, round(pct))),
+            hjust = -0.05, size = 2.6, color = "#251230") +
+  facet_wrap(~ dimension, scales = "free_y", ncol = 2) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.18)), labels = NULL) +
+  scale_fill_manual(values = c("TRUE" = "#602D89", "FALSE" = "#AC9E94"),
+                    guide = "none") +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 8) +
+  theme(
+    strip.text = element_text(face = "bold", color = "#602D89",
+                              size = 9, hjust = 0),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor   = element_blank(),
+    panel.grid.major.y = element_blank(),
+    axis.ticks         = element_blank(),
+    plot.margin = margin(2, 6, 2, 2)
+  )
+```
+
+\vfill
+\begin{center}
+{\color{cohcaccent}\small Generated by the Peer Schools Explorer. \\ For methodology details see the Help tab in the app.}
+\end{center}

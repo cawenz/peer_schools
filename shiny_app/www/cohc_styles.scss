@@ -3046,6 +3046,49 @@ ul, ol {
 
 /* ---------- Peer Search follow-up sections ---------- */
 
+/* Action cluster on the right side of the peer-results-header: two
+ * download buttons (Excel + PDF) followed by the About-this-table
+ * modal trigger. Wraps to a new line on narrow viewports. */
+.peer-results-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Compact outline buttons for the Excel + PDF downloads. Less
+ * prominent than the purple "About this table" CTA so the eye still
+ * lands on the explainer button first. */
+.peer-download-btn {
+  background: #FFFFFF;
+  color: #602D89;
+  border: 1px solid #602D89;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  /* Tighten icon spacing inside the button */
+  .fa, .fas, .far {
+    margin-right: 0.3rem;
+    font-size: 0.85rem;
+  }
+
+  &:hover, &:focus {
+    background: #F4EDEC;
+    color: #251230;
+    border-color: #251230;
+    text-decoration: none;
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.18);
+    outline: none;
+  }
+}
+
 /* Heavy divider between the main result and the follow-up sections, so
  * it's clear they're "after the search" tools. Tight margins — the
  * peer-results-table and peer-analysis-tabs neighbors already zero
