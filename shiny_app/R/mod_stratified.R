@@ -207,7 +207,9 @@ stratifiedSidebarUI <- function(id) {
                   .theme_default_weight(th)
                 else if (th == "athletics") 0 else 1.0
           sliderInput(ns(paste0("weight_", th)),
-                      label = stringr::str_to_title(th),
+                      # Use .theme_label() so "student_body" renders as
+                      # "Student body" instead of "Student_body".
+                      label = .theme_label(th),
                       min = 0, max = 3, value = dv, step = 0.25,
                       ticks = FALSE)
         })
@@ -267,19 +269,20 @@ stratifiedServer <- function(id) {
                    .THEMES),
       # Each non-balanced preset boosts exactly one theme to 2.5 and leaves
       # the rest at 1.0. Replaces the prior "mission_similar" preset, which
-      # boosted composition but had a misleading name for a Jesuit institution.
-      outcomes_heavy    = list(scale = 1, selectivity = 1,   resources = 1,
+      # boosted student_body but had a misleading name for a Jesuit
+      # institution.
+      outcomes_heavy    = list(size = 1, selectivity = 1,   resources = 1,
                                finance = 1, outcomes = 2.5,  aid = 1,
-                               composition = 1, athletics = 0),
-      resources_heavy   = list(scale = 1, selectivity = 1,   resources = 2,
+                               student_body = 1, athletics = 0),
+      resources_heavy   = list(size = 1, selectivity = 1,   resources = 2,
                                finance = 1.5, outcomes = 1,  aid = 1,
-                               composition = 1, athletics = 0),
-      selectivity_heavy = list(scale = 1, selectivity = 2.5, resources = 1,
+                               student_body = 1, athletics = 0),
+      selectivity_heavy = list(size = 1, selectivity = 2.5, resources = 1,
                                finance = 1, outcomes = 1,    aid = 1,
-                               composition = 1, athletics = 0),
-      aid_heavy         = list(scale = 1, selectivity = 1,   resources = 1,
+                               student_body = 1, athletics = 0),
+      aid_heavy         = list(size = 1, selectivity = 1,   resources = 1,
                                finance = 1, outcomes = 1,    aid = 2.5,
-                               composition = 1, athletics = 0)
+                               student_body = 1, athletics = 0)
     )
     apply_preset <- function(p) {
       v <- .THEME_PRESETS_LOCAL[[p]]

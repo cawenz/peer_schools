@@ -17,8 +17,8 @@
 # =============================================================================
 
 .COMPARE_THEME_ORDER <- c(
-  "scale", "selectivity", "resources", "finance",
-  "outcomes", "aid", "composition", "athletics"
+  "size", "selectivity", "resources", "finance",
+  "outcomes", "aid", "student_body", "athletics"
 )
 
 # -----------------------------------------------------------------------------
@@ -169,15 +169,15 @@
        })
 )
 .COMPARE_THEME_LABELS <- c(
-  scale       = "Scale",
-  selectivity = "Selectivity",
-  resources   = "Resources",
-  finance     = "Finance",
-  outcomes    = "Outcomes",
-  aid         = "Aid",
-  composition = "Composition",
-  athletics   = "Athletics",
-  descriptive = "Descriptive"
+  size         = "Size",
+  selectivity  = "Selectivity",
+  resources    = "Resources",
+  finance      = "Finance",
+  outcomes     = "Outcomes",
+  aid          = "Aid",
+  student_body = "Student body",
+  athletics    = "Athletics",
+  descriptive  = "Descriptive"
 )
 
 compareSidebarUI <- function(id) {

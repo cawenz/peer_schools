@@ -2043,8 +2043,10 @@ peerTableServer <- function(id, sidebar_state) {
       df <- data.frame(
         Variable = labels,
         Metric   = vars,
+        # Use .theme_label() so multi-word theme keys ("student_body")
+        # render as "Student body" instead of "Student_body".
         Theme    = ifelse(is.na(themes), "(unassigned)",
-                          stringr::str_to_title(themes)),
+                          .theme_label(themes)),
         Weight   = unname(m$weights),
         stringsAsFactors = FALSE,
         check.names = FALSE

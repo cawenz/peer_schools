@@ -57,7 +57,7 @@ suppressMessages({
 # -----------------------------------------------------------------------------
 
 .THEME_VARS <- list(
-  scale = c(
+  size = c(
     "total_enrollment", "undergraduate_enrollment",
     "first_time_enrollment", "full_time_enrollment"
   ),
@@ -87,7 +87,7 @@ suppressMessages({
     "pct_grant_aid", "avg_inst_grant", "inst_discount_rate",
     "pct_borrowing", "avg_fed_loan", "pct_need_met", "pct_need_fully_met"
   ),
-  composition = c(
+  student_body = c(
     "pct_undergrad", "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
     "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
@@ -97,7 +97,7 @@ suppressMessages({
   )
 )
 
-.COMPOSITION_HALF_WEIGHT <- c(
+.STUDENT_BODY_HALF_WEIGHT <- c(
   "pct_black", "pct_hispanic", "pct_asian",
   "pct_nhpi", "pct_aian", "pct_two_or_more"
 )
@@ -119,7 +119,7 @@ suppressMessages({
 
 .var_theme <- function(v) {
   for (t in names(.THEME_VARS)) if (v %in% .THEME_VARS[[t]]) return(t)
-  if (v %in% .COMPOSITION_HALF_WEIGHT) return("composition")
+  if (v %in% .STUDENT_BODY_HALF_WEIGHT) return("student_body")
   NA_character_
 }
 

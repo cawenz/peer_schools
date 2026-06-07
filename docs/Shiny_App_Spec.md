@@ -20,7 +20,7 @@ Make `compute_peers()` accessible to non-R-coding stakeholders for institutional
 
 ### 1. Theme-weight control
 
-Seven sliders in the sidebar, one per theme (`scale`, `selectivity`, `resources`, `finance`, `outcomes`, `aid`, `composition`). Range 0 to 3, default 1.0, step 0.25.
+Eight sliders in the sidebar, one per theme (`size`, `selectivity`, `resources`, `finance`, `outcomes`, `aid`, `student_body`, `athletics`). Range 0 to 3, default 1.0, step 0.25 (athletics defaults to 0, opt-in).
 
 A small "Presets" row above the sliders with quick buttons:
 - **Balanced** (all 1.0) — default

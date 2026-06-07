@@ -61,7 +61,7 @@ suppressMessages({
 # theme - they are used as filters via candidate_pool, not as similarity
 # dimensions.
 THEME_VARS <- list(
-  scale = c(
+  size = c(
     "total_enrollment", "undergraduate_enrollment",
     "first_time_enrollment", "full_time_enrollment"
   ),
@@ -91,7 +91,7 @@ THEME_VARS <- list(
     "pct_any_grant", "avg_inst_grant", "inst_discount_rate",
     "pct_federal_loan", "avg_federal_loan", "pct_need_met", "pct_need_fully_met"
   ),
-  composition = c(
+  student_body = c(
     "pct_undergrad", "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
     "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
@@ -118,11 +118,16 @@ THEME_VARS <- list(
   )
 )
 
-# 6 detail race variables get half weight in the Composition theme
-COMPOSITION_HALF_WEIGHT <- c(
+# 6 detail race variables get half weight in the Student body theme
+# (kept legacy constant name `COMPOSITION_HALF_WEIGHT` available below
+# as an alias so any external scripts that referenced it keep working.)
+STUDENT_BODY_HALF_WEIGHT <- c(
   "pct_black", "pct_hispanic", "pct_asian",
   "pct_nhpi", "pct_aian", "pct_two_or_more"
 )
+# Alias kept so any older code/scripts that referenced the prior name
+# continue to work. Safe to remove once we're sure nothing reads it.
+COMPOSITION_HALF_WEIGHT <- STUDENT_BODY_HALF_WEIGHT
 
 # -----------------------------------------------------------------------------
 # LOG TRANSFORM ASSIGNMENTS
@@ -217,7 +222,7 @@ ASPIRANT_LABELS <- list(
   for (theme in names(THEME_VARS)) {
     if (var_name %in% THEME_VARS[[theme]]) return(theme)
   }
-  if (var_name %in% COMPOSITION_HALF_WEIGHT) return("composition")
+  if (var_name %in% STUDENT_BODY_HALF_WEIGHT) return("student_body")
   NA_character_
 }
 
@@ -312,8 +317,8 @@ ASPIRANT_LABELS <- list(
 #'                       Default in_ranked_universe = TRUE (~1,235 schools).
 #'                       Pass list() for no filter (full universe).
 #' @param theme_weights Named list of theme weight overrides. Default all 1.0.
-#'                       Themes: scale, selectivity, resources, finance,
-#'                       outcomes, aid, composition.
+#'                       Themes: size, selectivity, resources, finance,
+#'                       outcomes, aid, student_body, athletics.
 #' @param variable_weights Named list of per-variable weight overrides.
 #'                          Multiplies the theme contribution for that variable.
 #' @param exclude_variables Character vector of variables to exclude entirely.
@@ -476,7 +481,7 @@ compute_peers <- function(
     # Variables in this theme that survived (full-weight and half-weight)
     theme_full <- intersect(THEME_VARS[[theme]], vars_final)
     theme_half <- intersect(
-      if (theme == "composition") COMPOSITION_HALF_WEIGHT else character(0),
+      if (theme == "student_body") STUDENT_BODY_HALF_WEIGHT else character(0),
       vars_final
     )
     theme_n <- length(theme_full) + 0.5 * length(theme_half)
@@ -873,8 +878,8 @@ compute_aspirant_peers <- function(
 #     )
 #   )
 
-#   # Up-weight Composition to make religious-tradition match more impactful
-   res_comp <- compute_peers(theme_weights = list(composition = 2.0))
+#   # Up-weight Student body to make religious-tradition match more impactful
+#   res_sb <- compute_peers(theme_weights = list(student_body = 2.0))
 #
 #   # Diagnostics
 #   res$meta$variables_dropped_coverage   # variables below 70% in pool

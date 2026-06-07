@@ -18,8 +18,8 @@
 # If you change the theme set, change BOTH definitions in lockstep.
 # -----------------------------------------------------------------------------
 if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
-  .THEMES <- c("scale", "selectivity", "resources", "finance",
-               "outcomes", "aid", "composition", "athletics")
+  .THEMES <- c("size", "selectivity", "resources", "finance",
+               "outcomes", "aid", "student_body", "athletics")
 }
 
 # Themes that default to 0 weight (opt-in). Sliders for these start at 0
@@ -71,18 +71,18 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
   # both get their own preset so users can lean into either dimension.
   # (Replaces the prior "mission_similar" preset, which boosted composition
   # but had a misleading name for a Jesuit institution.)
-  outcomes_heavy    = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
+  outcomes_heavy    = list(size = 1.0, selectivity = 1.0, resources = 1.0,
                            finance = 1.0, outcomes = 2.5, aid = 1.0,
-                           composition = 1.0, athletics = 0),
-  resources_heavy   = list(scale = 1.0, selectivity = 1.0, resources = 2.0,
+                           student_body = 1.0, athletics = 0),
+  resources_heavy   = list(size = 1.0, selectivity = 1.0, resources = 2.0,
                            finance = 1.5, outcomes = 1.0, aid = 1.0,
-                           composition = 1.0, athletics = 0),
-  selectivity_heavy = list(scale = 1.0, selectivity = 2.5, resources = 1.0,
+                           student_body = 1.0, athletics = 0),
+  selectivity_heavy = list(size = 1.0, selectivity = 2.5, resources = 1.0,
                            finance = 1.0, outcomes = 1.0, aid = 1.0,
-                           composition = 1.0, athletics = 0),
-  aid_heavy         = list(scale = 1.0, selectivity = 1.0, resources = 1.0,
+                           student_body = 1.0, athletics = 0),
+  aid_heavy         = list(size = 1.0, selectivity = 1.0, resources = 1.0,
                            finance = 1.0, outcomes = 1.0, aid = 2.5,
-                           composition = 1.0, athletics = 0)
+                           student_body = 1.0, athletics = 0)
 )
 
 # -----------------------------------------------------------------------------
@@ -180,7 +180,10 @@ peerSearchSidebarUI <- function(id) {
     # peer searches behave identically until the user dials it up.
     lapply(.THEMES, function(th) {
       sliderInput(ns(paste0("weight_", th)),
-                  label = stringr::str_to_title(th),
+                  # .theme_label() handles multi-word display names
+                  # ("student_body" → "Student body") that str_to_title()
+                  # would otherwise turn into "Student_body".
+                  label = .theme_label(th),
                   min = 0, max = 3,
                   value = .theme_default_weight(th),
                   step = 0.25, ticks = FALSE)

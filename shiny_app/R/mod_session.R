@@ -76,6 +76,22 @@
   for (i in seq_along(out)) {
     if (is.null(out[[i]]$saved_by)) out[[i]]$saved_by <- "(unknown)"
     if (is.null(out[[i]]$version))  out[[i]]$version  <- 1L
+    # Theme-name migration: prior versions stored the size theme as
+    # "scale" and the student_body theme as "composition". Rewrite the
+    # keys in-place on load so older saved searches keep working under
+    # the renamed theme set. Idempotent — safe to run on already-new
+    # records, where the old keys simply won't exist.
+    tw <- out[[i]]$state$theme_weights
+    if (is.list(tw)) {
+      if (!is.null(tw[["scale"]]) && is.null(tw[["size"]])) {
+        tw[["size"]]  <- tw[["scale"]]; tw[["scale"]] <- NULL
+      }
+      if (!is.null(tw[["composition"]]) && is.null(tw[["student_body"]])) {
+        tw[["student_body"]] <- tw[["composition"]]
+        tw[["composition"]]  <- NULL
+      }
+      out[[i]]$state$theme_weights <- tw
+    }
   }
   out
 }

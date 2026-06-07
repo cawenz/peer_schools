@@ -115,7 +115,9 @@ aspirantUI <- function(id) {
                         .theme_default_weight(th)
                       else if (th == "athletics") 0 else 1.0
                 sliderInput(ns(paste0("weight_", th)),
-                            label = stringr::str_to_title(th),
+                            # .theme_label() handles "student_body" →
+                            # "Student body" correctly.
+                            label = .theme_label(th),
                             min = 0, max = 3, value = dv,
                             step = 0.25, ticks = FALSE)
               })

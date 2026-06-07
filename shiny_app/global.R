@@ -179,8 +179,33 @@ if (file.exists(.schools_ath_path)) {
 # -----------------------------------------------------------------------------
 # Small constants the UI will need
 # -----------------------------------------------------------------------------
-.THEMES <- c("scale", "selectivity", "resources", "finance",
-             "outcomes", "aid", "composition", "athletics")
+.THEMES <- c("size", "selectivity", "resources", "finance",
+             "outcomes", "aid", "student_body", "athletics")
+
+# Display labels for the theme keys above. Used by slider/header
+# renderers in place of stringr::str_to_title() so multi-word themes
+# (e.g. student_body → "Student body") render cleanly instead of
+# "Student_body". Add new theme keys here when extending .THEMES.
+.THEME_LABELS <- c(
+  size         = "Size",
+  selectivity  = "Selectivity",
+  resources    = "Resources",
+  finance      = "Finance",
+  outcomes     = "Outcomes",
+  aid          = "Aid",
+  student_body = "Student body",
+  athletics    = "Athletics"
+)
+
+# Map an internal theme key (or a vector of keys) to its display label.
+# Falls back to stringr::str_to_title() for anything not in the lookup
+# (e.g. ad-hoc keys, "descriptive", etc.) so the renderer never breaks.
+.theme_label <- function(th) {
+  out <- unname(.THEME_LABELS[th])
+  miss <- is.na(out)
+  if (any(miss)) out[miss] <- stringr::str_to_title(th[miss])
+  out
+}
 
 .DEFAULT_ANCHOR_UNITID <- 166124L  # Holy Cross
 

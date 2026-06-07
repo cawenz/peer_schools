@@ -420,7 +420,7 @@ print_peers(res)
 
 # 4. Examples — Holy Cross is the default anchor
 # Outcomes-weighted
-compute_peers(theme_weights = list(outcomes = 2.5, scale = 0.5))
+compute_peers(theme_weights = list(outcomes = 2.5, size = 0.5))
 # New England regional
 compute_peers(candidate_pool = list(
   in_ranked_universe = TRUE,

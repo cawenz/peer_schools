@@ -9,10 +9,9 @@ any US College or University.
 You give the app a "home" institution (the **anchor**), and it returns
 the institutions most similar to that anchor on the dimensions you
 choose: size, selectivity, outcomes, finance, faculty resources, and
-student composition. Beyond that core peer search, the app helps you
+student body. Beyond that core peer search, the app helps you
 compare two schools side by side, inspect a single school's trajectory
-over time, curate a hand-picked cohort (for accreditation work, for
-example), and identify "aspirant" peers — schools you'd like to grow
+over time and identify "aspirant" peers: schools you'd like to grow
 toward on specific metrics. The default anchor is Holy Cross; you can
 change it on every tab.
 
@@ -20,7 +19,7 @@ change it on every tab.
 
 ## Quick start (about three clicks)
 
-1. Open the **Peer Search** tab. Click **Run search**. You'll see the top
+1. Open the **Peer Search** tab. Click **Run search** at the bottom of the sidebar. You'll see the top
    20 institutions most similar to your Anchor institution under the default
    methodology.
 2. Click any row in the results table. The app remembers your selection.
@@ -30,7 +29,7 @@ change it on every tab.
    You'll see Holy Cross's year-over-year line plotted against the peer
    set's interquartile band.
 
-That's the loop. Everything else is variations on those three actions
+That's the core functionality. Everything else is variations on those three actions
 for different questions.
 
 ---
@@ -40,8 +39,8 @@ for different questions.
 ### Peer Search
 
 > **What it answers:** "Which institutions, in our judgment of what
-> matters, look most like the anchor — and of those, which ones beat us
-> on growth metrics, and how do they break down across institutional
+> matters, look most like the anchor. Of those institutions, which ones beat us
+> across various metrics, and how do they break down across institutional
 > categories?"
 
 The headline tab. You set an **anchor school**, define a **candidate
@@ -51,9 +50,12 @@ by similarity to the anchor, then offers two follow-up refinements right
 below the result.
 
 **What's on screen.** The left sidebar holds all the controls. Anchor
-at the top, then pool filters (ranked universe, US News classification,
+at the top, then comparison pool filters (ranked universe, US News classification,
 sector, state/region, religious affiliation), then theme weight sliders,
-then output settings (number of peers to return). Click **Run search**.
+then output settings (number of peers to return). You also have the option to individually
+weight every possible clustering variable by clicking "Customize variables" below the weight sliders.
+
+Click **Run search**.
 The main panel shows:
 
 1. **Summary header + top peers table.** The closest K peers, sorted by
@@ -67,7 +69,7 @@ The main panel shows:
    peers to schools that beat the anchor on every chosen metric
    (**strict aspirants**) and schools that beat it on all but one
    (**near-miss**). Click any row to open the per-metric **Aspirational
-   gap** modal. The filter runs on the just-found peer set — fast and
+   gap** modal. The filter runs on the just-found peer set so it is fast and
    tied to the search you're already looking at.
 4. **Expand search into other groups.** Pick a stratification
    dimension (US News classification, Carnegie Research Activity,
@@ -232,13 +234,14 @@ dimension. Per-variable weights are derived from the **theme weights**
 you set in the sidebar.
 
 **Themes.** Variables are grouped into themes you can re-weight:
-**Scale** (enrollment counts), **Selectivity** (admit and yield rates),
+**Size** (enrollment counts), **Selectivity** (admit and yield rates),
 **Resources** (faculty, instruction spending), **Finance** (endowment,
 expenses, research), **Outcomes** (graduation rates, earnings,
 repayment), **Aid** (Pell, institutional grants, net price),
-**Composition** (Pell, first-generation, racial composition), and
-**Athletics** (intensity, breadth, multi-sport culture). Athletics
-defaults to weight 0 (opt-in).
+**Student body** (race, age, first-gen, family income, undergrad share,
+residential share, religious-tradition match), and **Athletics**
+(intensity, breadth, multi-sport culture). Athletics defaults to weight
+0 (opt-in).
 
 **Coverage and missingness.** Variables with less than 70% coverage
 within the candidate pool are dropped from the distance calculation for
@@ -295,9 +298,9 @@ and coverage — see the **Variables** tab.
   year.
 - **Coverage** — the share of the candidate pool that has a value for a
   given variable. Variables below 70% coverage drop out of the distance.
-- **Theme** — a grouping of variables (Scale, Outcomes, Aid, and so
-  on). Theme weights control how much each grouping contributes to the
-  distance calculation.
+- **Theme** — a grouping of variables (Size, Outcomes, Aid, Student
+  body, and so on). Theme weights control how much each grouping
+  contributes to the distance calculation.
 - **Strict aspirant** — a school that beats the anchor on every
   aspirational metric chosen.
 - **Near-miss aspirant** — a school that beats the anchor on all but
