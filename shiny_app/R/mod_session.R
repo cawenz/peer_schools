@@ -192,7 +192,7 @@ sessionUI <- function(id) {
       textInput(ns("saved_by"),
                  label = NULL,
                  value = "",
-                 width = "260px",
+                 width = "500px",
                  placeholder = "Your name (used to stamp future saves)")
     ),
 

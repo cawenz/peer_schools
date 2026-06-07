@@ -24,7 +24,9 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
 
 # Themes that default to 0 weight (opt-in). Sliders for these start at 0
 # and presets explicitly hold them at 0 unless overridden.
-.OPT_IN_THEMES <- c("athletics")
+.OPT_IN_THEMES <- c(
+  # "athletics"
+  )
 .theme_default_weight <- function(th) if (th %in% .OPT_IN_THEMES) 0 else 1.0
 
 # -----------------------------------------------------------------------------
