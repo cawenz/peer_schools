@@ -951,7 +951,11 @@ a:hover {
 
 .peer-comp-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  /* 5 dimensions, wider cards. minmax 420 fits ~2 columns at common
+   * widths and 3 at very wide; both layouts give the long category
+   * names ("National Liberal Arts Colleges", "NCAA Division I", etc.)
+   * enough room without ellipsis-truncation. */
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -1004,8 +1008,10 @@ a:hover {
 
 .peer-comp-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 90px minmax(0, 70px);
-  gap: 0.5rem;
+  /* Wider cards give the label column more room; bar column gets the
+   * same fixed footprint, stats stay compact on the right. */
+  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 80px);
+  gap: 0.6rem;
   align-items: center;
   padding: 0.2rem 0.4rem;
   border-radius: 3px;

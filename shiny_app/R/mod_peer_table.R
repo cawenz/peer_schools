@@ -1697,6 +1697,11 @@ peerTableServer <- function(id, sidebar_state) {
       as.character(df[[col]])
     }
 
+    # Five-card layout — focused on the dimensions that change most
+    # peer-to-peer and where the labels are short enough to not truncate
+    # in the side-by-side bar layout. Earlier 9-card version cut off
+    # things like "Special Focus: Arts and Sciences" and
+    # "Lower Access, Higher Earnings".
     .PEER_COMPOSITION_DIMS <- list(
       list(label    = "US News classification",
            accessor = function(df) .col_or_na(df, "usnews_classification"),
@@ -1704,12 +1709,9 @@ peerTableServer <- function(id, sidebar_state) {
              out <- .prettify_classification(v)
              if (length(out) != length(v)) v else as.character(out)
            }),
-      list(label    = "Sector / control",
-           accessor = function(df) .col_or_na(df, "control_grp"),
-           labeler  = function(v) {
-             out <- .prettify_control(v)
-             if (length(out) != length(v)) v else as.character(out)
-           }),
+      list(label    = "Institution size (Carnegie)",
+           accessor = function(df) .col_or_na(df, "ic2025size_label"),
+           labeler  = function(v) as.character(v)),
       list(label    = "Geographic region",
            accessor = function(df) {
              top <- c("northeast", "midwest", "south", "west")
@@ -1727,25 +1729,8 @@ peerTableServer <- function(id, sidebar_state) {
              out <- pretty[m]
              ifelse(is.na(out), "(unknown)", out)
            }),
-      list(label    = "Religious tradition",
-           accessor = function(df) {
-             v <- .col_or_na(df, "religious_tradition")
-             # nzchar(NA) is NA in R; coerce explicitly.
-             empty <- is.na(v) | (nzchar(v) %in% FALSE)
-             ifelse(empty, "(none / secular)", v)
-           },
-           labeler  = function(v) as.character(v)),
-      list(label    = "Carnegie Institutional (2025)",
-           accessor = function(df) .col_or_na(df, "ic2025_label"),
-           labeler  = function(v) as.character(v)),
-      list(label    = "Carnegie Setting (2025)",
-           accessor = function(df) .col_or_na(df, "setting2025_label"),
-           labeler  = function(v) as.character(v)),
-      list(label    = "Carnegie Research Activity (2025)",
+      list(label    = "Carnegie Research Activity",
            accessor = function(df) .col_or_na(df, "research2025_label"),
-           labeler  = function(v) as.character(v)),
-      list(label    = "Carnegie SAEC (2025)",
-           accessor = function(df) .col_or_na(df, "saec2025_label"),
            labeler  = function(v) as.character(v)),
       list(label    = "Athletics division",
            accessor = function(df) .col_or_na(df, "athletics_division"),
@@ -1842,7 +1827,10 @@ peerTableServer <- function(id, sidebar_state) {
         is_anchor <- isTRUE(b$is_anchor_cat)
         tags$div(class = paste("peer-comp-row",
                                 if (is_anchor) "peer-comp-row-anchor" else ""),
+          # Title attr surfaces the full category name on hover when the
+          # rendered text is truncated by the column width.
           tags$div(class = "peer-comp-row-label",
+                    title = as.character(b$label),
             if (is_anchor) HTML("&#9733; ") else NULL,
             b$label),
           tags$div(class = "peer-comp-row-bar",
@@ -1928,7 +1916,7 @@ peerTableServer <- function(id, sidebar_state) {
               value = "composition",
               div(class = "peer-composition-tab",
                   p(class = "peer-tab-lede text-muted",
-                    tags$small("How the peer set breaks down on nine ",
+                    tags$small("How the peer set breaks down on five ",
                                 "categorical dimensions. Anchor's category ",
                                 "is starred (★) and highlighted in each card.")),
                   uiOutput(ns("peer_composition")))
