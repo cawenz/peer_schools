@@ -674,43 +674,111 @@ a {
   padding-left: 0.6rem;
 }
 
-/* ---------- Sidebar: per-variable weight override panel ---------- */
-.var-override-slider {
-  margin-bottom: 0.25rem;
+/* ---------- Sidebar: variable override launcher + summary chip ---------- */
+.var-override-launcher {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
 
-  /* Tighten the slider label (variable display name) */
-  label, .control-label {
-    font-size: 0.78rem;
-    color: #251230;
-    margin-bottom: 0.1rem;
-    line-height: 1.3;
-  }
+  h6 { margin-bottom: 0.4rem; }
+}
 
-  /* shiny's irs slider widget has a healthy default vertical footprint;
-   * tighten it so 5+ overrides fit without runaway height. */
-  .irs--shiny {
-    margin-top: 0.1rem;
-    margin-bottom: 0.4rem;
+.var-override-summary {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
+
+  small { display: block; line-height: 1.4; }
+}
+
+.var-override-summary-empty {
+  background: #F4EDEC;
+  color: #475569;
+}
+
+.var-override-summary-set {
+  background: rgba(96, 45, 137, 0.08);
+  border-left: 3px solid #602D89;
+  color: #251230;
+
+  strong { color: #602D89; }
+
+  .var-override-list {
+    margin-top: 0.2rem;
+    color: #475569;
+    font-size: 0.72rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 
-.var-override-footer {
-  margin-top: 0.5rem;
-  padding-top: 0.4rem;
-  border-top: 1px dashed #AC9E94;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+/* ---------- Variable override modal grid ---------- */
+.var-modal-body {
+  padding-bottom: 0.5rem;
 }
 
-.var-override-clear {
-  font-size: 0.78rem;
+.var-modal-intro {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.var-modal-section {
+  margin-bottom: 1rem;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.var-modal-section-title {
   color: #602D89;
-  text-decoration: underline;
-  cursor: pointer;
-
-  &:hover, &:focus { color: #251230; }
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #F4EDEC;
 }
+
+.var-modal-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 220px;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.2rem;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+
+  &:hover { background: #FBF8F8; }
+
+  .var-modal-row-check {
+    .form-group, .checkbox { margin: 0 !important; padding: 0 !important; }
+    .form-check-input { margin: 0 !important; transform: scale(1.1); }
+    label { margin: 0 !important; }
+  }
+
+  .var-modal-row-label {
+    font-size: 0.85rem;
+    color: #251230;
+    line-height: 1.3;
+
+    label {
+      cursor: pointer;
+      margin: 0;
+      font-weight: 400;
+    }
+  }
+
+  .var-modal-row-slider {
+    .irs--shiny { margin: 0 !important; }
+    label, .control-label { display: none; }
+  }
+}
+
+/* Modal footer flex spacer so Reset stays left, Cancel/Apply stay right */
+.modal-footer { display: flex !important; align-items: center; }
 
 /* ---------- Sidebar: info button + label hints ---------- */
 /* "Ranked universe only" + a small info icon to its right. */

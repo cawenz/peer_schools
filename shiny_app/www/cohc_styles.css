@@ -14,9 +14,17 @@ body {
   font-size: 16px;
 }
 
+/* Brand the native form controls app-wide. Shiny's checkboxInput /
+ * checkboxGroupInput / radioButtons render raw <input> elements rather
+ * than Bootstrap .form-check-input, so without this they fall back to the
+ * OS default accent (blue). Pin them to brand purple everywhere. */
+input[type="checkbox"], input[type="radio"] {
+  accent-color: #602D89;
+}
+
 /* ---------- Navbar / page header ----------
  *
- * Neutral white navbar — no bold fill. The deep-blue accent color is
+ * Neutral white navbar — no bold fill. The brand-purple accent color is
  * reserved for active-tab indicators and the brand text so the header
  * stays quiet and the main content takes the visual lead.
  *
@@ -26,13 +34,13 @@ body {
  * override that here.
  */
 .navbar {
-  /* Solid deep-blue fill — provides a clear visual band that separates
+  /* Solid brand-purple fill — provides a clear visual band that separates
    * the navbar from the white content area below. Darker bottom border
    * sharpens the boundary; soft shadow lifts the bar above the body. */
   background-color: #602D89 !important;
   border-bottom: 2px solid #251230;
   min-height: 48px;
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.18);
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.18);
   padding: 0 !important;
 }
 
@@ -152,7 +160,7 @@ a:hover {
 .card {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(13, 27, 42, 0.05);
+  box-shadow: 0 2px 4px rgba(37, 18, 48, 0.05);
   margin-bottom: 1.5rem;
   background-color: #FFFFFF;
 }
@@ -497,7 +505,7 @@ a:hover {
   color: #251230;
 }
 
-/* Prominent button styling for "About this table" — solid deep-blue
+/* Prominent button styling for "About this table" — solid brand-purple
  * fill with white text, info-circle icon. Reads as a real CTA, not a
  * link, so users notice it. */
 .peer-about-btn {
@@ -526,7 +534,7 @@ a:hover {
 }
 
 .peer-about-btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.25);
+  box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.25);
 }
 
 .peer-about-btn .peer-about-icon {
@@ -719,44 +727,135 @@ a:hover {
   padding-left: 0.6rem;
 }
 
-/* ---------- Sidebar: per-variable weight override panel ---------- */
-.var-override-slider {
-  margin-bottom: 0.25rem;
-  /* Tighten the slider label (variable display name) */
-  /* shiny's irs slider widget has a healthy default vertical footprint;
-   * tighten it so 5+ overrides fit without runaway height. */
+/* ---------- Sidebar: variable override launcher + summary chip ---------- */
+.var-override-launcher {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.var-override-slider label, .var-override-slider .control-label {
-  font-size: 0.78rem;
-  color: #251230;
-  margin-bottom: 0.1rem;
-  line-height: 1.3;
-}
-
-.var-override-slider .irs--shiny {
-  margin-top: 0.1rem;
+.var-override-launcher h6 {
   margin-bottom: 0.4rem;
 }
 
-.var-override-footer {
-  margin-top: 0.5rem;
-  padding-top: 0.4rem;
-  border-top: 1px dashed #AC9E94;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+.var-override-summary {
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
 }
 
-.var-override-clear {
-  font-size: 0.78rem;
-  color: #602D89;
-  text-decoration: underline;
-  cursor: pointer;
+.var-override-summary small {
+  display: block;
+  line-height: 1.4;
 }
 
-.var-override-clear:hover, .var-override-clear:focus {
+.var-override-summary-empty {
+  background: #F4EDEC;
+  color: #475569;
+}
+
+.var-override-summary-set {
+  background: rgba(96, 45, 137, 0.08);
+  border-left: 3px solid #602D89;
   color: #251230;
+}
+
+.var-override-summary-set strong {
+  color: #602D89;
+}
+
+.var-override-summary-set .var-override-list {
+  margin-top: 0.2rem;
+  color: #475569;
+  font-size: 0.72rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Variable override modal grid ---------- */
+.var-modal-body {
+  padding-bottom: 0.5rem;
+}
+
+.var-modal-intro {
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.var-modal-section {
+  margin-bottom: 1rem;
+}
+
+.var-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.var-modal-section-title {
+  color: #602D89;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #F4EDEC;
+}
+
+.var-modal-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) 220px;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.2rem;
+  border-radius: 4px;
+  transition: background 0.1s ease;
+}
+
+.var-modal-row:hover {
+  background: #FBF8F8;
+}
+
+.var-modal-row .var-modal-row-check .form-group, .var-modal-row .var-modal-row-check .checkbox {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.var-modal-row .var-modal-row-check .form-check-input {
+  margin: 0 !important;
+  transform: scale(1.1);
+}
+
+.var-modal-row .var-modal-row-check label {
+  margin: 0 !important;
+}
+
+.var-modal-row .var-modal-row-label {
+  font-size: 0.85rem;
+  color: #251230;
+  line-height: 1.3;
+}
+
+.var-modal-row .var-modal-row-label label {
+  cursor: pointer;
+  margin: 0;
+  font-weight: 400;
+}
+
+.var-modal-row .var-modal-row-slider .irs--shiny {
+  margin: 0 !important;
+}
+
+.var-modal-row .var-modal-row-slider label, .var-modal-row .var-modal-row-slider .control-label {
+  display: none;
+}
+
+/* Modal footer flex spacer so Reset stays left, Cancel/Apply stay right */
+.modal-footer {
+  display: flex !important;
+  align-items: center;
 }
 
 /* ---------- Sidebar: info button + label hints ---------- */
@@ -1189,7 +1288,7 @@ a:hover {
 }
 
 /* Modal content: definition-list typography for the per-column
- * explanations. Terms in deep blue, definitions indented with
+ * explanations. Terms in brand purple, definitions indented with
  * comfortable line height. */
 .peer-about-body h6 {
   color: #602D89;
@@ -1248,7 +1347,7 @@ a:hover {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .compare-controls .compare-control label {
@@ -1431,11 +1530,11 @@ a:hover {
 }
 
 .compare-table tbody tr.clustering-var {
-  background: rgba(29, 53, 87, 0.04);
+  background: rgba(96, 45, 137, 0.04);
 }
 
 .compare-table tbody tr:hover {
-  background: rgba(29, 53, 87, 0.08);
+  background: rgba(96, 45, 137, 0.08);
 }
 
 .compare-table td {
@@ -1564,7 +1663,7 @@ a:hover {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .stratified-controls .stratified-control label {
@@ -1581,7 +1680,7 @@ a:hover {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .stratified-anchor label {
@@ -1594,7 +1693,7 @@ a:hover {
 
 .stratum-card-anchor {
   border-left-width: 6px !important;
-  box-shadow: 0 3px 10px rgba(29, 53, 87, 0.18) !important;
+  box-shadow: 0 3px 10px rgba(96, 45, 137, 0.18) !important;
 }
 
 .anchor-badge {
@@ -1613,7 +1712,7 @@ a:hover {
 }
 
 .stratum-table tbody tr.anchor-row {
-  background: rgba(29, 53, 87, 0.08);
+  background: rgba(96, 45, 137, 0.08);
   font-weight: 500;
 }
 
@@ -1637,7 +1736,7 @@ a:hover {
 .stratified-filter-mode {
   margin: -0.5rem 0 1rem 0;
   padding: 0.5rem 0.85rem;
-  background: rgba(29, 53, 87, 0.04);
+  background: rgba(96, 45, 137, 0.04);
   border-radius: 6px;
   font-size: 0.88rem;
 }
@@ -1675,7 +1774,7 @@ a:hover {
   padding: 1rem 1.25rem;
   margin-bottom: 1.75rem;
   /* clear vertical separation */
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.07);
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.07);
 }
 
 .stratum-header {
@@ -1728,7 +1827,7 @@ a:hover {
 }
 
 .stratum-table tbody tr:hover {
-  background: rgba(29, 53, 87, 0.05);
+  background: rgba(96, 45, 137, 0.05);
 }
 
 .stratum-table td {
@@ -1863,11 +1962,11 @@ a:hover {
 }
 
 .classification-table tbody tr.match {
-  background: rgba(29, 53, 87, 0.05);
+  background: rgba(96, 45, 137, 0.05);
 }
 
 .classification-table tbody tr:hover {
-  background: rgba(29, 53, 87, 0.1);
+  background: rgba(96, 45, 137, 0.1);
 }
 
 .classification-table td {
@@ -1906,7 +2005,7 @@ a:hover {
 /* ---------- Cohort Builder ---------- */
 .cohort-budget {
   padding: 0.6rem 0.85rem;
-  background: rgba(29, 53, 87, 0.05);
+  background: rgba(96, 45, 137, 0.05);
   border-radius: 6px;
   margin-bottom: 0.75rem;
 }
@@ -1970,7 +2069,7 @@ a:hover {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .cohort-view-controls .cohort-view-control label {
@@ -2029,7 +2128,7 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact tbody tr:hover td {
-  background-color: rgba(29, 53, 87, 0.05) !important;
+  background-color: rgba(96, 45, 137, 0.05) !important;
 }
 
 .cohort-table.cohort-table-compact td {
@@ -2059,7 +2158,7 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-anchor td {
-  background-color: rgba(29, 53, 87, 0.08);
+  background-color: rgba(96, 45, 137, 0.08);
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-anchor td {
@@ -2090,7 +2189,7 @@ a:hover {
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-proposed td {
-  background-color: rgba(29, 53, 87, 0.06);
+  background-color: rgba(96, 45, 137, 0.06);
 }
 
 .cohort-table.cohort-table-compact tr.cohort-action-possible td {
@@ -2110,7 +2209,7 @@ a:hover {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .cohort-inspector-control-row {
@@ -2243,14 +2342,14 @@ a:hover {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
   cursor: pointer;
   transition: border-color 0.12s, box-shadow 0.12s, transform 0.12s;
 }
 
 .dash-card:hover {
   border-color: #602D89;
-  box-shadow: 0 2px 6px rgba(29, 53, 87, 0.15);
+  box-shadow: 0 2px 6px rgba(96, 45, 137, 0.15);
   transform: translateY(-1px);
 }
 
@@ -2374,7 +2473,7 @@ a:hover {
   padding: 0.5rem 0;
 }
 
-/* Description block — white with deep-blue left accent. */
+/* Description block — white with brand-purple left accent. */
 .dash-modal-desc {
   font-size: 0.9rem;
   line-height: 1.45;
@@ -2439,7 +2538,7 @@ a:hover {
 }
 
 .dash-modal-table tbody tr:hover td {
-  background-color: rgba(29, 53, 87, 0.04);
+  background-color: rgba(96, 45, 137, 0.04);
 }
 
 .dash-modal-table td {
@@ -2491,7 +2590,7 @@ a:hover {
 .cohort-action-select:focus {
   outline: none;
   border-color: #602D89;
-  box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
+  box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
 }
 
 /* Mini variant used in the two-column table — only needs to hold
@@ -2562,14 +2661,14 @@ a:hover {
 }
 
 .cohort-move-btn:hover {
-  background: rgba(29, 53, 87, 0.12);
+  background: rgba(96, 45, 137, 0.12);
   border-color: #b6cce2;
 }
 
 .cohort-move-btn:focus {
   outline: none;
   border-color: #602D89;
-  box-shadow: 0 0 0 2px rgba(29, 53, 87, 0.2);
+  box-shadow: 0 0 0 2px rgba(96, 45, 137, 0.2);
 }
 
 /* Small × button that deletes an addition row outright. Only renders on
@@ -2608,7 +2707,7 @@ a:hover {
   background: #FFFFFF;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.05);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.05);
 }
 
 .saved-search-card .ssc-header {
@@ -2749,7 +2848,7 @@ ul li, ol li {
 
 .form-control:focus, .form-select:focus {
   border-color: #602D89;
-  box-shadow: 0 0 0 0.2rem rgba(29, 53, 87, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(96, 45, 137, 0.25);
 }
 
 /* Sliders */
@@ -2934,7 +3033,7 @@ ul li, ol li {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .asp-control-bar label {
@@ -3012,7 +3111,7 @@ ul li, ol li {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .trend-control-bar label {
@@ -3104,7 +3203,7 @@ ul li, ol li {
 }
 
 /* Compact "what's the comparison" line above the plot. White bg + a
- * clear deep-blue left accent so it reads as "info callout" rather
+ * clear brand-purple left accent so it reads as "info callout" rather
  * than a tinted block. */
 .trend-compare-pill {
   padding: 0.5rem 0.85rem;
@@ -3256,7 +3355,7 @@ ul li, ol li {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .var-filter-bar label {
@@ -3340,7 +3439,7 @@ ul li, ol li {
   background: rgba(255, 255, 255, 0.96) !important;
   border-radius: 6px !important;
   border: 1px solid #cbd5e1 !important;
-  box-shadow: 0 2px 6px rgba(13, 27, 42, 0.12) !important;
+  box-shadow: 0 2px 6px rgba(37, 18, 48, 0.12) !important;
 }
 
 .leaflet-control-layers label {
@@ -3378,7 +3477,7 @@ ul li, ol li {
   border: 1px solid #F4EDEC;
   border-left: 4px solid #602D89;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .cohort-map-control-block {
@@ -3446,7 +3545,7 @@ ul li, ol li {
   border: 1px solid #F4EDEC;
   border-radius: 8px;
   padding: 0.75rem 0.85rem;
-  box-shadow: 0 1px 2px rgba(13, 27, 42, 0.04);
+  box-shadow: 0 1px 2px rgba(37, 18, 48, 0.04);
 }
 
 .peer-strat-card.peer-strat-card-anchor {
