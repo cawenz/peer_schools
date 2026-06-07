@@ -194,6 +194,12 @@ build_peer_pdf <- function(peer_result, state, out_path) {
   render_env$.prettify_classification <- .prettify_classification
   render_env$.prettify_control        <- .prettify_control
   render_env$.describe_pool_filter    <- .describe_pool_filter
+  # .theme_label maps internal theme keys (e.g. "student_body") to
+  # display labels ("Student body") for the search-summary block. Only
+  # exists when global.R has been sourced; the Rmd has a title-case
+  # fallback if it's missing.
+  if (exists(".theme_label", mode = "function"))
+    render_env$.theme_label <- .theme_label
 
   rmarkdown::render(
     input             = tpl_tmp,

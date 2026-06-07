@@ -1,27 +1,34 @@
 ---
-title: "Peer Search Report"
 output:
   pdf_document:
     toc: false
     keep_tex: false
 geometry: margin=0.75in
 fontsize: 10pt
-# mainfont only works with xelatex/lualatex; we stick with the default
-# pdflatex for portability. Letter paper for the US institutional
-# research audience.
 classoption: letterpaper
+# No `title:` field — we render a custom centered title block in the body
+# so we get full control over color/font/spacing (and avoid the duplicate
+# LaTeX-rendered title that the YAML title produces).
 header-includes:
   - \usepackage{booktabs}
   - \usepackage{longtable}
   - \usepackage{array}
-  - \usepackage{multirow}
-  - \usepackage{wrapfig}
-  - \usepackage{float}
   - \usepackage{colortbl}
   - \usepackage[table]{xcolor}
+  - \usepackage{helvet}
+  - \renewcommand{\familydefault}{\sfdefault}
+  - \usepackage{titlesec}
+  - \usepackage{titling}
+  - \setlength{\droptitle}{-3em}
   - \definecolor{cohcpurple}{HTML}{602D89}
   - \definecolor{cohcblush}{HTML}{F4EDEC}
   - \definecolor{cohcaccent}{HTML}{AC9E94}
+  - \definecolor{cohcdeep}{HTML}{251230}
+  # Section headers in COHC purple, slightly smaller than default
+  - \titleformat*{\section}{\large\bfseries\color{cohcpurple}}
+  - \titleformat*{\subsection}{\normalsize\bfseries\color{cohcpurple}}
+  # Tighten section spacing
+  - \titlespacing*{\section}{0pt}{1.2em}{0.4em}
 ---
 
 ```{r setup, include=FALSE}
@@ -29,37 +36,54 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE,
                       fig.align = "center", dev = "pdf")
 suppressPackageStartupMessages({
   library(knitr)
+  library(kableExtra)
   library(ggplot2)
   library(dplyr)
   library(scales)
 })
 
-# kableExtra is optional — fall back to plain kable when absent so the
-# render doesn't hard-error on hosts without it.
-kableExtra_or_plain <- function(x) {
-  if (requireNamespace("kableExtra", quietly = TRUE)) {
-    kableExtra::kable_styling(x,
-      latex_options = c("hold_position", "striped"),
-      stripe_color = "cohcblush",
-      full_width   = FALSE,
-      position     = "left",
-      font_size    = 9)
-  } else {
-    x
-  }
-}
-
-# %||% is a Shiny/rlang infix that returns the LHS unless it's NULL.
-# Define a local fallback so this template renders even when no Shiny
-# context is active.
+# %||% is a Shiny/rlang infix — provide a local fallback so this template
+# renders even when no Shiny context is active.
 if (!exists("%||%", mode = "function")) {
   `%||%` <- function(a, b) if (is.null(a)) b else a
 }
 
-# The render envir has these injected:
+# Strip the names attribute that vapply leaves on its output — when
+# named character vectors land in data.frame(), R promotes the names
+# to row.names, which kable then renders as a phantom first column.
+# Wrap every prettify-style call with this helper.
+.un <- function(x) unname(x)
+
+# Abbreviate US News classification labels so the peer-list column
+# isn't 30+ chars wide — that's what was eating the Distance column
+# off the right edge of the page.
+.abbrev_class <- function(label) {
+  short_map <- c(
+    "National Liberal Arts Colleges" = "Nat. LAC",
+    "National Universities"          = "Nat. Univ.",
+    "Regional Universities (North)"   = "Reg. Univ. (N)",
+    "Regional Universities (South)"   = "Reg. Univ. (S)",
+    "Regional Universities (Midwest)" = "Reg. Univ. (MW)",
+    "Regional Universities (West)"    = "Reg. Univ. (W)",
+    "Regional Colleges (North)"       = "Reg. Coll. (N)",
+    "Regional Colleges (South)"       = "Reg. Coll. (S)",
+    "Regional Colleges (Midwest)"     = "Reg. Coll. (MW)",
+    "Regional Colleges (West)"        = "Reg. Coll. (W)"
+  )
+  out <- short_map[label]
+  ifelse(is.na(out), label, out)
+}
+
+# Pretty-printer for theme weight keys. Uses .theme_label() if it was
+# injected into the render envir; otherwise falls back to title-case.
+.theme_lbl <- function(keys) {
+  if (exists(".theme_label", mode = "function")) .theme_label(keys)
+  else tools::toTitleCase(gsub("_", " ", keys))
+}
+
+# Inputs from the render envir (see build_peer_pdf in download_helpers.R):
 #   peer_result, state
 #   .SCHOOLS, .prettify_classification, .prettify_control, .describe_pool_filter
-# (See build_peer_pdf in shiny_app/R/download_helpers.R.)
 meta  <- peer_result$meta
 peers <- peer_result$peers
 anchor_uid <- meta$anchor_unitid
@@ -70,22 +94,30 @@ anchor_name <- meta$anchor_name %||% (if (nrow(anchor_row)) anchor_row$instnm el
 peer_meta <- .SCHOOLS[.SCHOOLS$unitid %in% peers$unitid, , drop = FALSE]
 ```
 
-\begin{center}
-{\color{cohcpurple}\Large\bfseries Peer Search Report}\\[2pt]
-{\color{cohcaccent}\small Anchor: `r anchor_name` ~~|~~ `r nrow(peers)` peers ~~|~~ Generated `r format(Sys.time(), '%Y-%m-%d %H:%M')`}
-\end{center}
+\begin{flushleft}
+{\Huge\bfseries\color{cohcpurple}Peer Search Report}\\[4pt]
+{\color{cohcaccent}\small Anchor: \textbf{\color{cohcdeep}`r anchor_name`} ~~|~~ `r nrow(peers)` peers ~~|~~ Generated `r format(Sys.time(), '%Y-%m-%d %H:%M')`}
+\end{flushleft}
 
-\vspace{-0.5em}
+\vspace{0.5em}
+\noindent\textcolor{cohcaccent}{\rule{\linewidth}{0.5pt}}
 
-## Search settings
+# Search settings
 
-```{r summary-table, results="asis"}
+```{r summary-table}
+# Friendly theme-weight string. Internal keys (e.g. "student_body")
+# get mapped to display labels ("Student body") via .theme_label() so
+# the PDF doesn't expose snake_case implementation detail.
 tw <- state$theme_weights %||% list()
-tw_lbl <- if (length(tw))
-  paste(sprintf("%s = %.2f", names(tw), unlist(tw)), collapse = "; ") else "(all default)"
+tw_lbl <- if (length(tw)) {
+  parts <- mapply(function(k, v) sprintf("%s = %.2f", .theme_lbl(k), v),
+                   names(tw), unlist(tw), SIMPLIFY = TRUE, USE.NAMES = FALSE)
+  paste(parts, collapse = "; ")
+} else "(all default)"
 vw <- state$variable_weights %||% list()
-vw_lbl <- if (length(vw))
-  paste(sprintf("%s = %.2f", names(vw), unlist(vw)), collapse = "; ") else "(none)"
+vw_lbl <- if (length(vw)) {
+  paste(sprintf("%s = %.2f", names(vw), unlist(vw)), collapse = "; ")
+} else "(none)"
 
 summary_df <- data.frame(
   Field = c("Candidate pool",
@@ -100,65 +132,100 @@ summary_df <- data.frame(
             sprintf("%.0f%%", 100 * (meta$coverage_threshold %||% NA)),
             tw_lbl,
             vw_lbl),
-  check.names = FALSE,
+  check.names      = FALSE,
   stringsAsFactors = FALSE
 )
+row.names(summary_df) <- NULL  # belt-and-suspenders against rowname leakage
+
 kable(summary_df, format = "latex", booktabs = TRUE,
       col.names = c("", ""),
-      align = c("l", "l"), linesep = "") |>
-  kableExtra_or_plain()
+      align = c("l", "l"),
+      linesep = "",
+      row.names = FALSE) |>
+  kable_styling(latex_options = c("hold_position"),
+                full_width = FALSE,
+                position   = "left",
+                font_size  = 9) |>
+  column_spec(1, bold = TRUE, color = "#251230", width = "1.6in") |>
+  column_spec(2, width = "5.0in")
 ```
 
-## Ranked peer list
+# Ranked peer list
 
-```{r peer-table, results="asis"}
-# Anchor row at top, then peers in rank order. Distances formatted to 3 dp.
+```{r peer-table}
+# Build the table. Note: .un() strips names from prettify output so
+# data.frame() doesn't auto-promote them to row.names (which kable would
+# then render as a stray leading column — that was the bug in v1 of
+# this template).
 disp <- data.frame(
-  Rank   = peers$rank,
-  School = peers$instnm,
-  Class  = .prettify_classification(peers$usnews_classification %||%
-                                      rep(NA_character_, nrow(peers))),
-  `USN Rank` = ifelse(is.na(peers$usnews_rank %||% rep(NA_real_, nrow(peers))),
-                       "", as.character(peers$usnews_rank %||% NA_real_)),
+  Rank     = as.character(peers$rank),
+  School   = peers$instnm,
+  Class    = .un(.abbrev_class(.un(.prettify_classification(
+                 peers$usnews_classification %||%
+                 rep(NA_character_, nrow(peers)))))),
+  `USN`    = ifelse(is.na(peers$usnews_rank %||% rep(NA_real_, nrow(peers))),
+                     "", as.character(peers$usnews_rank %||% NA_real_)),
   State    = peers$stabbr %||% rep("", nrow(peers)),
   Distance = sprintf("%.3f", peers$distance),
-  check.names = FALSE,
+  check.names      = FALSE,
   stringsAsFactors = FALSE
 )
 
 if (nrow(anchor_row) == 1) {
   a_row <- data.frame(
-    Rank   = "*",
-    School = paste0(anchor_row$instnm, " (anchor)"),
-    Class  = .prettify_classification(anchor_row$usnews_classification),
-    `USN Rank` = if (is.na(anchor_row$usnews_rank)) "" else
-                 as.character(anchor_row$usnews_rank),
-    State    = anchor_row$stabbr,
+    Rank     = "★",
+    School   = paste0(anchor_row$instnm, " (anchor)"),
+    Class    = .un(.abbrev_class(.un(.prettify_classification(
+                   anchor_row$usnews_classification)))),
+    `USN`    = if (is.na(anchor_row$usnews_rank)) "" else
+               as.character(anchor_row$usnews_rank),
+    State    = anchor_row$stabbr %||% "",
     Distance = "0.000",
-    check.names = FALSE,
+    check.names      = FALSE,
     stringsAsFactors = FALSE
   )
   disp <- rbind(a_row, disp)
 }
+row.names(disp) <- NULL
 
-kable(disp, format = "latex", booktabs = TRUE, longtable = TRUE,
-      align = c("r", "l", "l", "r", "c", "r"),
-      linesep = "") |>
-  kableExtra_or_plain()
+n_anchor <- if (nrow(anchor_row) == 1) 1 else 0
+
+kt <- kable(disp, format = "latex", booktabs = TRUE, longtable = TRUE,
+            align = c("r", "l", "l", "r", "c", "r"),
+            linesep = "",
+            row.names = FALSE) |>
+  # No "striped" here — we shade the anchor row in cohcblush below, and
+  # an alternating stripe in the same color would hide it.
+  kable_styling(latex_options = c("repeat_header"),
+                font_size     = 9,
+                position      = "left") |>
+  column_spec(1, width = "0.5in") |>
+  column_spec(2, width = "2.6in") |>
+  column_spec(3, width = "1.4in") |>
+  column_spec(4, width = "0.5in") |>
+  column_spec(5, width = "0.4in") |>
+  column_spec(6, width = "0.6in") |>
+  row_spec(0, bold = TRUE, color = "#602D89")
+
+# Highlight the anchor row in COHC purple.
+if (n_anchor == 1) {
+  kt <- kt |> row_spec(1, bold = TRUE,
+                       background = "F4EDEC",
+                       color      = "#251230")
+}
+
+kt
 ```
 
-## Composition of the peer set
+# Composition of the peer set
 
 ```{r composition-cards, fig.width=6.8, fig.height=6, fig.pos="H"}
-# Reuse the same 5 dimensions the Composition tab shows. Replicated
-# here so the Rmd is self-contained — when these definitions change
-# in mod_peer_table.R, mirror them here.
+# Same 5 dimensions the on-screen Composition tab uses. Replicated
+# here so the Rmd is self-contained.
 .col_or <- function(df, name) {
   if (name %in% names(df)) df[[name]] else rep(NA_character_, nrow(df))
 }
 
-# Geographic region from state — mirrors .REGIONS in ui_sidebar.R but
-# we only need the top-level four buckets here.
 state_to_region <- function(stabbr) {
   northeast <- c("CT","ME","MA","NH","NJ","NY","PA","RI","VT")
   midwest   <- c("IL","IN","IA","KS","MI","MN","MO","NE","ND","OH","SD","WI")
@@ -173,20 +240,28 @@ state_to_region <- function(stabbr) {
   out
 }
 
-# Build a long frame: one row per (dimension, peer school, category value).
 dims <- list(
   list(label = "US News classification",
-       vals  = .prettify_classification(.col_or(peer_meta, "usnews_classification")),
-       anchor_val = if (nrow(anchor_row)) .prettify_classification(anchor_row$usnews_classification) else NA),
+       vals  = .un(.abbrev_class(.un(.prettify_classification(
+                   .col_or(peer_meta, "usnews_classification"))))),
+       anchor_val = if (nrow(anchor_row))
+                      .un(.abbrev_class(.un(.prettify_classification(
+                          anchor_row$usnews_classification))))
+                    else NA),
   list(label = "Institution size (Carnegie)",
        vals  = as.character(.col_or(peer_meta, "ic2025size_label")),
-       anchor_val = if (nrow(anchor_row)) as.character(anchor_row$ic2025size_label %||% NA) else NA),
+       anchor_val = if (nrow(anchor_row))
+                      as.character(anchor_row$ic2025size_label %||% NA)
+                    else NA),
   list(label = "Geographic region",
        vals  = state_to_region(.col_or(peer_meta, "stabbr")),
-       anchor_val = if (nrow(anchor_row)) state_to_region(anchor_row$stabbr) else NA),
+       anchor_val = if (nrow(anchor_row)) state_to_region(anchor_row$stabbr)
+                    else NA),
   list(label = "Carnegie Research Activity",
        vals  = as.character(.col_or(peer_meta, "research2025_label")),
-       anchor_val = if (nrow(anchor_row)) as.character(anchor_row$research2025_label %||% NA) else NA),
+       anchor_val = if (nrow(anchor_row))
+                      as.character(anchor_row$research2025_label %||% NA)
+                    else NA),
   list(label = "Athletics division",
        vals  = ifelse(is.na(.col_or(peer_meta, "athletics_division")),
                        "(no athletics)",
@@ -213,17 +288,16 @@ card_df <- do.call(rbind, lapply(dims, function(d) {
   )
 }))
 
-# Star the anchor category in the bar label.
 card_df$category_lbl <- ifelse(card_df$is_anchor,
                                 paste0("★ ", card_df$category),
                                 card_df$category)
-# Truncate very long labels so the bars stay readable.
-card_df$category_lbl <- ifelse(nchar(card_df$category_lbl) > 40,
-                                paste0(substr(card_df$category_lbl, 1, 37), "..."),
+# Truncate very long labels so bars stay readable inside the half-page card.
+card_df$category_lbl <- ifelse(nchar(card_df$category_lbl) > 32,
+                                paste0(substr(card_df$category_lbl, 1, 29),
+                                       "..."),
                                 card_df$category_lbl)
 
-# Sort categories within each card by share descending so the longest
-# bar is on top of each subplot.
+# Sort categories within each card by share descending.
 card_df <- card_df[order(card_df$dimension, -card_df$pct), ]
 card_df$category_lbl <- factor(card_df$category_lbl,
                                 levels = rev(unique(card_df$category_lbl)))
@@ -231,25 +305,30 @@ card_df$category_lbl <- factor(card_df$category_lbl,
 ggplot(card_df, aes(x = pct, y = category_lbl, fill = is_anchor)) +
   geom_col(width = 0.7) +
   geom_text(aes(label = sprintf("%d (%d%%)", n, round(pct))),
-            hjust = -0.05, size = 2.6, color = "#251230") +
+            hjust = -0.08, size = 2.3, color = "#251230") +
   facet_wrap(~ dimension, scales = "free_y", ncol = 2) +
-  scale_x_continuous(expand = expansion(mult = c(0, 0.18)), labels = NULL) +
+  # Bumped right expansion from 18% to 40% so the "57 (78%)" labels
+  # render in full instead of clipping mid-string.
+  scale_x_continuous(expand = expansion(mult = c(0, 0.40)), labels = NULL) +
   scale_fill_manual(values = c("TRUE" = "#602D89", "FALSE" = "#AC9E94"),
                     guide = "none") +
   labs(x = NULL, y = NULL) +
   theme_minimal(base_size = 8) +
   theme(
+    text       = element_text(family = "Helvetica"),
     strip.text = element_text(face = "bold", color = "#602D89",
                               size = 9, hjust = 0),
     panel.grid.major.x = element_blank(),
     panel.grid.minor   = element_blank(),
     panel.grid.major.y = element_blank(),
     axis.ticks         = element_blank(),
-    plot.margin = margin(2, 6, 2, 2)
+    plot.margin        = margin(2, 8, 2, 2)
   )
 ```
 
-\vfill
+\vspace{0.5em}
+\noindent\textcolor{cohcaccent}{\rule{\linewidth}{0.4pt}}
+
 \begin{center}
-{\color{cohcaccent}\small Generated by the Peer Schools Explorer. \\ For methodology details see the Help tab in the app.}
+{\color{cohcaccent}\footnotesize Generated by the Peer Schools Explorer. For methodology details see the Help tab in the app.}
 \end{center}
