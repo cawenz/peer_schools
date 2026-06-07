@@ -865,11 +865,12 @@ a {
 
 .peer-comp-grid {
   display: grid;
-  /* 5 dimensions, wider cards. minmax 420 fits ~2 columns at common
-   * widths and 3 at very wide; both layouts give the long category
-   * names ("National Liberal Arts Colleges", "NCAA Division I", etc.)
-   * enough room without ellipsis-truncation. */
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  /* Rows are now label-on-top + full-width-bar-below, so each card
+   * can be narrower (no inner column eating label width). 340px lets
+   * 2 cards fit at ~720px viewport, 3 at ~1080px, 4 on very wide
+   * monitors. Long category names get the entire card width minus
+   * the stats they share their row with. */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -920,17 +921,25 @@ a {
 }
 
 .peer-comp-row {
-  display: grid;
-  /* Wider cards give the label column more room; bar column gets the
-   * same fixed footprint, stats stay compact on the right. */
-  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 80px);
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0.2rem 0.4rem;
+  /* Two-line layout per row: label + stats on top, full-width bar
+   * below. Labels can't get pinched by an adjacent fixed-width column
+   * anymore — they always get the full card width minus the stats. */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.35rem 0.4rem 0.5rem 0.4rem;
   border-radius: 3px;
   transition: background 0.15s ease;
 
   &:hover { background: #f8f5f9; }
+}
+
+.peer-comp-row-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  /* Label hugs left, stats hug right via auto margin */
+  .peer-comp-row-stats { margin-left: auto; }
 }
 
 .peer-comp-row-anchor {

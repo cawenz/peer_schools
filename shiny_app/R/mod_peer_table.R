@@ -1825,19 +1825,23 @@ peerTableServer <- function(id, sidebar_state) {
         b <- brk[i, ]
         bar_pct <- sprintf("%.0f%%", 100 * b$pct)
         is_anchor <- isTRUE(b$is_anchor_cat)
+        # Stacked layout: label + stats on the top line (label takes
+        # the room it needs, stats hug right). Bar fills the full card
+        # width below, so no inner column constraint can chop long
+        # category names like "National Liberal Arts Colleges".
         tags$div(class = paste("peer-comp-row",
                                 if (is_anchor) "peer-comp-row-anchor" else ""),
-          # Title attr surfaces the full category name on hover when the
-          # rendered text is truncated by the column width.
-          tags$div(class = "peer-comp-row-label",
-                    title = as.character(b$label),
-            if (is_anchor) HTML("&#9733; ") else NULL,
-            b$label),
+          tags$div(class = "peer-comp-row-header",
+            tags$div(class = "peer-comp-row-label",
+                      title = as.character(b$label),
+              if (is_anchor) HTML("&#9733; ") else NULL,
+              b$label),
+            tags$div(class = "peer-comp-row-stats",
+                      sprintf("%d  (%s)", b$n, bar_pct))
+          ),
           tags$div(class = "peer-comp-row-bar",
             tags$div(class = "peer-comp-row-bar-fill",
-                     style = sprintf("width: %.1f%%;", 100 * b$pct))),
-          tags$div(class = "peer-comp-row-stats",
-                    sprintf("%d  (%s)", b$n, bar_pct))
+                     style = sprintf("width: %.1f%%;", 100 * b$pct)))
         )
       }) else list(tags$div(class = "text-muted",
                               tags$small("No data on this dimension.")))
