@@ -24,6 +24,49 @@ suppressMessages({
 })
 
 # -----------------------------------------------------------------------------
+# Curated "key variables" list used by both downloads. ~20 metrics covering
+# every clustering theme, picked for institutional-research prominence:
+# - Size: enrollment headcounts
+# - Selectivity: admit + yield + entering-class quality (sat_mid50 is
+#   descriptive but the most-asked-for benchmark)
+# - Aid: net price + Pell + discount rate
+# - Resources: faculty ratio + faculty salary + small-class share
+# - Finance: endowment + tuition
+# - Outcomes: grad + retention + earnings + Pell-grad gap
+# - Student body: BIPOC + first-gen + residential share
+# Edit this list if a different cut should drive the report; the Excel
+# "Key variables" sheet and the PDF density plots both read from it.
+.KEY_VARS_20 <- c(
+  # Size
+  "total_enrollment", "undergraduate_enrollment",
+  # Selectivity
+  "acceptance_rate", "yield_rate", "sat_mid50",
+  # Aid
+  "avg_net_price_aided", "pct_pell", "inst_discount_rate",
+  # Resources
+  "student_faculty_ratio", "avg_ft_faculty_salary", "pct_classes_under_20",
+  # Finance
+  "endowment_per_fte", "published_tuition_fees",
+  # Outcomes
+  "grad_rate_6yr", "retention_rate", "median_earnings_10yr", "pell_grad_gap",
+  # Student body
+  "pct_bipoc", "pct_first_generation", "residential_share"
+)
+
+# The 8-variable subset that the PDF density plots feature. Picked to fit
+# legibly in a 2x4 grid on a single page. Subset of .KEY_VARS_20 above.
+.PDF_DENSITY_VARS <- c(
+  "total_enrollment",
+  "acceptance_rate",
+  "pct_pell",
+  "avg_net_price_aided",
+  "student_faculty_ratio",
+  "endowment_per_fte",
+  "grad_rate_6yr",
+  "median_earnings_10yr"
+)
+
+# -----------------------------------------------------------------------------
 # XLSX
 # -----------------------------------------------------------------------------
 build_peer_xlsx <- function(peer_result, state, out_path) {
@@ -85,17 +128,24 @@ build_peer_xlsx <- function(peer_result, state, out_path) {
     }
   }
 
-  # ---- Sheet 2 — wide variable matrix ------------------------------------
+  # ---- Sheet 2 — curated key variables ---------------------------------
+  # Trimmed from the full ~85-column wide matrix down to the 20 most
+  # frequently-asked-for metrics across every theme. Users who want the
+  # full matrix can pull it via the Saved Searches bundle download.
   uids <- unique(c(anchor_uid, peers$unitid))
   wide <- .SCHOOLS_WIDE[.SCHOOLS_WIDE$unitid %in% uids, , drop = FALSE]
   rank_lookup <- c(setNames(0L, anchor_uid),
                    setNames(peers$rank, peers$unitid))
   wide$rank <- rank_lookup[as.character(wide$unitid)]
   wide <- wide[order(wide$rank), , drop = FALSE]
+
+  # Front matter (rank, unitid, instnm) + the 20 curated metrics, in that
+  # order. intersect() preserves the .KEY_VARS_20 ordering so the sheet
+  # always reads in the theme-grouped sequence defined above.
   front <- c("rank", "unitid", "instnm")
-  ordered_cols <- c(intersect(front, names(wide)),
-                    setdiff(names(wide), front))
-  wide <- wide[, ordered_cols, drop = FALSE]
+  keep  <- c(intersect(front, names(wide)),
+             intersect(.KEY_VARS_20, names(wide)))
+  wide  <- wide[, keep, drop = FALSE]
 
   # ---- Sheet 3 — search summary (metadata) -------------------------------
   # Compact key/value block so users can reproduce the search later.
@@ -133,28 +183,30 @@ build_peer_xlsx <- function(peer_result, state, out_path) {
   # ---- Build & save workbook ---------------------------------------------
   wb <- openxlsx::createWorkbook()
   openxlsx::addWorksheet(wb, "Peer list")
-  openxlsx::addWorksheet(wb, "Variables")
+  openxlsx::addWorksheet(wb, "Key variables")
   openxlsx::addWorksheet(wb, "Search summary")
 
-  openxlsx::writeData(wb, "Peer list",      peers_disp)
-  openxlsx::writeData(wb, "Variables",      wide)
-  openxlsx::writeData(wb, "Search summary", summary_df)
+  openxlsx::writeData(wb, "Peer list",       peers_disp)
+  openxlsx::writeData(wb, "Key variables",   wide)
+  openxlsx::writeData(wb, "Search summary",  summary_df)
 
   hdr_style <- openxlsx::createStyle(textDecoration = "bold",
                                      halign = "left",
                                      fgFill = "#F4EDEC")
-  openxlsx::addStyle(wb, "Peer list",      hdr_style,
+  openxlsx::addStyle(wb, "Peer list",       hdr_style,
                      rows = 1, cols = seq_len(ncol(peers_disp)))
-  openxlsx::addStyle(wb, "Variables",       hdr_style,
+  openxlsx::addStyle(wb, "Key variables",   hdr_style,
                      rows = 1, cols = seq_len(ncol(wide)))
   openxlsx::addStyle(wb, "Search summary",  hdr_style,
                      rows = 1, cols = seq_len(ncol(summary_df)))
 
-  openxlsx::freezePane(wb, "Peer list", firstRow = TRUE)
-  openxlsx::freezePane(wb, "Variables",  firstRow = TRUE,
+  openxlsx::freezePane(wb, "Peer list",      firstRow = TRUE)
+  openxlsx::freezePane(wb, "Key variables",  firstRow = TRUE,
                        firstActiveCol = min(4, ncol(wide)))
   openxlsx::setColWidths(wb, "Peer list",
                          cols = seq_len(ncol(peers_disp)), widths = "auto")
+  openxlsx::setColWidths(wb, "Key variables",
+                         cols = seq_len(ncol(wide)), widths = "auto")
   openxlsx::setColWidths(wb, "Search summary",
                          cols = 1:2, widths = c(28, 70))
 
@@ -191,6 +243,11 @@ build_peer_pdf <- function(peer_result, state, out_path) {
   render_env$state       <- state
   # Make the helpers the template needs available in the render env.
   render_env$.SCHOOLS <- .SCHOOLS
+  # .SCHOOLS_WIDE feeds the new "Distribution of key indicators"
+  # density-plot section — Rmd reads pool values for each metric from
+  # this and overlays the anchor + peer-median lines.
+  render_env$.SCHOOLS_WIDE <- .SCHOOLS_WIDE
+  render_env$.PDF_DENSITY_VARS <- .PDF_DENSITY_VARS
   render_env$.prettify_classification <- .prettify_classification
   render_env$.prettify_control        <- .prettify_control
   render_env$.describe_pool_filter    <- .describe_pool_filter

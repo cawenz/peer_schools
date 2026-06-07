@@ -243,6 +243,126 @@ if (n_anchor == 1) {
 kt
 ```
 
+# Distribution of key indicators
+
+```{r density-plots, fig.width=6.8, fig.height=5, fig.pos="H"}
+# Per-variable metadata: display label, format, and whether to log-
+# transform the values before plotting (the right-tailed enrollment +
+# endowment distributions are unreadable on a linear axis).
+.PDF_VAR_META <- list(
+  total_enrollment     = list(label="Total enrollment",     fmt="count",    log=TRUE),
+  acceptance_rate      = list(label="Acceptance rate",      fmt="percent",  log=FALSE),
+  pct_pell             = list(label="% Pell",               fmt="percent",  log=FALSE),
+  avg_net_price_aided  = list(label="Avg net price (aided)",fmt="currency", log=FALSE),
+  student_faculty_ratio= list(label="Student/faculty ratio",fmt="ratio",    log=FALSE),
+  endowment_per_fte    = list(label="Endowment per FTE",    fmt="currency", log=TRUE),
+  grad_rate_6yr        = list(label="6-yr grad rate",       fmt="percent",  log=FALSE),
+  median_earnings_10yr = list(label="Median earnings (10yr)", fmt="currency", log=FALSE)
+)
+
+# Restrict the "pool" to the ranked universe so the comparison
+# distribution matches what most users would think of as "the universe."
+# (isTRUE() is scalar-only, so we use the elementwise form for filtering.)
+pool_wide <- .SCHOOLS_WIDE
+if ("in_ranked_universe" %in% names(pool_wide)) {
+  ir <- pool_wide$in_ranked_universe
+  pool_wide <- pool_wide[!is.na(ir) & ir, , drop = FALSE]
+}
+
+# Anchor + peers' values come from the same wide matrix.
+anchor_wide <- pool_wide[pool_wide$unitid == anchor_uid, , drop = FALSE]
+peers_wide  <- .SCHOOLS_WIDE[.SCHOOLS_WIDE$unitid %in% peers$unitid, , drop = FALSE]
+
+# Formatters: each is fed a numeric and returns a short label string
+# for the annotation overlay.
+.fmt_val <- function(v, fmt) {
+  if (!is.finite(v)) return("—")
+  switch(fmt,
+    percent  = sprintf("%.0f%%", v),
+    currency = sprintf("$%s",
+                       scales::label_comma(accuracy = 1)(round(v))),
+    count    = scales::label_comma(accuracy = 1)(round(v)),
+    ratio    = sprintf("%.1f", v),
+    as.character(round(v, 2)))
+}
+
+# Pull pool + anchor + peer values for each variable, log-transform if
+# the metadata says so, and build a long data frame indexed by variable.
+plot_rows <- list()
+for (m in .PDF_DENSITY_VARS) {
+  meta_m <- .PDF_VAR_META[[m]]
+  if (is.null(meta_m) || !(m %in% names(pool_wide))) next
+  pool_v   <- pool_wide[[m]]; pool_v <- pool_v[is.finite(pool_v)]
+  if (length(pool_v) < 5) next
+  anchor_v <- if (nrow(anchor_wide) == 1) anchor_wide[[m]] else NA_real_
+  peer_v   <- peers_wide[[m]]; peer_v <- peer_v[is.finite(peer_v)]
+  peer_med <- if (length(peer_v) > 0) median(peer_v) else NA_real_
+
+  # Original values for the annotation — formatted BEFORE log transform
+  anchor_lbl <- .fmt_val(anchor_v, meta_m$fmt)
+  peer_lbl   <- .fmt_val(peer_med, meta_m$fmt)
+
+  if (isTRUE(meta_m$log)) {
+    pool_v   <- log10(pool_v   + 1)
+    anchor_v <- log10(anchor_v + 1)
+    peer_med <- log10(peer_med + 1)
+  }
+
+  facet_lbl <- meta_m$label
+  plot_rows[[length(plot_rows) + 1]] <- data.frame(
+    var        = m,
+    facet      = factor(facet_lbl,
+                        levels = unname(vapply(.PDF_DENSITY_VARS,
+                                                function(k)
+                                                  .PDF_VAR_META[[k]]$label,
+                                                character(1)))),
+    value      = pool_v,
+    anchor_val = anchor_v,
+    peer_med   = peer_med,
+    anno       = sprintf("Anchor: %s\nPeer med: %s", anchor_lbl, peer_lbl),
+    stringsAsFactors = FALSE
+  )
+}
+plot_df <- do.call(rbind, plot_rows)
+
+# Per-facet anchor/peer-median/annotation extracted once (single-value
+# columns per facet are still safe inside geom_vline / geom_text when
+# we coerce to data.frame).
+anno_df <- unique(plot_df[, c("facet", "anchor_val", "peer_med", "anno")])
+
+ggplot(plot_df, aes(x = value)) +
+  geom_density(fill = "#E6DEE7", color = "#AC9E94",
+               linewidth = 0.3, alpha = 0.9) +
+  geom_vline(data = anno_df, aes(xintercept = anchor_val),
+             color = "#602D89", linewidth = 0.8) +
+  geom_vline(data = anno_df, aes(xintercept = peer_med),
+             color = "#251230", linewidth = 0.5, linetype = "dashed") +
+  geom_text(data = anno_df,
+            aes(x = -Inf, y = Inf, label = anno),
+            hjust = -0.05, vjust = 1.2, size = 2.2,
+            color = "#251230", lineheight = 0.95,
+            inherit.aes = FALSE) +
+  facet_wrap(~ facet, scales = "free", ncol = 4) +
+  scale_x_continuous(labels = NULL) +
+  scale_y_continuous(labels = NULL, expand = expansion(mult = c(0, 0.12))) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 8) +
+  theme(
+    text       = element_text(family = "Helvetica"),
+    strip.text = element_text(face = "bold", color = "#602D89",
+                              size = 8, hjust = 0),
+    panel.grid.major.x = element_line(color = "#F4EDEC", linewidth = 0.3),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    axis.ticks         = element_blank(),
+    plot.margin        = margin(2, 6, 2, 2)
+  )
+```
+
+\begin{flushleft}
+{\color{cohcaccent}\footnotesize \textbf{Reading these:} the gray distribution shows the ranked universe; the solid purple line is the anchor; the dashed line is the peer-set median. Enrollment and endowment use a log scale so their right tails don't crush the bulk of the distribution.}
+\end{flushleft}
+
 # Composition of the peer set
 
 ```{r composition-cards, fig.width=6.8, fig.height=6, fig.pos="H"}
