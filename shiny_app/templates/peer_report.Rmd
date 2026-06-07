@@ -245,7 +245,7 @@ kt
 
 # Distribution of key indicators
 
-```{r density-plots, fig.width=6.8, fig.height=7.6, fig.pos="H"}
+```{r density-plots, fig.width=6.8, fig.height=8.2, fig.pos="H"}
 # Per-variable metadata: display label, format, and whether to log-
 # transform the values before plotting (the right-tailed enrollment +
 # endowment distributions are unreadable on a linear axis).
@@ -390,6 +390,11 @@ ggplot(plot_df, aes(x = value)) +
     text       = element_text(family = "Helvetica"),
     strip.text = element_text(face = "bold", color = "#602D89",
                               size = 10, hjust = 0),
+    # Vertical breathing room between rows so the bottom range markers
+    # of one row don't visually collide with the strip text of the next.
+    # Horizontal spacing left at default — the 2-column grid already
+    # has natural separation between the two columns.
+    panel.spacing.y = unit(1.6, "lines"),
     panel.grid.major.x = element_line(color = "#F4EDEC", linewidth = 0.3),
     panel.grid.major.y = element_blank(),
     panel.grid.minor   = element_blank(),
