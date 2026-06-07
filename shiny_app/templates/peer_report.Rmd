@@ -245,7 +245,7 @@ kt
 
 # Distribution of key indicators
 
-```{r density-plots, fig.width=6.8, fig.height=5, fig.pos="H"}
+```{r density-plots, fig.width=6.8, fig.height=7.6, fig.pos="H"}
 # Per-variable metadata: display label, format, and whether to log-
 # transform the values before plotting (the right-tailed enrollment +
 # endowment distributions are unreadable on a linear axis).
@@ -339,18 +339,21 @@ ggplot(plot_df, aes(x = value)) +
              color = "#251230", linewidth = 0.5, linetype = "dashed") +
   geom_text(data = anno_df,
             aes(x = -Inf, y = Inf, label = anno),
-            hjust = -0.05, vjust = 1.2, size = 2.2,
+            hjust = -0.05, vjust = 1.2, size = 2.8,
             color = "#251230", lineheight = 0.95,
             inherit.aes = FALSE) +
-  facet_wrap(~ facet, scales = "free", ncol = 4) +
+  # 2 panels per row instead of 4 — each density gets ~2x the horizontal
+  # room, so the anchor + peer-median annotation no longer overlaps the
+  # curve peak and the strip text can comfortably show the full label.
+  facet_wrap(~ facet, scales = "free", ncol = 2) +
   scale_x_continuous(labels = NULL) +
-  scale_y_continuous(labels = NULL, expand = expansion(mult = c(0, 0.12))) +
+  scale_y_continuous(labels = NULL, expand = expansion(mult = c(0, 0.18))) +
   labs(x = NULL, y = NULL) +
-  theme_minimal(base_size = 8) +
+  theme_minimal(base_size = 9) +
   theme(
     text       = element_text(family = "Helvetica"),
     strip.text = element_text(face = "bold", color = "#602D89",
-                              size = 8, hjust = 0),
+                              size = 10, hjust = 0),
     panel.grid.major.x = element_line(color = "#F4EDEC", linewidth = 0.3),
     panel.grid.major.y = element_blank(),
     panel.grid.minor   = element_blank(),
