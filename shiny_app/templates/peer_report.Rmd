@@ -289,6 +289,7 @@ peers_wide  <- .SCHOOLS_WIDE[.SCHOOLS_WIDE$unitid %in% peers$unitid, , drop = FA
 # Pull pool + anchor + peer values for each variable, log-transform if
 # the metadata says so, and build a long data frame indexed by variable.
 plot_rows <- list()
+range_rows <- list()
 for (m in .PDF_DENSITY_VARS) {
   meta_m <- .PDF_VAR_META[[m]]
   if (is.null(meta_m) || !(m %in% names(pool_wide))) next
@@ -298,9 +299,16 @@ for (m in .PDF_DENSITY_VARS) {
   peer_v   <- peers_wide[[m]]; peer_v <- peer_v[is.finite(peer_v)]
   peer_med <- if (length(peer_v) > 0) median(peer_v) else NA_real_
 
-  # Original values for the annotation — formatted BEFORE log transform
+  # Original values for the annotation + axis-range markers — formatted
+  # BEFORE the log transform so the user sees actual dollars/counts.
   anchor_lbl <- .fmt_val(anchor_v, meta_m$fmt)
   peer_lbl   <- .fmt_val(peer_med, meta_m$fmt)
+  # Trim the pool to the 1st-99th percentile for the range-marker labels
+  # so a single outlier doesn't drive the axis range. The density still
+  # uses the full pool, so the curve's shape is unaffected.
+  q <- quantile(pool_v, c(0.01, 0.99), na.rm = TRUE)
+  xmin_lbl <- .fmt_val(q[[1]], meta_m$fmt)
+  xmax_lbl <- .fmt_val(q[[2]], meta_m$fmt)
 
   if (isTRUE(meta_m$log)) {
     pool_v   <- log10(pool_v   + 1)
@@ -309,21 +317,28 @@ for (m in .PDF_DENSITY_VARS) {
   }
 
   facet_lbl <- meta_m$label
+  facet_levels <- unname(vapply(.PDF_DENSITY_VARS,
+                                 function(k) .PDF_VAR_META[[k]]$label,
+                                 character(1)))
+  facet_factor <- factor(facet_lbl, levels = facet_levels)
   plot_rows[[length(plot_rows) + 1]] <- data.frame(
     var        = m,
-    facet      = factor(facet_lbl,
-                        levels = unname(vapply(.PDF_DENSITY_VARS,
-                                                function(k)
-                                                  .PDF_VAR_META[[k]]$label,
-                                                character(1)))),
+    facet      = facet_factor,
     value      = pool_v,
     anchor_val = anchor_v,
     peer_med   = peer_med,
     anno       = sprintf("Anchor: %s\nPeer med: %s", anchor_lbl, peer_lbl),
     stringsAsFactors = FALSE
   )
+  range_rows[[length(range_rows) + 1]] <- data.frame(
+    facet    = facet_factor,
+    xmin_lbl = xmin_lbl,
+    xmax_lbl = xmax_lbl,
+    stringsAsFactors = FALSE
+  )
 }
-plot_df <- do.call(rbind, plot_rows)
+plot_df  <- do.call(rbind, plot_rows)
+range_df <- do.call(rbind, range_rows)
 
 # Per-facet anchor/peer-median/annotation extracted once (single-value
 # columns per facet are still safe inside geom_vline / geom_text when
@@ -337,17 +352,38 @@ ggplot(plot_df, aes(x = value)) +
              color = "#602D89", linewidth = 0.8) +
   geom_vline(data = anno_df, aes(xintercept = peer_med),
              color = "#251230", linewidth = 0.5, linetype = "dashed") +
-  geom_text(data = anno_df,
-            aes(x = -Inf, y = Inf, label = anno),
-            hjust = -0.05, vjust = 1.2, size = 2.8,
-            color = "#251230", lineheight = 0.95,
-            inherit.aes = FALSE) +
-  # 2 panels per row instead of 4 — each density gets ~2x the horizontal
-  # room, so the anchor + peer-median annotation no longer overlaps the
-  # curve peak and the strip text can comfortably show the full label.
+  # geom_label (vs geom_text) gives the annotation a white background +
+  # zero-width border, so the vertical lines passing behind the text
+  # don't bleed through. Solves the visual collision when the anchor
+  # value sits at the left edge of the x-range.
+  geom_label(data = anno_df,
+             aes(x = -Inf, y = Inf, label = anno),
+             hjust = -0.02, vjust = 1.1, size = 2.7,
+             color = "#251230", lineheight = 0.95,
+             fill = "white", label.size = 0,
+             label.padding = unit(0.18, "lines"),
+             inherit.aes = FALSE) +
+  # Range markers at the bottom corners of each panel — give the reader
+  # a feel for the x-axis extremes without rendering a full tick scale.
+  # Computed from the 1st/99th percentile of the pool (in linear space)
+  # so single outliers don't drive the labels.
+  geom_text(data = range_df,
+            aes(x = -Inf, y = -Inf, label = xmin_lbl),
+            hjust = -0.05, vjust = -0.4, size = 2.3,
+            color = "#7A6E66", inherit.aes = FALSE) +
+  geom_text(data = range_df,
+            aes(x = Inf, y = -Inf, label = xmax_lbl),
+            hjust = 1.05, vjust = -0.4, size = 2.3,
+            color = "#7A6E66", inherit.aes = FALSE) +
+  # 2 panels per row — each density gets ~2x the horizontal room, so
+  # annotation no longer overlaps the curve peak and the strip text
+  # can comfortably show the full label.
   facet_wrap(~ facet, scales = "free", ncol = 2) +
-  scale_x_continuous(labels = NULL) +
-  scale_y_continuous(labels = NULL, expand = expansion(mult = c(0, 0.18))) +
+  scale_x_continuous(labels = NULL,
+                     expand = expansion(mult = c(0.02, 0.02))) +
+  # Bottom padding so the range markers have room below the curve.
+  scale_y_continuous(labels = NULL,
+                     expand = expansion(mult = c(0.18, 0.18))) +
   labs(x = NULL, y = NULL) +
   theme_minimal(base_size = 9) +
   theme(
@@ -363,7 +399,7 @@ ggplot(plot_df, aes(x = value)) +
 ```
 
 \begin{flushleft}
-{\color{cohcaccent}\footnotesize \textbf{Reading these:} the gray distribution shows the ranked universe; the solid purple line is the anchor; the dashed line is the peer-set median. Enrollment and endowment use a log scale so their right tails don't crush the bulk of the distribution.}
+{\color{cohcaccent}\footnotesize \textbf{Reading these:} the gray distribution shows the ranked universe; the solid purple line is the anchor; the dashed line is the peer-set median. The small values at the lower-left and lower-right of each panel are the 1st and 99th percentiles of the pool (so you can read the x-axis extremes). Enrollment and endowment use a log scale so their right tails don't crush the bulk of the distribution.}
 \end{flushleft}
 
 # Composition of the peer set
