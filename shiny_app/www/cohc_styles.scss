@@ -2832,6 +2832,21 @@ ul, ol {
     margin: 0.5rem 0;
   }
 
+  /* CSS margins between adjacent block elements collapse to the
+   * larger value, so an <hr> sitting between content and an <h2>
+   * (margin-top: 2rem) shows 2rem below it regardless of the <hr>'s
+   * own margin. Tighten headings + first-line elements that
+   * immediately follow a divider so the divider actually looks
+   * tight to its section. */
+  hr + h2,
+  hr + h3,
+  hr + h4,
+  hr + p,
+  hr + ul,
+  hr + ol {
+    margin-top: 0.5rem;
+  }
+
   ul, ol {
     color: #251230;
   }
