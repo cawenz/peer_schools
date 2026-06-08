@@ -123,13 +123,11 @@ representing the comparison group's 25th–75th percentile range and a
 dashed gray line for the group's median. Most variables in the app are
 a five-year panel (2020–2024).
 
-**Comparison groups.** Five choices:
+**Comparison groups.** Four choices:
 
 - **Peer Search results** — the most recent peer search from the Peer
   Search tab. The dropdown shows the live count, with a clear fallback
   when no search has been run.
-- **Cohort Builder cohort** — the schools currently in the cohort on
-  the Cohort Builder tab. Live count included in the label.
 - **Ranked universe — same US News class as anchor** — all schools in
   the ranked universe that share the anchor's US News classification.
   The default.
@@ -149,36 +147,6 @@ collapse obscures. Try *% Pell* or *% BIPOC* over time for Holy Cross
 against National Liberal Arts Colleges; the trajectory of each is more
 interesting than any single year's value.
 
-### Cohort Builder
-
-> **What it answers:** "Given an accreditor-supplied (or hand-built)
-> peer cohort, how does it actually look, and what would I change?"
-
-Pre-loaded with the NECHE-recommended peer set for Holy Cross. The main
-view is a two-column table: **In Cohort** on the left (Anchor + Keep +
-Maybe + Proposed), **Out / Considering** on the right (Remove +
-Possible). Each row has a status badge (color-coded) and a one-click
-arrow to move the school between sides.
-
-**Below the table:** a dashboard of eleven stat cards showing the
-cohort's distribution on key metrics against the ranked universe (click
-a card for a description and per-school detail), a variable inspector
-for deep dives on any single variable, and an export button (in the
-sidebar) that downloads the cohort plus a codebook plus a README as a
-single zip.
-
-**Status vocabulary.**
-
-- **Anchor** — the home institution. Read-only.
-- **Keep** — recommended peer that we'd keep.
-- **Maybe** — recommended peer we're undecided on.
-- **Remove** — recommended peer we're flagging for replacement.
-- **Proposed** — additional school we want to add to the cohort.
-- **Possible** — brainstormed candidate, not yet committed.
-
-Use the **→** arrow to send a school from In to Out, **←** to bring one
-back. The × on additions deletes the row entirely.
-
 ### When to use which tab
 
 - Use **Peer Search** when the question is "who are our peers?" Drop
@@ -189,8 +157,6 @@ back. The × on additions deletes the row entirely.
   the full variable-by-variable comparison.
 - Use **Trends** when the question is "how are *we* doing on a specific
   metric, over time?"
-- Use **Cohort Builder** when an external party (NECHE, a board, an
-  accreditor) has handed you a list and you need to assess it.
 
 ### Variables
 
@@ -280,9 +246,6 @@ and coverage — see the **Variables** tab.
   Every tab has its own anchor picker.
 - **Peer** — an institution similar to the anchor on the dimensions
   chosen for a particular search.
-- **Cohort** — a curated set of peers, typically an accreditor's
-  recommended set plus your own adjustments. Lives on the Cohort
-  Builder tab.
 - **Aspirant peer** — an institution similar to the anchor in context
   (size, sector, classification) but better than the anchor on chosen
   growth metrics.
@@ -293,9 +256,6 @@ and coverage — see the **Variables** tab.
   schools US News doesn't rank (specialty schools, very small
   institutions, and any institution that appears in IPEDS but isn't
   ranked).
-- **In-cohort** — the schools in the Cohort Builder's left column:
-  Anchor + Keep + Maybe + Proposed. Used by the variable inspector and
-  the dashboard cards.
 - **IQR ribbon** — the faint purple band on the Trends chart.
   Represents the 25th–75th percentile of the comparison group at each
   year.
