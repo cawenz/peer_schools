@@ -580,9 +580,20 @@ compute_peers <- function(
     # weight sliders have NO EFFECT on Mahalanobis rankings; only
     # variable inclusion (weight > 0 vs == 0) matters. The diagnostics
     # block below surfaces this so users know what's going on.
-    sqrt_weights <- sqrt(weights[vars_final])
-    Xw <- as.matrix(data_mat) %*% diag(sqrt_weights, nrow = length(sqrt_weights))
-    colnames(Xw) <- vars_final
+    #
+    # IMPORTANT: restrict to ACTIVE vars (weight > 0) before building
+    # Xw and Σ. Previously we used the full vars_final, which meant
+    # zero-weighted vars produced zero columns -> rank-deficient Σ ->
+    # singular fallback -> the search silently ran weighted Euclidean
+    # under a Mahalanobis label. Treating weight = 0 as "exclude"
+    # matches the Euclidean branch's behavior (which already filters
+    # to active_idx) and lets users actually test Mahalanobis without
+    # specific theme bundles.
+    mah_vars     <- vars_final[active_idx]
+    sqrt_weights <- sqrt(weights[mah_vars])
+    Xw <- as.matrix(data_mat[, mah_vars, drop = FALSE]) %*%
+          diag(sqrt_weights, nrow = length(sqrt_weights))
+    colnames(Xw) <- mah_vars
 
     # Compute covariance on complete pairs; if singular, fall back to
     # diagonal (which reduces to weighted Euclidean) with a warning.
@@ -597,7 +608,7 @@ compute_peers <- function(
     # condition number = max/min |eigenvalue|, effective rank = count
     # above a tolerance.
     mah_diag <- list(
-      n_vars            = length(vars_final),
+      n_vars            = length(mah_vars),
       n_active_dims     = length(active_idx),
       theme_weights_active_note =
         "Mahalanobis is scale-invariant: theme/variable WEIGHTS cancel in the final distance. Only variable INCLUSION (weight > 0) matters. Use Euclidean if you want weights to drive rankings.",
@@ -608,13 +619,16 @@ compute_peers <- function(
       n_negative_eigs   = NA_integer_,
       effective_rank    = NA_integer_,
       eigenvalues       = NULL,
+      smallest_direction_loadings = NULL,
       singular_fallback = is.null(Sigma_inv)
     )
     if (!is.null(Sigma)) {
-      ev <- tryCatch(
-        eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values,
+      ev_decomp <- tryCatch(
+        eigen(Sigma, symmetric = TRUE, only.values = FALSE),
         error = function(e) NULL)
-      if (!is.null(ev) && length(ev)) {
+      if (!is.null(ev_decomp) && length(ev_decomp$values)) {
+        ev   <- ev_decomp$values     # already sorted DESC by eigen()
+        evec <- ev_decomp$vectors    # eigenvectors as columns
         absev <- abs(ev)
         max_ae <- max(absev)
         # Standard numerical-rank tolerance: eigenvalues smaller than
@@ -628,10 +642,28 @@ compute_peers <- function(
         mah_diag$condition_number <-
           if (mah_diag$eigen_min > 0) max_ae / mah_diag$eigen_min
           else Inf
-        # Store the full sorted-descending spectrum so the Shiny app's
-        # eigenvalue plot can render it. Original signs preserved so
-        # any negative eigenvalues show up below zero on the plot.
-        mah_diag$eigenvalues <- sort(ev, decreasing = TRUE)
+        # Full spectrum for the diagnostic plot. eigen() returns values
+        # in decreasing order already, so this matches the plot's
+        # "largest -> smallest" x-axis convention.
+        mah_diag$eigenvalues <- ev
+
+        # Top variables loading on the smallest eigendirection — i.e.,
+        # the linear combination with the smallest variance in the
+        # pool. Large loadings here = "this variable is part of the
+        # near-collinear bundle driving the inverse-cov blow-up."
+        # Drop one of them and Mahalanobis usually stabilizes.
+        smallest_vec <- evec[, length(ev), drop = TRUE]
+        loadings <- abs(smallest_vec)
+        names(loadings) <- mah_vars
+        total <- sum(loadings)
+        loadings <- sort(loadings, decreasing = TRUE)
+        n_show <- min(10, length(loadings))
+        mah_diag$smallest_direction_loadings <- data.frame(
+          metric  = names(loadings)[seq_len(n_show)],
+          loading = unname(loadings[seq_len(n_show)]),
+          pct     = unname(loadings[seq_len(n_show)]) / total * 100,
+          stringsAsFactors = FALSE
+        )
       }
     }
 

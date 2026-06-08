@@ -2195,6 +2195,25 @@ peerTableServer <- function(id, sidebar_state) {
                 "the Mahalanobis distance.")),
             plotOutput(ns("mah_eigen_plot"), height = "220px")
           ),
+          # "Who's making it unstable?" — variables with the largest
+          # absolute loading on the SMALLEST eigendirection. They form
+          # the near-collinear bundle. Removing any one usually drops
+          # the condition number by orders of magnitude.
+          if (!is.null(mdg$smallest_direction_loadings) &&
+              nrow(mdg$smallest_direction_loadings) > 0) tagList(
+            tags$h6(class = "mah-diag-subhead",
+                    "Top variables on the smallest eigendirection"),
+            p(class = "text-muted",
+              tags$small(
+                "The smallest eigendirection is the linear combination ",
+                "of variables that has the smallest variance in the ",
+                "pool — i.e., a near-collinear bundle. These variables ",
+                "have the largest weights in that combination. Excluding ",
+                "one of them (uncheck or set weight to 0 via the variable ",
+                "overrides modal) usually drops the condition number by ",
+                "several orders of magnitude.")),
+            DT::DTOutput(ns("mah_loadings_table"))
+          ),
           tags$div(class = "mah-diag-note",
             tags$strong("Heads up: "),
             mdg$theme_weights_active_note %||% ""),
@@ -2283,6 +2302,42 @@ peerTableServer <- function(id, sidebar_state) {
           panel.grid.minor   = ggplot2::element_blank(),
           plot.margin = ggplot2::margin(4, 6, 4, 4)
         )
+    })
+
+    # ---- Diagnostics: Mahalanobis smallest-eigendirection loadings ----
+    # Compact 3-column table (Variable | Loading | % of bundle). Use
+    # the same display-name + theme lookup as the weights table so the
+    # user sees familiar labels, not raw metric IDs.
+    output$mah_loadings_table <- DT::renderDT({
+      res <- peer_result()
+      req(res)
+      mdg <- res$meta$mahalanobis_diagnostics
+      req(!is.null(mdg), !is.null(mdg$smallest_direction_loadings))
+      df <- mdg$smallest_direction_loadings
+      labels <- .VARIABLES$display_name[match(df$metric, .VARIABLES$metric)]
+      labels <- ifelse(is.na(labels), df$metric, labels)
+      themes <- vapply(df$metric, .var_theme, character(1))
+      out <- data.frame(
+        Variable = labels,
+        Metric   = df$metric,
+        Theme    = ifelse(is.na(themes), "(unassigned)",
+                          .theme_label(themes)),
+        Loading  = round(df$loading, 3),
+        `% of bundle` = sprintf("%.1f%%", df$pct),
+        check.names      = FALSE,
+        stringsAsFactors = FALSE
+      )
+      DT::datatable(
+        out,
+        rownames = FALSE,
+        options  = list(
+          pageLength = 10, dom = "t",
+          ordering   = FALSE,
+          columnDefs = list(
+            list(className = "dt-right", targets = c(3, 4))
+          )
+        )
+      )
     })
 
     # ---- Diagnostics: weights table ----
