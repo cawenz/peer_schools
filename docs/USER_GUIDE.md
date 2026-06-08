@@ -231,7 +231,9 @@ not a missing optimization.
 | **IPEDS** (HD, ADM, EF, SFA, OUT, FIN tables) | Most of the data: enrollment, admissions, finance, graduation rates, aid, classifications | 5-year panel, 2020–2024 |
 | **Carnegie 2025 Public Data File** | Institutional classifications and HERD research expenditures | 2025 release |
 | **College Scorecard** | 6- and 10-year median earnings, loan repayment rate | Most recent release |
-| **Common Data Set** | Percent of need met, percent of need fully met | Most recent academic year reported |
+| **Common Data Set** (via US News Academic Insights) | CDS-reported metrics such as percent of need met, percent of need fully met, top-10% of high-school class, early-decision detail, residential share, and class-size shares | 2025–2026 academic year |
+| **Washington Monthly College Guide** | Washington Monthly rankings within the Liberal Arts, Bachelor's, Master's, and National categories (plus the Best Bang for the Buck regional lists) | 2025 release |
+| **Forbes America's Top Colleges** | Forbes overall rank | 2025 release |
 | **EADA** (Equity in Athletics Disclosure Act) | Athletics: sponsoring body, division, conference, varsity sports, athlete counts | 2024–25 |
 | **Wikipedia** (institution lists) | Conference assignments (matched to EADA UnitIDs) | Refreshed annually |
 
