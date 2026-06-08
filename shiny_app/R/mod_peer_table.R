@@ -2178,6 +2178,23 @@ peerTableServer <- function(id, sidebar_state) {
               "above actually used weighted Euclidean. Drop a few highly-",
               "correlated variables via the variable overrides modal, or ",
               "switch back to Euclidean explicitly."),
+          # Eigenvalue spectrum plot. Shows the dropoff from largest to
+          # smallest eigenvalue on a log scale — a steep cliff means a
+          # near-collinear bundle of variables is dominating the inverse
+          # covariance and inflating distances.
+          if (!is.null(mdg$eigenvalues)) tagList(
+            tags$h6(class = "mah-diag-subhead",
+                    "Eigenvalue spectrum"),
+            p(class = "text-muted",
+              tags$small(
+                "Each bar is one eigenvalue of the candidate-pool ",
+                "covariance matrix, sorted largest to smallest on a ",
+                "log10 axis. A steep cliff at the right end is what ",
+                "drives the condition-number problem: those tiny ",
+                "eigenvalues get inverted to huge numbers and dominate ",
+                "the Mahalanobis distance.")),
+            plotOutput(ns("mah_eigen_plot"), height = "220px")
+          ),
           tags$div(class = "mah-diag-note",
             tags$strong("Heads up: "),
             mdg$theme_weights_active_note %||% ""),
@@ -2222,6 +2239,50 @@ peerTableServer <- function(id, sidebar_state) {
           tags$ul(lapply(m$variables_dropped_anchor_na, tags$li))
         )
       )
+    })
+
+    # ---- Diagnostics: Mahalanobis eigenvalue spectrum ----
+    # Sorted-descending bar chart on log10 axis. The "cliff" at the
+    # right end tells the user how many directions are near-collinear
+    # — those are the ones blowing up the inverse covariance.
+    output$mah_eigen_plot <- renderPlot({
+      res <- peer_result()
+      req(res)
+      mdg <- res$meta$mahalanobis_diagnostics
+      req(!is.null(mdg), !is.null(mdg$eigenvalues))
+      ev <- mdg$eigenvalues
+      df <- data.frame(
+        idx = seq_along(ev),
+        # Plot |λ| on log10 so the floor is visible; negative eigenvalues
+        # (if any) are marked separately via fill color.
+        absev = pmax(abs(ev), 1e-12),
+        sign  = ifelse(ev < 0, "negative", "positive"),
+        stringsAsFactors = FALSE
+      )
+      tol_line <- 1e-10 * max(df$absev)
+      ggplot2::ggplot(df, ggplot2::aes(x = idx, y = absev, fill = sign)) +
+        ggplot2::geom_col(width = 0.8) +
+        ggplot2::geom_hline(yintercept = tol_line,
+                            linetype = "dashed",
+                            color = "#AC9E94",
+                            linewidth = 0.4) +
+        ggplot2::annotate("text", x = max(df$idx), y = tol_line,
+                          label = "numerical-zero floor",
+                          vjust = -0.4, hjust = 1, size = 3,
+                          color = "#7A6E66") +
+        ggplot2::scale_y_log10(
+          labels = function(v) formatC(v, format = "e", digits = 1)) +
+        ggplot2::scale_fill_manual(
+          values = c(positive = "#602D89", negative = "#C44"),
+          guide  = "none") +
+        ggplot2::labs(x = "Eigenvalue index (largest -> smallest)",
+                      y = "|eigenvalue|  (log10)") +
+        ggplot2::theme_minimal(base_size = 10) +
+        ggplot2::theme(
+          panel.grid.major.x = ggplot2::element_blank(),
+          panel.grid.minor   = ggplot2::element_blank(),
+          plot.margin = ggplot2::margin(4, 6, 4, 4)
+        )
     })
 
     # ---- Diagnostics: weights table ----

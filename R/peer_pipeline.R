@@ -607,6 +607,7 @@ compute_peers <- function(
       eigen_median      = NA_real_,
       n_negative_eigs   = NA_integer_,
       effective_rank    = NA_integer_,
+      eigenvalues       = NULL,
       singular_fallback = is.null(Sigma_inv)
     )
     if (!is.null(Sigma)) {
@@ -627,6 +628,10 @@ compute_peers <- function(
         mah_diag$condition_number <-
           if (mah_diag$eigen_min > 0) max_ae / mah_diag$eigen_min
           else Inf
+        # Store the full sorted-descending spectrum so the Shiny app's
+        # eigenvalue plot can render it. Original signs preserved so
+        # any negative eigenvalues show up below zero on the plot.
+        mah_diag$eigenvalues <- sort(ev, decreasing = TRUE)
       }
     }
 
