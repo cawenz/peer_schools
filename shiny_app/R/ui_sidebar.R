@@ -472,6 +472,50 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
       var_override_weights(list())
     })
 
+    # ---- Bidirectional sync: checkbox <-> slider ----
+    # Two-way mirroring so the user can't end up in a confused state
+    # where checked + slider = 0 (or unchecked + slider = 2). The
+    # observer pairs are loop-safe because Shiny doesn't fire on
+    # no-op updates (setting an input to the value it already has).
+    #
+    #   Slider 0   <->  Checkbox unchecked
+    #   Slider > 0 <->  Checkbox checked
+    #   Re-check from unchecked -> slider snaps to 1.0 (theme default)
+    #
+    # ignoreInit = TRUE skips the modal-open initial paint so we don't
+    # accidentally rewrite the saved state on every reopen.
+    lapply(seq_len(nrow(.CLUSTERING_VARS)), function(i) {
+      m         <- .CLUSTERING_VARS$metric[i]
+      incl_id   <- paste0("incl_", m)
+      slider_id <- paste0("weight_var_", m)
+
+      # Slider movement -> checkbox state
+      observeEvent(input[[slider_id]], {
+        sv <- input[[slider_id]]
+        cv <- isolate(input[[incl_id]])
+        if (is.null(sv)) return()
+        if (sv <= 0 && isTRUE(cv)) {
+          updateCheckboxInput(session, incl_id, value = FALSE)
+        } else if (sv > 0 && isFALSE(cv)) {
+          updateCheckboxInput(session, incl_id, value = TRUE)
+        }
+      }, ignoreInit = TRUE)
+
+      # Checkbox toggle -> slider value
+      observeEvent(input[[incl_id]], {
+        cv <- input[[incl_id]]
+        sv <- isolate(input[[slider_id]])
+        if (is.null(cv) || is.null(sv)) return()
+        if (isTRUE(cv) && sv <= 0) {
+          # Re-include: snap to theme default (1.0).
+          updateSliderInput(session, slider_id, value = 1.0)
+        } else if (isFALSE(cv) && sv > 0) {
+          # Exclude: mirror to slider = 0.
+          updateSliderInput(session, slider_id, value = 0)
+        }
+      }, ignoreInit = TRUE)
+    })
+
     # Pretty labels for usnews_classification (.prettify_classification
     # lives in R/helpers_format.R). Three sentinel "All" options at the
     # top expand to multiple raw classifications when the filter is
