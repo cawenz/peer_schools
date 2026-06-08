@@ -25,9 +25,15 @@ suppressMessages(library(memoise))
 # Cache key is the argument list (just output_dir, typically a constant
 # for the session). First search pays the disk-read cost; subsequent
 # searches hit a hot in-memory cache, saving 400-700ms per call.
+#
+# The is.memoised() guards keep this idempotent: when global.R re-sources
+# the file (interactive reloads, runApp() called twice, etc.) we don't
+# double-wrap, which memoise refuses with "`f` must not be memoised."
 # -----------------------------------------------------------------------------
-.load_wide_facts <- memoise::memoise(.load_wide_facts)
-.load_schools    <- memoise::memoise(.load_schools)
+if (!memoise::is.memoised(.load_wide_facts))
+  .load_wide_facts <- memoise::memoise(.load_wide_facts)
+if (!memoise::is.memoised(.load_schools))
+  .load_schools    <- memoise::memoise(.load_schools)
 
 compute_peers_cached <- memoise::memoise(function(
     anchor_unitid     = .DEFAULT_ANCHOR_UNITID,
