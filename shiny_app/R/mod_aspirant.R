@@ -153,15 +153,12 @@ aspirantServer <- function(id) {
     ns <- session$ns
 
     # --- Populate choices ---
-    anchor_choices <- {
-      vals <- .SCHOOLS$unitid
-      names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals[order(names(vals))]
-    }
+    # Reuse the global .ANCHOR_CHOICES cache + server-side paging so
+    # the 2,598-school list doesn't get re-shipped per session.
     updateSelectizeInput(session, "anchor_unitid",
-                         choices = anchor_choices,
+                         choices  = .ANCHOR_CHOICES,
                          selected = .DEFAULT_ANCHOR_UNITID,
-                         server = FALSE)
+                         server   = TRUE)
 
     raw_classes  <- sort(unique(stats::na.omit(.SCHOOLS$usnews_classification)))
     class_choices <- setNames(raw_classes, .prettify_classification(raw_classes))

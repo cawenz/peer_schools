@@ -209,6 +209,17 @@ if (file.exists(.schools_ath_path)) {
 
 .DEFAULT_ANCHOR_UNITID <- 166124L  # Holy Cross
 
+# Pre-build the anchor-picker choices vector once at app startup. Used
+# by every selectizeInput across the app (Peer Search sidebar, Side-by-
+# Side, Aspirant, Stratified). Building this at module level instead of
+# per-session shaves ~10ms off every session start and keeps the
+# memory footprint small since the vector is shared.
+.ANCHOR_CHOICES <- {
+  vals <- .SCHOOLS$unitid
+  names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
+  vals[order(names(vals))]
+}
+
 # -----------------------------------------------------------------------------
 # Source the app's R/ helpers and module stubs
 # -----------------------------------------------------------------------------

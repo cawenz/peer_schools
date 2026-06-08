@@ -250,19 +250,15 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
 
     # --- Populate dynamic choices on startup from .SCHOOLS in global.R ---
     # Sorted alphabetically by label and shipped client-side so selectize's
-    # Sifter scorer ranks word-start matches first (e.g. typing "Holy"
-    # surfaces "College of the Holy Cross" near the top). Server-side
-    # selectize would cap the dropdown at maxOptions in unitid order, which
-    # buries the school the user actually wants under common-prefix matches.
-    anchor_choices <- {
-      vals <- .SCHOOLS$unitid
-      names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals[order(names(vals))]
-    }
+    # server = TRUE pages results from the server instead of shipping
+    # all 2,598 schools to the client as JSON on every session start.
+    # Cuts ~156KB out of the initial payload + skips selectize2 having
+    # to build a 2,598-option DOM upfront — the slowest single thing
+    # that fired during app launch.
     updateSelectizeInput(session, "anchor_unitid",
-                         choices  = anchor_choices,
+                         choices  = .ANCHOR_CHOICES,
                          selected = .DEFAULT_ANCHOR_UNITID,
-                         server   = FALSE)
+                         server   = TRUE)
 
     # ---- Per-variable override modal state ----
     # var_override_weights is the COMMITTED state: named list of

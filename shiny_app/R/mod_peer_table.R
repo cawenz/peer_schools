@@ -12,17 +12,132 @@
 #   - $selected_peer reactive single-row tibble for the selected DT row
 # =============================================================================
 
+# -----------------------------------------------------------------------------
+# Empty-state hero — static onboarding panel shown until the first
+# Run search lands. Pure HTML, no reactive dependencies, so it lives in
+# the static UI and renders on the first DOM paint instead of requiring
+# a server-side renderUI roundtrip.
+#
+# Returns a top-level div the caller can drop into a conditionalPanel.
+# `ns` is the module namespace function (NS(id)) so any future input
+# references stay namespaced; right now nothing inside the hero binds
+# to inputs, but threading it through keeps the contract clean.
+# -----------------------------------------------------------------------------
+.peer_empty_hero <- function(ns) {
+  div(class = "peer-empty-hero",
+    div(class = "peer-empty-headline",
+        h3("How this works"),
+        p(class = "peer-empty-lede",
+          "Pick an anchor school, narrow the candidate pool, ",
+          "and the tool ranks every remaining institution by ",
+          "weighted similarity. Use the results to find peers ",
+          "for benchmarking, cohort building, or aspirant analysis.")
+    ),
+
+    div(class = "peer-empty-steps",
+      div(class = "peer-step",
+          div(class = "peer-step-num", "1"),
+          div(class = "peer-step-body",
+              h6("Set your anchor school"),
+              p("Open the ", tags$strong("Anchor school"),
+                " picker in the sidebar and start typing. ",
+                "The anchor is the school we compare every ",
+                "candidate against."))),
+      div(class = "peer-step",
+          div(class = "peer-step-num", "2"),
+          div(class = "peer-step-body",
+              h6("Narrow the candidate pool"),
+              p("Default filters mirror the anchor's US News ",
+                "classification and sector. Loosen them to widen ",
+                "the search, or add state / religious tradition / ",
+                "athletics filters to focus."),
+              p(class = "peer-step-aside",
+                tags$strong("Theme weights"), " let you emphasize ",
+                "Enrollment, Admissions, Finance, etc. Presets ",
+                "exist for common framings (Balanced, ",
+                "Outcomes-heavy).") )),
+      div(class = "peer-step",
+          div(class = "peer-step-num", "3"),
+          div(class = "peer-step-body",
+              h6("Tune the weights (optional)"),
+              p("If a single variable matters more than its theme ",
+                "would suggest, override it directly. Click ",
+                tags$strong("Customize variables…"),
+                " under the theme sliders to open the full ",
+                "clustering-variable list — check each variable ",
+                "you want to override and set its weight from 0 ",
+                "(drop entirely) to 3 (triple influence). ",
+                "Unchecked variables continue to use their theme ",
+                "weight."),
+              p(class = "peer-step-aside",
+                "Most searches don't need this — the theme sliders ",
+                "cover the common cases. Reach for individual ",
+                "overrides when you want to spotlight a specific ",
+                "metric (e.g. ", tags$em("grad rate"),
+                ") above everything else in its theme.") )),
+      div(class = "peer-step",
+          div(class = "peer-step-num", "4"),
+          div(class = "peer-step-body",
+              h6("Run search"),
+              p("Hit the ", tags$strong("Run search"), " button. ",
+                "Results appear here, sorted by distance ascending. ",
+                "Click any row to load that school into the ",
+                tags$strong("Side-by-Side"), " tab for a direct ",
+                "anchor-vs-peer comparison.")))
+    ),
+
+    div(class = "peer-empty-method",
+      tags$h6("What's happening under the hood"),
+      tags$ol(class = "peer-empty-method-list",
+        tags$li(tags$strong("Pool. "),
+                "The universe of 4-year, non-profit institutions ",
+                "is filtered by your sidebar selections."),
+        tags$li(tags$strong("Z-score. "),
+                "Each variable is standardized over the pool so ",
+                "different units (dollars, percents, counts) ",
+                "contribute on the same scale."),
+        tags$li(tags$strong("Distance. "),
+                "Weighted Euclidean distance from each candidate ",
+                "to the anchor. Theme weights apply by default; ",
+                "individual variables override their theme weight ",
+                "when you've customized them."),
+        tags$li(tags$strong("Rank. "),
+                "Candidates sorted ascending by distance; lower ",
+                "is more similar."))),
+
+    div(class = "peer-empty-footer",
+      p(tags$small(
+        "Full variable definitions are on the ",
+        tags$strong("Variables"), " tab. Step-by-step examples ",
+        "and methodology notes are on the ", tags$strong("Help"),
+        " tab. Once results appear, the ",
+        tags$strong("About this table"), " link will explain ",
+        "each column.")))
+  )
+}
+
 peerTableUI <- function(id) {
   ns <- NS(id)
   tagList(
     h4("Peer Search"),
     # Tagline only — full onboarding lives in the empty-state hero
-    # rendered by header_or_empty so the explanation is right where
-    # the user's eye is once they're ready to read.
+    # rendered inline below so the explanation is right where the
+    # user's eye is once they're ready to read.
     p(class = "section-intro",
       "Rank institutions by similarity to an anchor school across IPEDS, ",
       "US News, Carnegie, EADA, and Scorecard data."),
 
+    # Empty-state hero now lives in the static UI (wrapped in a
+    # conditionalPanel that hides it once results land) so it paints
+    # on the first DOM render rather than waiting for a server-side
+    # renderUI roundtrip to ship the same static HTML over WebSocket.
+    # This is the bulk of the perceived "app launch is slow" feeling.
+    conditionalPanel(
+      condition = sprintf("!output['%s']", ns("has_results")),
+      .peer_empty_hero(ns)
+    ),
+
+    # Stats grid (rendered server-side ONLY after first search).
     uiOutput(ns("header_or_empty")),
     uiOutput(ns("analysis_indicator")),
 
@@ -171,105 +286,22 @@ peerTableServer <- function(id, sidebar_state) {
     }, ignoreInit = TRUE, ignoreNULL = TRUE)
 
     # -------------------------------------------------------------------------
-    # Header: stats grid before results, empty-state message before first Run.
+    # Header: stats grid AFTER first search. The empty-state hero now
+    # lives in the static UI (peerTableUI) wrapped in a conditionalPanel
+    # so it paints on first DOM render instead of waiting for the server
+    # to ship the same static HTML over WebSocket.
     # -------------------------------------------------------------------------
+
+    # Flag for the conditionalPanel guarding the empty-state hero. Has
+    # to be exposed via outputOptions(suspendWhenHidden = FALSE) below
+    # so the value reaches the client even before any output that reads
+    # it is on screen.
+    output$has_results <- reactive({ !is.null(peer_result()) })
+    outputOptions(output, "has_results", suspendWhenHidden = FALSE)
+
     output$header_or_empty <- renderUI({
       res <- peer_result()
-      if (is.null(res)) {
-        # Empty-state hero — substantial first-run guide. Disappears
-        # once the user clicks Run search and a result lands, so
-        # repeat users see only the stats grid + table.
-        return(div(class = "peer-empty-hero",
-          div(class = "peer-empty-headline",
-              h3("How this works"),
-              p(class = "peer-empty-lede",
-                "Pick an anchor school, narrow the candidate pool, ",
-                "and the tool ranks every remaining institution by ",
-                "weighted similarity. Use the results to find peers ",
-                "for benchmarking, cohort building, or aspirant analysis.")
-          ),
-
-          div(class = "peer-empty-steps",
-            div(class = "peer-step",
-                div(class = "peer-step-num", "1"),
-                div(class = "peer-step-body",
-                    h6("Set your anchor school"),
-                    p("Open the ", tags$strong("Anchor school"),
-                      " picker in the sidebar and start typing. ",
-                      "The anchor is the school we compare every ",
-                      "candidate against."))),
-            div(class = "peer-step",
-                div(class = "peer-step-num", "2"),
-                div(class = "peer-step-body",
-                    h6("Narrow the candidate pool"),
-                    p("Default filters mirror the anchor's US News ",
-                      "classification and sector. Loosen them to widen ",
-                      "the search, or add state / religious tradition / ",
-                      "athletics filters to focus."),
-                    p(class = "peer-step-aside",
-                      tags$strong("Theme weights"), " let you emphasize ",
-                      "Enrollment, Admissions, Finance, etc. Presets ",
-                      "exist for common framings (Balanced, ",
-                      "Outcomes-heavy).") )),
-            div(class = "peer-step",
-                div(class = "peer-step-num", "3"),
-                div(class = "peer-step-body",
-                    h6("Tune the weights (optional)"),
-                    p("If a single variable matters more than its theme ",
-                      "would suggest, override it directly. Click ",
-                      tags$strong("Customize variables…"),
-                      " under the theme sliders to open the full ",
-                      "clustering-variable list — check each variable ",
-                      "you want to override and set its weight from 0 ",
-                      "(drop entirely) to 3 (triple influence). ",
-                      "Unchecked variables continue to use their theme ",
-                      "weight."),
-                    p(class = "peer-step-aside",
-                      "Most searches don't need this — the theme sliders ",
-                      "cover the common cases. Reach for individual ",
-                      "overrides when you want to spotlight a specific ",
-                      "metric (e.g. ", tags$em("grad rate"),
-                      ") above everything else in its theme.") )),
-            div(class = "peer-step",
-                div(class = "peer-step-num", "4"),
-                div(class = "peer-step-body",
-                    h6("Run search"),
-                    p("Hit the ", tags$strong("Run search"), " button. ",
-                      "Results appear here, sorted by distance ascending. ",
-                      "Click any row to load that school into the ",
-                      tags$strong("Side-by-Side"), " tab for a direct ",
-                      "anchor-vs-peer comparison.")))
-          ),
-
-          div(class = "peer-empty-method",
-            tags$h6("What's happening under the hood"),
-            tags$ol(class = "peer-empty-method-list",
-              tags$li(tags$strong("Pool. "),
-                      "The universe of 4-year, non-profit institutions ",
-                      "is filtered by your sidebar selections."),
-              tags$li(tags$strong("Z-score. "),
-                      "Each variable is standardized over the pool so ",
-                      "different units (dollars, percents, counts) ",
-                      "contribute on the same scale."),
-              tags$li(tags$strong("Distance. "),
-                      "Weighted Euclidean distance from each candidate ",
-                      "to the anchor. Theme weights apply by default; ",
-                      "individual variables override their theme weight ",
-                      "when you've customized them."),
-              tags$li(tags$strong("Rank. "),
-                      "Candidates sorted ascending by distance; lower ",
-                      "is more similar."))),
-
-          div(class = "peer-empty-footer",
-            p(tags$small(
-              "Full variable definitions are on the ",
-              tags$strong("Variables"), " tab. Step-by-step examples ",
-              "and methodology notes are on the ", tags$strong("Help"),
-              " tab. Once results appear, the ",
-              tags$strong("About this table"), " link will explain ",
-              "each column.")))
-        ))
-      }
+      if (is.null(res)) return(NULL)   # static hero covers this case
 
       anchor_name <- res$meta$anchor_name
       pool_n      <- res$meta$candidate_pool_size

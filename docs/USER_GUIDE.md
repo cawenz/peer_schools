@@ -6,10 +6,10 @@ any US College or University.
 
 ## What this app does
 
-You give the app a "home" institution (the **anchor**), and it returns
-the institutions most similar to that anchor on the dimensions you
-choose: size, selectivity, outcomes, finance, faculty resources, and
-student body. Beyond that core peer search, the app helps you
+You give the app an "anchor" institution, and it returns
+the schools most similar on the dimensions you
+choose: size, selectivity, outcomes, finance, faculty resources,
+student body and athletics. Beyond that core peer search, the app helps you
 compare two schools side by side, inspect a single school's trajectory
 over time and identify "aspirant" peers: schools you'd like to grow
 toward on specific metrics. The default anchor is Holy Cross; you can
@@ -23,13 +23,13 @@ change it on every tab.
    20 institutions most similar to your Anchor institution under the default
    methodology.
 2. Click any row in the results table. The app remembers your selection.
-   Switch to **Side-by-Side**. The chosen peer is already loaded — you'll
-   see Holy Cross next to that institution across every available variable.
+   Switch to **Side-by-Side**. The chosen peer is already loaded and you'll
+   see your anchor school next to that institution across every available variable. Click the graph icon to view the data for a variable in depth.
 3. Switch to **Trends**. Pick a variable like *6-year graduation rate*.
    You'll see Holy Cross's year-over-year line plotted against the peer
    set's interquartile band.
 
-That's the core functionality. Everything else is variations on those three actions
+That's the core functionality; everything else is variations on those three actions
 for different questions.
 
 ---
@@ -38,12 +38,12 @@ for different questions.
 
 ### Peer Search
 
-> **What it answers:** "Which institutions, in our judgment of what
+> **What questions the app answers:** "Which institutions, in our judgment of what
 > matters, look most like the anchor. Of those institutions, which ones beat us
 > across various metrics, and how do they break down across institutional
 > categories?"
 
-The headline tab. You set an **anchor school**, define a **candidate
+You set an **anchor school**, define a **candidate
 pool** (the universe to search within), and adjust **theme weights** that
 control how much each dimension matters. The app ranks every candidate
 by similarity to the anchor, then offers two follow-up refinements right
@@ -58,7 +58,7 @@ weight every possible clustering variable by clicking "Customize variables" belo
 Click **Run search**.
 The main panel shows:
 
-1. **Summary header + top peers table.** The closest K peers, sorted by
+1. **Summary header + top peers table.** The closest K peers (set by the user), sorted by
    similarity. Click any row to load that institution into Side-by-Side.
 2. **Diagnostics accordion.** Which variables drove the result, what
    got dropped by coverage, what got dropped because the anchor had no
@@ -73,22 +73,21 @@ The main panel shows:
    tied to the search you're already looking at.
 4. **Expand search into other groups.** Pick a stratification
    dimension (US News classification, Carnegie Research Activity,
-   Region, Sector, etc.) and the app runs a separate peer search per
-   value of that dimension, using the same anchor + theme weights. Get
-   "who's HC's closest LAC, closest R1, closest regional university"
-   in one view without reconfiguring anything.
+   Region, Public/Private, etc.) and the app runs a separate peer search per
+   value of that dimension, using the same anchor and theme weights. Get
+   "who's the anchor's closest LAC, closest R1, closest regional university"
+   in one view without re-configuring anything.
 
-**Quick tips.** The pool filters do most of the work — if you want to
+**Quick tips.** The pool filters do most of the work: if you want to
 compare only against private liberal arts colleges, narrow the pool
 before adjusting weights. The theme weights all default to 1.0 (equal
-across themes); Athletics defaults to 0. Click any peer row to load
-that school into the Side-by-Side tab. The refine and expand sections
+across themes). Click any peer row to load that school into the Side-by-Side tab. The refine and expand sections
 appear only after you've run a search.
 
 ### Side-by-Side
 
 > **What it answers:** "How does the anchor compare to *one specific*
-> peer across every variable we have?"
+> peer across every variable we can use to find peers?"
 
 Pick an anchor and a peer. The main panel shows every variable in our
 data, grouped by theme, with both schools' values, the difference, and a
@@ -108,7 +107,7 @@ placing both in the pool's range.
 schools are structurally comparable. If a Side-by-Side row shows a big
 difference but the bar shows both schools in roughly the same percentile
 of the pool, the difference may not be meaningful in context. Click any
-variable to open the distribution modal — that's where the variable's
+variable to open the distribution modal: that's where the variable's
 full definition and source live.
 
 ### Trends
@@ -121,7 +120,7 @@ Pick a school, pick a variable, pick a comparison group. The chart
 shows the school's line in bold purple, with a faint purple band
 representing the comparison group's 25th–75th percentile range and a
 dashed gray line for the group's median. Most variables in the app are
-a five-year panel (2020–2024).
+a five-year panel (2020-21 to 2024-25).
 
 **Comparison groups.** Four choices:
 
@@ -143,7 +142,7 @@ school's value, the comparison median, the comparison min/max range,
 the IQR (Q1–Q3), and the school's percentile within the comparison set.
 
 **Quick tips.** This is where you spot trends that the 5-year-mean
-collapse obscures. Try *% Pell* or *% BIPOC* over time for Holy Cross
+collapse obscures. Try *% Pell* or *% BIPOC* or *Acceptance rate* over time for Holy Cross
 against National Liberal Arts Colleges; the trajectory of each is more
 interesting than any single year's value.
 
@@ -151,7 +150,7 @@ interesting than any single year's value.
 
 - Use **Peer Search** when the question is "who are our peers?" Drop
   into the Refine section right below the result to ask "of those, who
-  are we trying to become?" The Expand section answers "what about
+  are we trying to become more like?" The Expand section answers "what about
   peers in other categories?"
 - Use **Side-by-Side** when you have two specific institutions and want
   the full variable-by-variable comparison.
@@ -179,22 +178,16 @@ for confirmation).
 on the server, so closing the browser or restarting the app doesn't
 lose them. Everyone using this deployment sees the same list, with
 *saved by* attribution on each card.
-
-### Help
-
-You're reading it. The Help tab renders this guide in the app so it's
-always one click away.
-
 ---
 
-## Methodology, in plain language
+## Methodology
 
 The peer ranking uses **weighted Euclidean distance**: each school
 becomes a point in a multi-dimensional space (one dimension per
 variable), each variable is z-scored within the candidate pool so
 dollars and percentages and counts are on the same scale, a handful of
 heavily-skewed variables (endowments, enrollment counts) are
-log-transformed first so the heavy tails don't dominate, and the
+log-transformed first so the heavy tails in the data don't dominate the distance calculations, and the
 distance from the anchor to each candidate is computed dimension by
 dimension. Per-variable weights are derived from the **theme weights**
 you set in the sidebar.
@@ -206,8 +199,7 @@ expenses, research), **Outcomes** (graduation rates, earnings,
 repayment), **Aid** (Pell, institutional grants, net price),
 **Student body** (race, age, first-gen, family income, undergrad share,
 residential share, religious-tradition match), and **Athletics**
-(intensity, breadth, multi-sport culture). Athletics defaults to weight
-0 (opt-in).
+(intensity, breadth, multi-sport culture).
 
 **Coverage and missingness.** Variables with less than 70% coverage
 within the candidate pool are dropped from the distance calculation for
@@ -216,11 +208,9 @@ dropped. The diagnostics panel under the peer table shows what was
 used, what was dropped, and why.
 
 **What this methodology doesn't do.** It doesn't pick variables for you
-based on what "clusters" in the data. We tested that approach and found
+based on what variables result in natural "clusters" in the data. We tested that approach and found
 it produces a finance-dominated peer set that doesn't reflect the
-institutional-character similarity the IR office actually wants. The
-equal-by-default theme weights are a deliberate methodological choice,
-not a missing optimization.
+institutional-character similarity we would want. 
 
 ---
 
@@ -262,7 +252,7 @@ and coverage — see the **Variables** tab.
   Represents the 25th–75th percentile of the comparison group at each
   year.
 - **Coverage** — the share of the candidate pool that has a value for a
-  given variable. Variables below 70% coverage drop out of the distance.
+  given variable. Variables below 70% coverage drop out of the distance calculations.
 - **Theme** — a grouping of variables (Size, Outcomes, Aid, Student
   body, and so on). Theme weights control how much each grouping
   contributes to the distance calculation.

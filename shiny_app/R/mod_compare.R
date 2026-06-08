@@ -235,20 +235,17 @@ compareServer <- function(id, peer_selection, peer_result) {
     # the same set or restricted to the current peer group depending on
     # the toggle.
     # -------------------------------------------------------------------------
-    anchor_choices_all <- {
-      vals <- .SCHOOLS$unitid
-      names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals[order(names(vals))]
-    }
+    # Reuse the global .ANCHOR_CHOICES (built once at app startup).
+    anchor_choices_all <- .ANCHOR_CHOICES
 
     updateSelectizeInput(session, "anchor_compare",
-                         choices = anchor_choices_all,
+                         choices  = anchor_choices_all,
                          selected = .DEFAULT_ANCHOR_UNITID,
-                         server   = FALSE)
+                         server   = TRUE)
     updateSelectizeInput(session, "peer_compare",
-                         choices = anchor_choices_all,
+                         choices  = anchor_choices_all,
                          selected = character(0),
-                         server   = FALSE)
+                         server   = TRUE)
 
     # -------------------------------------------------------------------------
     # Peer choices react to the toggle and to peer_result changes.
@@ -279,8 +276,11 @@ compareServer <- function(id, peer_selection, peer_result) {
       ch <- peer_choices()
       cur <- isolate(input$peer_compare)
       sel <- if (length(cur) && cur %in% as.character(ch)) cur else character(0)
+      # server = TRUE: peer choices can include the full ranked
+       # universe (~1,500 schools) when no peer search is loaded.
+       # Paging via the server keeps initial-load cheap.
       updateSelectizeInput(session, "peer_compare",
-                           choices = ch, selected = sel, server = FALSE)
+                           choices = ch, selected = sel, server = TRUE)
     })
 
     # When a new search lands, sync the anchor picker to that search's anchor

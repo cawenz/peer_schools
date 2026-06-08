@@ -250,15 +250,11 @@ stratifiedServer <- function(id) {
     ns <- session$ns
 
     # ---- Anchor picker ----
-    anchor_choices_all <- {
-      vals <- .SCHOOLS$unitid
-      names(vals) <- sprintf("%s (%s)", .SCHOOLS$instnm, .SCHOOLS$stabbr)
-      vals[order(names(vals))]
-    }
+    # Reuse the global .ANCHOR_CHOICES cache + server-side paging.
     updateSelectizeInput(session, "anchor_strat",
-                         choices  = anchor_choices_all,
+                         choices  = .ANCHOR_CHOICES,
                          selected = .DEFAULT_ANCHOR_UNITID,
-                         server   = FALSE)
+                         server   = TRUE)
 
     # ---- Theme weight presets ----
     .THEME_PRESETS_LOCAL <- list(
