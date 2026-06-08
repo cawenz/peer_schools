@@ -295,15 +295,26 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     # Sidebar summary chip: shows current commit count.
     output$var_override_summary <- renderUI({
       w <- var_override_weights()
-      n <- length(w)
-      if (n == 0) {
+      vals <- unlist(w)
+      n_excluded <- sum(!is.na(vals) & vals <= 0)
+      n_custom   <- sum(!is.na(vals) & vals > 0)
+      n_total    <- n_excluded + n_custom
+      if (n_total == 0) {
         tags$div(class = "var-override-summary var-override-summary-empty",
-          tags$small("No overrides set — every clustering variable uses ",
-                     "its theme default."))
+          tags$small("No overrides set — every clustering variable is ",
+                     "included at its theme default weight."))
       } else {
+        # Build the summary line — "N excluded, M custom weight(s)" or
+        # whichever is non-zero. Plus the comma list of affected vars.
+        parts <- character(0)
+        if (n_excluded > 0)
+          parts <- c(parts, sprintf("%d excluded", n_excluded))
+        if (n_custom > 0)
+          parts <- c(parts, sprintf("%d custom weight%s", n_custom,
+                                     if (n_custom == 1) "" else "s"))
+        headline <- paste(parts, collapse = " · ")
         tags$div(class = "var-override-summary var-override-summary-set",
-          tags$small(tags$strong(sprintf("%d variable%s customized",
-                                          n, if (n == 1) "" else "s"))),
+          tags$small(tags$strong(headline)),
           tags$small(class = "var-override-list",
             paste(vapply(names(w), function(m) {
               lbl <- .CLUSTERING_VARS$display_name[
@@ -316,9 +327,18 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     # ---- Modal launcher + builder ----
     observeEvent(input$open_var_override_modal, {
       current <- var_override_weights()
-      # Build the grid: one row per clustering variable, grouped by
-      # THEME section (matches the sidebar slider order). Each row has
-      # a checkbox + label + slider.
+      # Semantics:
+      #   - Checkbox = INCLUDE this variable in the distance calc.
+      #     Default state is CHECKED (every clustering variable is
+      #     included unless the user explicitly excludes it).
+      #   - Slider = weight when included. Defaults to 1.0 (= theme
+      #     default). Setting the slider to 0 is equivalent to
+      #     unchecking — both exclude the variable from distance.
+      # State storage in `var_override_weights` carries only DEVIATIONS
+      # from default:
+      #   - var excluded   -> entry with weight 0
+      #   - var customized -> entry with weight != 1.0
+      #   - var at default -> no entry
       build_section <- function(theme_key) {
         rows <- .CLUSTERING_VARS[.CLUSTERING_VARS$theme %in% theme_key, ,
                                   drop = FALSE]
@@ -329,19 +349,22 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
           tagList(lapply(seq_len(nrow(rows)), function(i) {
             m   <- rows$metric[i]
             lbl <- rows$display_name[i]
-            included <- m %in% names(current)
-            weight   <- if (included) current[[m]] else 1.0
+            # Default-checked unless an explicit weight-0 exclusion
+            # is on file. Slider preserves any saved customisation.
+            saved <- current[[m]]
+            checked <- is.null(saved) || (!is.na(saved) && saved > 0)
+            slider_val <- if (is.null(saved)) 1.0 else saved
             tags$div(class = "var-modal-row",
               tags$div(class = "var-modal-row-check",
                 checkboxInput(ns(paste0("incl_", m)),
-                              label = NULL, value = included,
+                              label = NULL, value = checked,
                               width = NULL)),
               tags$div(class = "var-modal-row-label",
                 tags$label(`for` = ns(paste0("incl_", m)), lbl)),
               tags$div(class = "var-modal-row-slider",
                 sliderInput(ns(paste0("weight_var_", m)),
                             label = NULL,
-                            min = 0, max = 3, value = weight,
+                            min = 0, max = 3, value = slider_val,
                             step = 0.25, ticks = FALSE, width = "100%")))
           })))
       }
@@ -361,17 +384,18 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
             tagList(lapply(seq_len(nrow(other_rows)), function(i) {
               m   <- other_rows$metric[i]
               lbl <- other_rows$display_name[i]
-              included <- m %in% names(current)
-              weight   <- if (included) current[[m]] else 1.0
+              saved <- current[[m]]
+              checked    <- is.null(saved) || (!is.na(saved) && saved > 0)
+              slider_val <- if (is.null(saved)) 1.0 else saved
               tags$div(class = "var-modal-row",
                 tags$div(class = "var-modal-row-check",
                   checkboxInput(ns(paste0("incl_", m)),
-                                 label = NULL, value = included)),
+                                 label = NULL, value = checked)),
                 tags$div(class = "var-modal-row-label", lbl),
                 tags$div(class = "var-modal-row-slider",
                   sliderInput(ns(paste0("weight_var_", m)),
                               label = NULL,
-                              min = 0, max = 3, value = weight,
+                              min = 0, max = 3, value = slider_val,
                               step = 0.25, ticks = FALSE)))
             })))
         })))
@@ -395,36 +419,57 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         ),
         div(class = "var-modal-body",
           tags$p(class = "var-modal-intro",
-            "Check a row to override that variable's weight. Unchecked ",
-            "rows continue to use the theme weight. Slide 0 to drop a ",
-            "variable from the distance calculation entirely; slide 3 ",
-            "to triple its influence."),
+            "Every variable is included by default at its theme ",
+            "weight (slider = 1.0). ",
+            tags$strong("Uncheck a row"),
+            " to drop that variable from the distance calculation ",
+            "entirely. Move the ",
+            tags$strong("slider"),
+            " to scale its influence — 0 excludes it (same as ",
+            "unchecking), 3 triples it. Rows left at slider = 1.0 ",
+            "use the theme weight unchanged."),
           sections)
       ))
     })
 
-    # Apply: read every checkbox + slider in the modal, build the new
-    # committed map, dismiss the modal.
+    # Apply: read every checkbox + slider, build the deviations-from-
+    # default map, dismiss the modal. The map carries ONLY rows that
+    # differ from the default of "included at theme weight (1.0)":
+    #   - unchecked row OR slider = 0  -> entry with weight 0 (exclude)
+    #   - checked + slider != 1.0      -> entry with that slider weight
+    #   - checked + slider == 1.0      -> no entry (default behavior)
     observeEvent(input$var_modal_apply, {
       new_map <- list()
       for (i in seq_len(nrow(.CLUSTERING_VARS))) {
         m <- .CLUSTERING_VARS$metric[i]
-        if (isTRUE(input[[paste0("incl_", m)]])) {
-          w <- input[[paste0("weight_var_", m)]]
-          if (!is.null(w)) new_map[[m]] <- as.numeric(w)
+        checked <- isTRUE(input[[paste0("incl_", m)]])
+        w <- input[[paste0("weight_var_", m)]]
+        w_num <- if (is.null(w)) 1.0 else as.numeric(w)
+        if (!checked || (!is.na(w_num) && w_num <= 0)) {
+          # Excluded — both "unchecked" and "slider = 0" map to weight 0
+          # so the backend's active_idx filter drops the var cleanly.
+          new_map[[m]] <- 0
+        } else if (!is.na(w_num) && abs(w_num - 1.0) > 1e-6) {
+          # Customised — keep the slider value as an override multiplier.
+          new_map[[m]] <- w_num
         }
+        # else: checked + slider == 1.0 -> default, no entry written.
       }
       var_override_weights(new_map)
       removeModal()
     })
 
-    # Reset: tick off every include checkbox and set sliders to 1.0.
+    # Reset: re-include every variable at slider 1.0 (theme default).
+    # Clearing var_override_weights is enough — the modal builder
+    # treats absence as "checked, slider 1.0" — but we also push the
+    # UI updates in case the modal is still open when Reset is hit.
     observeEvent(input$var_modal_reset, {
       for (i in seq_len(nrow(.CLUSTERING_VARS))) {
         m <- .CLUSTERING_VARS$metric[i]
-        updateCheckboxInput(session, paste0("incl_", m), value = FALSE)
+        updateCheckboxInput(session, paste0("incl_", m), value = TRUE)
         updateSliderInput(session,  paste0("weight_var_", m), value = 1.0)
       }
+      var_override_weights(list())
     })
 
     # Pretty labels for usnews_classification (.prettify_classification
