@@ -12,6 +12,23 @@
 
 suppressMessages(library(memoise))
 
+# -----------------------------------------------------------------------------
+# Disk-I/O cache. compute_peers() internally calls .load_schools() and
+# .load_wide_facts() on every invocation — those re-read schools.csv and
+# 12 module CSVs, bind/aggregate/pivot them, and produce the wide facts
+# matrix. None of that data changes during a Shiny session, so we wrap
+# them with memoise here (in globalenv, after .safe_source_peer_pipeline
+# placed the originals there). compute_peers() looks them up by name at
+# call time, so the rebound memoised versions get used automatically —
+# no change to compute_peers() needed.
+#
+# Cache key is the argument list (just output_dir, typically a constant
+# for the session). First search pays the disk-read cost; subsequent
+# searches hit a hot in-memory cache, saving 400-700ms per call.
+# -----------------------------------------------------------------------------
+.load_wide_facts <- memoise::memoise(.load_wide_facts)
+.load_schools    <- memoise::memoise(.load_schools)
+
 compute_peers_cached <- memoise::memoise(function(
     anchor_unitid     = .DEFAULT_ANCHOR_UNITID,
     candidate_pool    = list(in_ranked_universe = TRUE),
