@@ -2110,10 +2110,86 @@ peerTableServer <- function(id, sidebar_state) {
         n_vars, n_drop_cov, n_drop_anc
       )
 
+      # Mahalanobis-specific diagnostic block — only rendered when the
+      # user picked that metric (or it fell back from it). Shows the
+      # numerical-stability indicators (covariance condition number,
+      # eigenvalue spectrum, effective rank) plus a callout that theme
+      # weights are mathematically inert under Mahalanobis.
+      mah_block <- if (!is.null(m$mahalanobis_diagnostics)) {
+        mdg <- m$mahalanobis_diagnostics
+        .fmt <- function(x, d = 2) {
+          if (is.null(x) || !is.finite(x)) return("—")
+          if (abs(x) >= 1e4 || (abs(x) > 0 && abs(x) < 1e-2))
+            formatC(x, format = "e", digits = 2)
+          else formatC(x, format = "f", digits = d)
+        }
+        cond_band <- if (!is.finite(mdg$condition_number)) "singular"
+                     else if (mdg$condition_number < 1e3)  "well-conditioned"
+                     else if (mdg$condition_number < 1e6)  "marginal"
+                     else                                   "ill-conditioned"
+        tagList(
+          h5("Mahalanobis numerics"),
+          p(class = "text-muted",
+            tags$small(
+              "Mahalanobis adjusts distance for variable correlation. ",
+              "These numbers show whether the candidate-pool covariance ",
+              "matrix is well-behaved enough to make that adjustment ",
+              "reliable. Big condition numbers, lots of near-zero ",
+              "eigenvalues, or negative eigenvalues all mean Mahalanobis ",
+              "is amplifying noise — switch back to Euclidean.")),
+          tags$div(class = "mah-diag-grid",
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Condition number"),
+              tags$div(class = "mah-diag-value", .fmt(mdg$condition_number)),
+              tags$div(class = "mah-diag-band", cond_band)),
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Effective rank"),
+              tags$div(class = "mah-diag-value",
+                       sprintf("%s / %d",
+                               .fmt(mdg$effective_rank, 0),
+                               mdg$n_vars %||% mdg$n_active_dims %||% 0L))),
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Negative eigenvalues"),
+              tags$div(class = "mah-diag-value",
+                       .fmt(mdg$n_negative_eigs, 0)),
+              tags$div(class = "mah-diag-band",
+                if (isTRUE(mdg$n_negative_eigs > 0)) "pairwise-NA artefact" else "")),
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Eigenvalue range"),
+              tags$div(class = "mah-diag-value",
+                       sprintf("%s — %s",
+                               .fmt(mdg$eigen_min), .fmt(mdg$eigen_max)))),
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Peer distance median"),
+              tags$div(class = "mah-diag-value",
+                       .fmt(mdg$pool_distance_median %||% NA_real_)),
+              tags$div(class = "mah-diag-band",
+                sprintf("expected ~ sqrt(active dims) = %s",
+                        .fmt(sqrt(mdg$n_active_dims %||% NA_real_), 1)))),
+            tags$div(class = "mah-diag-card",
+              tags$div(class = "mah-diag-label", "Peer distance max"),
+              tags$div(class = "mah-diag-value",
+                       .fmt(mdg$pool_distance_max %||% NA_real_)))
+          ),
+          if (isTRUE(mdg$singular_fallback))
+            tags$div(class = "mah-diag-alert",
+              tags$strong("Fallback: "),
+              "the covariance matrix was singular, so the ranking you see ",
+              "above actually used weighted Euclidean. Drop a few highly-",
+              "correlated variables via the variable overrides modal, or ",
+              "switch back to Euclidean explicitly."),
+          tags$div(class = "mah-diag-note",
+            tags$strong("Heads up: "),
+            mdg$theme_weights_active_note %||% ""),
+          tags$br()
+        )
+      } else NULL
+
       tagList(
         tags$hr(class = "peer-section-divider"),
         h4("Diagnostics"),
         p(class = "section-intro", summary_text),
+        mah_block,
 
         h5("Variables used (with per-variable weights)"),
         p(class = "text-muted",

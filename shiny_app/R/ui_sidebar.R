@@ -218,9 +218,13 @@ peerSearchSidebarUI <- function(id) {
                       value = FALSE),
         helpText(tags$small(
           "Mahalanobis adjusts for correlation between variables. ",
-          "On this data it typically converges with weighted Euclidean ",
-          "after redundant variables are pruned, and falls back to ",
-          "Euclidean automatically if the covariance matrix is singular."
+          tags$strong("Theme and variable weights have no effect under "),
+          tags$strong("Mahalanobis"),
+          " — the metric is scale-invariant, so the weight sliders ",
+          "cancel out in the ranking. Only variable INCLUSION (weight ",
+          "> 0) matters. Falls back to Euclidean automatically if the ",
+          "covariance matrix is singular. Numerical-stability ",
+          "diagnostics live in the Diagnostics tab."
         ))
       )
     ),

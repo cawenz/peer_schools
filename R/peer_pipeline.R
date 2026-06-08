@@ -335,10 +335,16 @@ ASPIRANT_LABELS <- list(
 #'                        adjusts for correlation between variables using the
 #'                        candidate-pool covariance matrix - useful when many
 #'                        variables are highly correlated, but less directly
-#'                        interpretable. With Mahalanobis, theme/variable
-#'                        weights are still applied via a diagonal weighting
-#'                        matrix that scales each dimension before the
-#'                        Mahalanobis computation.
+#'                        interpretable.
+#'                        IMPORTANT: Mahalanobis distance is mathematically
+#'                        SCALE-INVARIANT, so the theme/variable weight
+#'                        sliders cancel out in the final ranking. Only
+#'                        variable INCLUSION (weight > 0 vs == 0) matters.
+#'                        If you want weights to drive the result, use
+#'                        Euclidean. compute_peers() returns numerical-
+#'                        stability diagnostics under
+#'                        meta$mahalanobis_diagnostics so the Shiny app can
+#'                        warn when the covariance matrix is ill-conditioned.
 #' @param k Number of peers to return. Default 20.
 #' @param output_dir Directory containing facts and variables CSVs. Default "output".
 #'
@@ -567,30 +573,75 @@ compute_peers <- function(
     # Mahalanobis: adjusts for correlation between variables using the
     # candidate-pool covariance matrix. We pre-multiply each column by
     # sqrt(weight) so the dimension weights still apply within the
-    # Mahalanobis metric.
+    # Mahalanobis metric -- BUT note that Mahalanobis distance is
+    # mathematically scale-invariant: pre-scaling X by sqrt(W) and
+    # recomputing the covariance from the scaled data cancels the
+    # weights out in the final distance. In practice the theme/variable
+    # weight sliders have NO EFFECT on Mahalanobis rankings; only
+    # variable inclusion (weight > 0 vs == 0) matters. The diagnostics
+    # block below surfaces this so users know what's going on.
     sqrt_weights <- sqrt(weights[vars_final])
     Xw <- as.matrix(data_mat) %*% diag(sqrt_weights, nrow = length(sqrt_weights))
     colnames(Xw) <- vars_final
-    
+
     # Compute covariance on complete pairs; if singular, fall back to
     # diagonal (which reduces to weighted Euclidean) with a warning.
     Sigma <- tryCatch(cov(Xw, use = "pairwise.complete.obs"),
                       error = function(e) NULL)
     Sigma_inv <- tryCatch(solve(Sigma),
                           error = function(e) NULL)
-    
+
+    # Capture covariance-matrix diagnostics BEFORE distance computation —
+    # we want these even on the fallback path so users can see why we
+    # bailed out. eigen() on the symmetric Sigma gives the spectrum;
+    # condition number = max/min |eigenvalue|, effective rank = count
+    # above a tolerance.
+    mah_diag <- list(
+      n_vars            = length(vars_final),
+      n_active_dims     = length(active_idx),
+      theme_weights_active_note =
+        "Mahalanobis is scale-invariant: theme/variable WEIGHTS cancel in the final distance. Only variable INCLUSION (weight > 0) matters. Use Euclidean if you want weights to drive rankings.",
+      condition_number  = NA_real_,
+      eigen_min         = NA_real_,
+      eigen_max         = NA_real_,
+      eigen_median      = NA_real_,
+      n_negative_eigs   = NA_integer_,
+      effective_rank    = NA_integer_,
+      singular_fallback = is.null(Sigma_inv)
+    )
+    if (!is.null(Sigma)) {
+      ev <- tryCatch(
+        eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values,
+        error = function(e) NULL)
+      if (!is.null(ev) && length(ev)) {
+        absev <- abs(ev)
+        max_ae <- max(absev)
+        # Standard numerical-rank tolerance: eigenvalues smaller than
+        # tol * max are treated as effectively zero.
+        tol <- 1e-10 * max_ae
+        mah_diag$eigen_min        <- min(absev)
+        mah_diag$eigen_max        <- max_ae
+        mah_diag$eigen_median     <- stats::median(absev)
+        mah_diag$n_negative_eigs  <- sum(ev < -tol)
+        mah_diag$effective_rank   <- sum(absev > tol)
+        mah_diag$condition_number <-
+          if (mah_diag$eigen_min > 0) max_ae / mah_diag$eigen_min
+          else Inf
+      }
+    }
+
     if (is.null(Sigma_inv)) {
       warning("Mahalanobis covariance is singular; falling back to weighted Euclidean.")
       distance_metric <- "euclidean (Mahalanobis fallback)"
       anchor_active <- anchor_z[active_idx]
       w_active      <- weights[active_idx]
-      distances <- sapply(seq_len(nrow(data_mat)), function(i) {
-        cand_z <- as.numeric(data_mat[i, ])
-        diffs  <- (cand_z[active_idx] - anchor_active)^2 * w_active
-        diffs  <- diffs[!is.na(diffs)]
-        if (!length(diffs)) return(NA_real_)
-        sqrt(sum(diffs))
-      })
+      # Same vectorised pattern as the primary Euclidean branch.
+      data_active   <- as.matrix(data_mat)[, active_idx, drop = FALSE]
+      diffs_sq      <- sweep(data_active, 2, anchor_active, "-")^2
+      weighted_sq   <- sweep(diffs_sq, 2, w_active, "*")
+      n_valid       <- rowSums(!is.na(weighted_sq))
+      distances     <- sqrt(rowSums(weighted_sq, na.rm = TRUE))
+      distances[n_valid == 0] <- NA_real_
     } else {
       anchor_w <- Xw[as.character(anchor_unitid), ]
       distances <- sapply(seq_len(nrow(Xw)), function(i) {
@@ -606,6 +657,20 @@ compute_peers <- function(
         if (is.na(val) || val < 0) return(NA_real_)
         sqrt(val)
       })
+    }
+
+    # Distance-distribution stats — useful for sanity-checking whether
+    # Mahalanobis is producing the expected scale. Expected order of
+    # magnitude is sqrt(n_active_dims) for a "median" candidate under
+    # a well-conditioned covariance; values much larger usually mean
+    # the cov inverse has near-singular directions amplifying noise.
+    finite_d <- distances[is.finite(distances)]
+    if (length(finite_d)) {
+      mah_diag$pool_distance_median   <- stats::median(finite_d)
+      mah_diag$pool_distance_p99      <- stats::quantile(finite_d, 0.99,
+                                                          names = FALSE)
+      mah_diag$pool_distance_max      <- max(finite_d)
+      mah_diag$n_na_distances         <- sum(!is.finite(distances))
     }
   }
   
@@ -658,7 +723,10 @@ compute_peers <- function(
     weights = weights,
     # Comparable-distance support (see Shiny app's stratified peers tab):
     pool_distances        = pool_distances,
-    pool_median_distance  = pool_median_distance
+    pool_median_distance  = pool_median_distance,
+    # Mahalanobis-only diagnostics; NULL for Euclidean searches so the
+    # Diagnostics tab can hide the panel cleanly.
+    mahalanobis_diagnostics = if (exists("mah_diag")) mah_diag else NULL
   )
   
   list(peers = result, meta = meta)

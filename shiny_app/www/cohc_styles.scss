@@ -313,6 +313,62 @@ a {
   margin: 1.5rem 0;
 }
 
+/* Compact diagnostic grid used by the Mahalanobis panel in the
+ * Diagnostics tab. Smaller cards than .stat-card because we have 6 of
+ * them and they hold a number + tiny annotation, not headline stats. */
+.mah-diag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.65rem;
+  margin: 0.75rem 0 1rem 0;
+}
+.mah-diag-card {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 3px solid #AC9E94;
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+}
+.mah-diag-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #251230;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+.mah-diag-value {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #602D89;
+  line-height: 1.2;
+}
+.mah-diag-band {
+  font-size: 0.7rem;
+  color: #7A6E66;
+  margin-top: 0.1rem;
+}
+.mah-diag-alert {
+  background: #F4EDEC;
+  border-left: 3px solid #C44;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+.mah-diag-note {
+  background: #FFFCEF;
+  border-left: 3px solid #D9A437;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
 .stat-card {
   background: #FFFFFF;
   border: 1px solid #F4EDEC;
