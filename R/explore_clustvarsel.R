@@ -58,8 +58,10 @@ suppressMessages({
 
 .THEME_VARS <- list(
   size = c(
-    "total_enrollment", "undergraduate_enrollment",
-    "first_time_enrollment", "full_time_enrollment"
+    # Trimmed from 4 nearly-identical headcounts to UG + UG-share.
+    # See peer_pipeline.R for empirical rationale.
+    "undergraduate_enrollment",
+    "pct_undergrad"
   ),
   selectivity = c(
     "acceptance_rate", "yield_rate", "application_volume",
@@ -88,7 +90,8 @@ suppressMessages({
     "pct_borrowing", "avg_fed_loan", "pct_need_met", "pct_need_fully_met"
   ),
   student_body = c(
-    "pct_undergrad", "pct_part_time", "pct_age_25plus",
+    # pct_undergrad relocated to `size` — institutional shape lives there now.
+    "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
     "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
     "transfer_in_enrollment", "residential_share"

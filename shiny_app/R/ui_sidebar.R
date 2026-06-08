@@ -270,23 +270,27 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     # The modal lets users edit a draft, then Apply commits to this store.
     var_override_weights <- reactiveVal(list())
 
-    # Clustering-eligible variables grouped by category. Cached here so
-    # the modal builder doesn't re-scan .VARIABLES every open.
+    # Clustering-eligible variables grouped by THEME (not module
+    # category) so the modal headings + ordering match the sidebar
+    # theme sliders exactly. Each var's theme comes from .var_theme()
+    # in peer_pipeline.R (which reads THEME_VARS). Sorting by theme
+    # position in .THEMES then by display_name keeps the modal in
+    # lockstep with the slider stack above it.
     .CLUSTERING_VARS <- local({
       df <- .VARIABLES[!is.na(.VARIABLES$use_type) &
                          .VARIABLES$use_type == "clustering", ,
                          drop = FALSE]
-      df[order(df$category, df$display_name), ]
+      df$theme <- vapply(df$metric, function(m) {
+        t <- .var_theme(m)
+        if (is.na(t)) NA_character_ else as.character(t)
+      }, character(1))
+      theme_pos <- match(df$theme, .THEMES)
+      # Anything not assigned to a theme sorts to the bottom so it's
+      # still visible in the modal but doesn't displace the canonical
+      # themed sections.
+      theme_pos[is.na(theme_pos)] <- length(.THEMES) + 1L
+      df[order(theme_pos, df$display_name), ]
     })
-    .CATEGORY_LABELS_VAR <- c(
-      admissions = "Selectivity & Admissions",
-      enrollment = "Enrollment & Composition",
-      resources  = "Resources",
-      finance    = "Finance",
-      outcomes   = "Outcomes & Programs",
-      aid        = "Financial Aid",
-      athletics  = "Athletics (EADA)"
-    )
 
     # Sidebar summary chip: shows current commit count.
     output$var_override_summary <- renderUI({
@@ -313,13 +317,15 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     observeEvent(input$open_var_override_modal, {
       current <- var_override_weights()
       # Build the grid: one row per clustering variable, grouped by
-      # category section. Each row has a checkbox + label + slider.
-      build_section <- function(cat_key, cat_label) {
-        rows <- .CLUSTERING_VARS[.CLUSTERING_VARS$category == cat_key, ,
+      # THEME section (matches the sidebar slider order). Each row has
+      # a checkbox + label + slider.
+      build_section <- function(theme_key) {
+        rows <- .CLUSTERING_VARS[.CLUSTERING_VARS$theme %in% theme_key, ,
                                   drop = FALSE]
         if (!nrow(rows)) return(NULL)
         tags$div(class = "var-modal-section",
-          tags$h6(class = "var-modal-section-title", cat_label),
+          tags$h6(class = "var-modal-section-title",
+                  .theme_label(theme_key)),
           tagList(lapply(seq_len(nrow(rows)), function(i) {
             m   <- rows$metric[i]
             lbl <- rows$display_name[i]
@@ -339,9 +345,37 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                             step = 0.25, ticks = FALSE, width = "100%")))
           })))
       }
-      sections <- lapply(names(.CATEGORY_LABELS_VAR), function(k) {
-        build_section(k, .CATEGORY_LABELS_VAR[[k]])
-      })
+      # Section order = .THEMES order = sidebar slider order. Anything
+      # unassigned to a theme ends up in a trailing "Other" section so
+      # nothing gets silently dropped from the modal.
+      sections <- lapply(.THEMES, build_section)
+      # Use `%in% NA` via a sentinel; rows with theme = NA still pass
+      # through under "Other" so we don't silently lose anything.
+      other_rows <- .CLUSTERING_VARS[is.na(.CLUSTERING_VARS$theme), ,
+                                      drop = FALSE]
+      if (nrow(other_rows)) {
+        sections <- c(sections, list(local({
+          # Same row-builder as build_section but inlined for clarity.
+          tags$div(class = "var-modal-section",
+            tags$h6(class = "var-modal-section-title", "Other"),
+            tagList(lapply(seq_len(nrow(other_rows)), function(i) {
+              m   <- other_rows$metric[i]
+              lbl <- other_rows$display_name[i]
+              included <- m %in% names(current)
+              weight   <- if (included) current[[m]] else 1.0
+              tags$div(class = "var-modal-row",
+                tags$div(class = "var-modal-row-check",
+                  checkboxInput(ns(paste0("incl_", m)),
+                                 label = NULL, value = included)),
+                tags$div(class = "var-modal-row-label", lbl),
+                tags$div(class = "var-modal-row-slider",
+                  sliderInput(ns(paste0("weight_var_", m)),
+                              label = NULL,
+                              min = 0, max = 3, value = weight,
+                              step = 0.25, ticks = FALSE)))
+            })))
+        })))
+      }
       sections <- Filter(Negate(is.null), sections)
 
       showModal(modalDialog(

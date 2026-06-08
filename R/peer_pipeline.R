@@ -61,9 +61,15 @@ suppressMessages({
 # theme - they are used as filters via candidate_pool, not as similarity
 # dimensions.
 THEME_VARS <- list(
+  # Size = scale + institutional shape. Trimmed from the original 4
+  # nearly-identical headcounts (cond ~528) to UG enrollment + UG-share
+  # (cond ~1.4) — two orthogonal signals. pct_undergrad captures
+  # research-university grad mix without needing total_enrollment, which
+  # was 0.98 correlated with UG and just inflated the size bundle.
+  # See commit msg / Mahalanobis diagnostics for the empirical work.
   size = c(
-    "total_enrollment", "undergraduate_enrollment",
-    "first_time_enrollment", "full_time_enrollment"
+    "undergraduate_enrollment",
+    "pct_undergrad"
   ),
   selectivity = c(
     "acceptance_rate", "yield_rate", "application_volume",
@@ -92,7 +98,11 @@ THEME_VARS <- list(
     "pct_federal_loan", "avg_federal_loan", "pct_need_met", "pct_need_fully_met"
   ),
   student_body = c(
-    "pct_undergrad", "pct_part_time", "pct_age_25plus",
+    # pct_undergrad relocated to `size` — it's institutional shape
+    # (UG-focused vs research-university), not a student-demographic
+    # attribute, and pairs well with undergraduate_enrollment to give
+    # the size theme one scale + one shape signal.
+    "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
     "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
     "transfer_in_enrollment", "residential_share",
