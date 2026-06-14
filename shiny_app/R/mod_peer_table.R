@@ -682,12 +682,24 @@ peerTableServer <- function(id, sidebar_state) {
       }
       df <- df_visible
 
+      # Sort-safe cell builder: DataTables honours the data-order
+      # attribute on the cell's outer element for sorting (the cell still
+      # *displays* the inner text). Without this, an integer rank column
+      # rendered as character string-sorts "10" < "2" < "27"; with it,
+      # DT sorts by the underlying numeric value. NA values get a sentinel
+      # of 999999 so they sink to the bottom on ascending sort.
+      .sort_html_num <- function(value, display = NULL) {
+        if (is.null(display))
+          display <- ifelse(is.na(value), "", as.character(value))
+        ifelse(is.na(value),
+               '<span data-order="999999"></span>',
+               sprintf('<span data-order="%g">%s</span>',
+                       as.numeric(value),
+                       htmltools::htmlEscape(display)))
+      }
       .rank_disp <- function(col) {
-        if (col %in% names(df)) {
-          ifelse(is.na(df[[col]]), "", as.character(df[[col]]))
-        } else {
-          rep("", nrow(df))
-        }
+        if (col %in% names(df)) .sort_html_num(df[[col]])
+        else rep('<span data-order="999999"></span>', nrow(df))
       }
       usn_rank_disp    <- .rank_disp("usnews_rank")
       forbes_rank_disp <- .rank_disp("forbes_rank")
@@ -697,10 +709,13 @@ peerTableServer <- function(id, sidebar_state) {
         cat <- if ("wamo_category" %in% names(df)) df$wamo_category
                else rep(NA_character_, nrow(df))
         sfx <- ifelse(is.na(cat), "", paste0(" (", wamo_short[cat], ")"))
-        ifelse(is.na(df$wamo_rank), "",
-               paste0(as.character(df$wamo_rank), sfx))
+        # Display text combines rank + category suffix; sort key is the
+        # bare numeric rank so columns like "2 (LA)" still sort right.
+        disp_text <- ifelse(is.na(df$wamo_rank), "",
+                             paste0(as.character(df$wamo_rank), sfx))
+        .sort_html_num(df$wamo_rank, disp_text)
       } else {
-        rep("", nrow(df))
+        rep('<span data-order="999999"></span>', nrow(df))
       }
 
       # ---- Build Status badges ----
@@ -753,8 +768,12 @@ peerTableServer <- function(id, sidebar_state) {
       if (nrow(a) == 1) {
         .one <- function(v) if (is.null(v) || length(v) == 0 ||
                                   is.na(v)) "" else as.character(v)
-        a_wamo <- if (!is.na(a$wamo_rank) &&
-                       !is.na(a$wamo_category %||% NA)) {
+        # Anchor row uses the same sort-safe rank format as peer rows so
+        # the column sorts consistently even when the anchor's USN /
+        # WM / Forbes rank is itself a number that would otherwise be
+        # string-sorted vs the peer rows.
+        a_wamo_disp_text <- if (!is.na(a$wamo_rank) &&
+                                   !is.na(a$wamo_category %||% NA)) {
           paste0(a$wamo_rank, " (",
                   wamo_short[a$wamo_category] %||% a$wamo_category, ")")
         } else if (!is.na(a$wamo_rank)) {
@@ -765,9 +784,9 @@ peerTableServer <- function(id, sidebar_state) {
           School        = paste0("★ ", a$instnm, "  (anchor)"),
           Status        = '<span class="peer-status-badge peer-status-anchor">Anchor</span>',
           `Class.`      = .prettify_classification(a$usnews_classification),
-          `USN Rank`    = .one(a$usnews_rank),
-          `WM Rank`     = a_wamo,
-          `Forbes Rank` = .one(a$forbes_rank),
+          `USN Rank`    = .sort_html_num(a$usnews_rank),
+          `WM Rank`     = .sort_html_num(a$wamo_rank, a_wamo_disp_text),
+          `Forbes Rank` = .sort_html_num(a$forbes_rank),
           Sector        = .prettify_control(a$control_grp),
           State         = .one(a$stabbr),
           Distance      = 0,
@@ -1746,14 +1765,32 @@ peerTableServer <- function(id, sidebar_state) {
         100 * mean(pool_vals < v)
       }, numeric(1))
 
+      # Value + Percentile are formatted strings; wrap each in a
+      # data-order span so DT sorts by the underlying numeric value
+      # when the user clicks the column header (without changing the
+      # rendered text). NA -> sentinel data-order so NAs sink to the
+      # bottom of either sort direction.
+      val_display <- vapply(raw_vals, function(v) .format_value(v, fmt),
+                             character(1))
+      val_html <- ifelse(
+        is.finite(raw_vals),
+        sprintf('<span data-order="%g">%s</span>',
+                raw_vals,
+                vapply(val_display, htmltools::htmlEscape, character(1))),
+        '<span data-order="-1e15">&#8212;</span>'
+      )
+      pct_html <- ifelse(
+        is.na(pct),
+        '<span data-order="-1e15">&#8212;</span>',
+        sprintf('<span data-order="%g">%.0f</span>', pct, pct)
+      )
+
       tbl <- data.frame(
         Action      = actions,
         School      = names_v,
         State       = states,
-        Value       = vapply(raw_vals, function(v) .format_value(v, fmt),
-                              character(1)),
-        Percentile  = ifelse(is.na(pct), "—",
-                              sprintf("%.0f", pct)),
+        Value       = val_html,
+        Percentile  = pct_html,
         `_sort`     = ifelse(is.finite(raw_vals), raw_vals, -Inf),
         stringsAsFactors = FALSE,
         check.names = FALSE
@@ -1763,6 +1800,11 @@ peerTableServer <- function(id, sidebar_state) {
         tbl,
         rownames = FALSE,
         selection = "none",
+        # escape = FALSE lets the Value/Percentile data-order span
+        # wrappers render as real HTML so DT picks up the sort hint.
+        # Action / School / State are simple text; harmless to leave
+        # them in the unescaped set.
+        escape = FALSE,
         options = list(
           pageLength = 50,
           dom = "tip",
@@ -2382,10 +2424,13 @@ peerTableServer <- function(id, sidebar_state) {
       labels <- .VARIABLES$display_name[match(d$metric, .VARIABLES$metric)]
       labels <- ifelse(is.na(labels), d$metric, labels)
 
+      # Keep Coverage numeric so DT sorts by value. formatPercentage()
+      # below paints the "%" symbol at render time without losing the
+      # underlying numeric type — string-sort bugs avoided.
       df <- data.frame(
         Variable = labels,
         Metric   = d$metric,
-        Coverage = sprintf("%.1f%%", 100 * d$coverage),
+        Coverage = as.numeric(d$coverage),
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -2394,7 +2439,8 @@ peerTableServer <- function(id, sidebar_state) {
         rownames = FALSE,
         options  = list(pageLength = 10, dom = "tip"),
         class    = "compact stripe"
-      )
+      ) |>
+        DT::formatPercentage("Coverage", digits = 1)
     })
 
     # =========================================================================
@@ -2599,16 +2645,24 @@ peerTableServer <- function(id, sidebar_state) {
         vals <- df[[m]]
         cells <- vapply(seq_along(vals), function(i) {
           v <- vals[i]
-          if (!is.finite(v)) return("—")
+          # NA value: sentinel sort-order so it sinks to the bottom on
+          # both ascending and descending sorts (no real value beats
+          # 1e15).
+          if (!is.finite(v))
+            return('<span data-order="1e15">&#8212;</span>')
           gap <- v - a_val
           beats <- if (dir == "higher") gap > 0 else gap < 0
           arrow <- if (is.na(beats)) ""
                    else if (beats) "<span class=\"asp-up\">&#9650;</span>"
                    else            "<span class=\"asp-down\">&#9660;</span>"
-          sprintf("%s  %s",
-                  .format_value(v, fmt),
-                  paste0(arrow, " ",
-                          sprintf("%+s", .format_value(abs(gap), fmt))))
+          display_text <- sprintf("%s  %s",
+                                   .format_value(v, fmt),
+                                   paste0(arrow, " ",
+                                           sprintf("%+s",
+                                                   .format_value(abs(gap), fmt))))
+          # data-order = the raw numeric value so DT sorts by metric
+          # value, not by string-of-formatted-text.
+          sprintf('<span data-order="%g">%s</span>', v, display_text)
         }, character(1))
         cols[[col_label]] <- cells
       }
