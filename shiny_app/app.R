@@ -65,15 +65,18 @@ ui <- page_navbar(
     trendsUI("trends")
   ),
 
-  nav_panel(
-    "Saved Searches",
-    sessionUI("session")
-  ),
-
-  # Reference tabs at the right end of the navbar.
+  # Variables reference comes before Saved Searches so the four
+  # working tabs (Peer Search, Side-by-Side, Trends, Variables) sit
+  # together at the start and Saved Searches lives next to Help in
+  # the "supporting" cluster at the right end.
   nav_panel(
     "Variables",
     variablesUI("variables")
+  ),
+
+  nav_panel(
+    "Saved Searches",
+    sessionUI("session")
   ),
 
   nav_panel(
