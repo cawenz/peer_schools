@@ -792,25 +792,33 @@ peerTableServer <- function(id, sidebar_state) {
           pageLength = 150,
           dom        = "tip",
           order      = list(list(0, "asc")),
+          # NOTE: targets use 0-based COLUMN INDICES (not display-name
+          # strings). DT R passes targets straight to DataTables, and
+          # name-string matching against column headers with spaces
+          # (e.g. "USN Rank") silently no-ops on some DT / DataTables
+          # versions — the render never fires and the columns
+          # string-sort the underlying HTML / formatted text. Indices
+          # are unambiguous.
+          # Column layout for reference (0-indexed):
+          #   0 Rank | 1 School | 2 Status | 3 Class.
+          #   4 USN Rank | 5 WM Rank | 6 Forbes Rank
+          #   7 Sector | 8 State | 9 Distance | 10 Actions
           columnDefs = list(
-            list(className = "dt-right",  targets = c("Distance", "Rank",
-                                                       "USN Rank",
-                                                       "WM Rank",
-                                                       "Forbes Rank")),
-            list(className = "dt-center", targets = c("State", "Actions")),
-            list(targets = "Rank",
+            list(className = "dt-right",  targets = c(0, 4, 5, 6, 9)),
+            list(className = "dt-center", targets = c(8, 10)),
+            list(targets = 0,
                  render = DT::JS(
                    "function(data, type, row) {",
                    "  if (type === 'display' && data === 0) return '\\u2014';",
                    "  if (type === 'display' && data === null) return '+';",
                    "  return data;",
                    "}")),
-            # USN Rank / Forbes Rank / WM Rank are formatted strings
+            # USN Rank / WM Rank / Forbes Rank are formatted strings
             # ("27", "" for missing, "2 (LA)" for WM). Sort by parsing
             # the leading numeric; blanks / non-numeric sort to the
-            # bottom on both directions so missing-rank schools don't
+            # bottom of ascending order so missing-rank schools don't
             # crowd the top.
-            list(targets = c("USN Rank", "Forbes Rank", "WM Rank"),
+            list(targets = c(4, 5, 6),
                  type   = "num",
                  render = DT::JS(
                    "function(data, type, row) {",
