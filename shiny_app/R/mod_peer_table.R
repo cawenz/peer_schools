@@ -682,31 +682,30 @@ peerTableServer <- function(id, sidebar_state) {
       }
       df <- df_visible
 
-      # Display text for rank columns. Plain strings — sort is driven
-      # by the per-column DT::JS render function in columnDefs below
-      # (parses each cell's leading number; NAs / blanks go to +Inf so
-      # they sink to the bottom on ascending sort). Earlier attempts
-      # used data-order span wrappers, but DataTables only honours
-      # data-order on the <td> itself, not on child <span> nodes.
-      .rank_disp <- function(col) {
-        if (col %in% names(df))
-          ifelse(is.na(df[[col]]), "", as.character(df[[col]]))
-        else rep("", nrow(df))
-      }
-      usn_rank_disp    <- .rank_disp("usnews_rank")
-      forbes_rank_disp <- .rank_disp("forbes_rank")
+      # NEW APPROACH (after 3 failed attempts):
+      # Pass raw NUMERIC values for the rank columns. DataTables auto-
+      # detects integer columns and sorts them natively. A per-column
+      # render handles display: format NA as "", append the WM category
+      # suffix from a hidden helper column. No parseFloat tricks, no
+      # data-order spans, no orderData redirection — just numbers in,
+      # numbers sorted, formatted strings out.
       wamo_short <- c("Liberal Arts" = "LA", "Baccalaureate" = "Bacc",
                       "Master's" = "Mas",  "National" = "Nat")
-      wamo_disp <- if ("wamo_rank" %in% names(df)) {
-        cat <- if ("wamo_category" %in% names(df)) df$wamo_category
-               else rep(NA_character_, nrow(df))
-        sfx <- ifelse(is.na(cat), "", paste0(" (", wamo_short[cat], ")"))
-        # "2 (LA)" — leading parseFloat catches the 2 for sort.
-        ifelse(is.na(df$wamo_rank), "",
-               paste0(as.character(df$wamo_rank), sfx))
+      wamo_cat_short <- if ("wamo_category" %in% names(df)) {
+        cat_raw <- df$wamo_category
+        ifelse(is.na(cat_raw), "",
+               ifelse(cat_raw %in% names(wamo_short),
+                      wamo_short[cat_raw], as.character(cat_raw)))
       } else {
         rep("", nrow(df))
       }
+      .num_col <- function(col) {
+        if (col %in% names(df)) as.numeric(df[[col]])
+        else rep(NA_real_, nrow(df))
+      }
+      usn_rank_num    <- .num_col("usnews_rank")
+      wamo_rank_num   <- .num_col("wamo_rank")
+      forbes_rank_num <- .num_col("forbes_rank")
 
       # ---- Build Status badges ----
       # For each row: which source tags apply.
@@ -732,21 +731,6 @@ peerTableServer <- function(id, sidebar_state) {
         '<span class="peer-remove-btn" title="Remove from main list">&#10005;</span>',
         nrow(df))
 
-      # Hidden numeric sort columns for USN / WM / Forbes Rank. The
-      # visible columns are formatted strings ("27", "2 (LA)", ""); the
-      # underlying sort uses these numeric columns instead via the
-      # columnDefs orderData option below. NAs replaced with a large
-      # sentinel so missing-rank schools sink to the bottom on ascending
-      # sort. (Multiple earlier attempts to make DataTables parse the
-      # leading number out of the formatted strings — data-order spans,
-      # type: 'num' + render parseFloat — both silently no-op'd. The
-      # orderData pattern is DataTables's canonical solution and the
-      # only one that actually fires for these columns.)
-      .sort_key <- function(v) ifelse(is.na(v), 1e9, as.numeric(v))
-      usn_sort    <- .sort_key(df$usnews_rank %||% rep(NA_real_, nrow(df)))
-      wamo_sort   <- .sort_key(df$wamo_rank   %||% rep(NA_real_, nrow(df)))
-      forbes_sort <- .sort_key(df$forbes_rank %||% rep(NA_real_, nrow(df)))
-
       # Religious-affiliation column was retired here — same information
       # is available on the Side-by-Side tab's classifications block.
       display_df <- data.frame(
@@ -754,18 +738,18 @@ peerTableServer <- function(id, sidebar_state) {
         School        = df$instnm,
         Status        = status_badges,
         `Class.`      = .prettify_classification(df$usnews_classification),
-        `USN Rank`    = usn_rank_disp,
-        `WM Rank`     = wamo_disp,
-        `Forbes Rank` = forbes_rank_disp,
+        # USN / WM / Forbes Rank are now RAW NUMERIC. Render in
+        # columnDefs below formats for display (NA -> "", WM appends
+        # " (LA)" from the hidden _wamo_cat column).
+        `USN Rank`    = usn_rank_num,
+        `WM Rank`     = wamo_rank_num,
+        `Forbes Rank` = forbes_rank_num,
         Sector        = .prettify_control(df$control_grp),
         State         = df$stabbr,
         Distance      = round(df$distance, 3),
         Actions       = action_html,
-        # Hidden sort keys (must stay last so the visible columns'
-        # 0-indexed positions don't shift).
-        `_usn_sort`    = usn_sort,
-        `_wamo_sort`   = wamo_sort,
-        `_forbes_sort` = forbes_sort,
+        # Hidden category-short for WM display render.
+        `_wamo_cat`   = wamo_cat_short,
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -778,29 +762,25 @@ peerTableServer <- function(id, sidebar_state) {
       if (nrow(a) == 1) {
         .one <- function(v) if (is.null(v) || length(v) == 0 ||
                                   is.na(v)) "" else as.character(v)
-        a_wamo <- if (!is.na(a$wamo_rank) &&
-                       !is.na(a$wamo_category %||% NA)) {
-          paste0(a$wamo_rank, " (",
-                  wamo_short[a$wamo_category] %||% a$wamo_category, ")")
-        } else if (!is.na(a$wamo_rank)) {
-          as.character(a$wamo_rank)
+        a_wamo_cat_short <- if (!is.na(a$wamo_category %||% NA)) {
+          if (a$wamo_category %in% names(wamo_short))
+            wamo_short[a$wamo_category]
+          else as.character(a$wamo_category)
         } else ""
         anchor_row_df <- data.frame(
           Rank          = 0L,
           School        = paste0("★ ", a$instnm, "  (anchor)"),
           Status        = '<span class="peer-status-badge peer-status-anchor">Anchor</span>',
           `Class.`      = .prettify_classification(a$usnews_classification),
-          `USN Rank`    = .one(a$usnews_rank),
-          `WM Rank`     = a_wamo,
-          `Forbes Rank` = .one(a$forbes_rank),
+          `USN Rank`    = as.numeric(a$usnews_rank),  # NA stays NA
+          `WM Rank`     = as.numeric(a$wamo_rank),
+          `Forbes Rank` = as.numeric(a$forbes_rank),
           Sector        = .prettify_control(a$control_grp),
           State         = .one(a$stabbr),
           Distance      = 0,
           Actions       = "",
-          # Hidden sort keys, matching the visible row schema.
-          `_usn_sort`    = if (is.na(a$usnews_rank)) 1e9 else as.numeric(a$usnews_rank),
-          `_wamo_sort`   = if (is.na(a$wamo_rank))   1e9 else as.numeric(a$wamo_rank),
-          `_forbes_sort` = if (is.na(a$forbes_rank)) 1e9 else as.numeric(a$forbes_rank),
+          # Hidden category for WM display render.
+          `_wamo_cat`   = a_wamo_cat_short,
           check.names = FALSE,
           stringsAsFactors = FALSE
         )
@@ -818,17 +798,13 @@ peerTableServer <- function(id, sidebar_state) {
           order      = list(list(0, "asc")),
           # Column layout (0-indexed):
           #   0 Rank | 1 School | 2 Status | 3 Class.
-          #   4 USN Rank | 5 WM Rank | 6 Forbes Rank
+          #   4 USN Rank | 5 WM Rank | 6 Forbes Rank  (all numeric)
           #   7 Sector | 8 State | 9 Distance | 10 Actions
-          #   11 _usn_sort | 12 _wamo_sort | 13 _forbes_sort  (HIDDEN)
+          #   11 _wamo_cat (HIDDEN — drives WM display suffix)
           #
-          # USN/WM/Forbes Rank are display strings. Their sort is
-          # redirected to the hidden numeric columns via orderData —
-          # the canonical DataTables pattern when display and sort
-          # values diverge. Prior attempts (data-order spans,
-          # type: 'num' + render parseFloat, name-string targets) all
-          # failed to actually intercept the sort; orderData on a
-          # numeric column does.
+          # USN/WM/Forbes Rank carry raw numeric data so DataTables
+          # auto-detects numeric sort. The renders only handle display
+          # (NA -> "", append " (LA)" suffix on WM from row[11]).
           columnDefs = list(
             list(className = "dt-right",  targets = c(0, 4, 5, 6, 9)),
             list(className = "dt-center", targets = c(8, 10)),
@@ -839,12 +815,25 @@ peerTableServer <- function(id, sidebar_state) {
                    "  if (type === 'display' && data === null) return '+';",
                    "  return data;",
                    "}")),
-            # Redirect sort of visible columns to the hidden numeric ones.
-            list(targets = 4, orderData = 11),
-            list(targets = 5, orderData = 12),
-            list(targets = 6, orderData = 13),
-            # Hide the sort columns from the table view.
-            list(visible = FALSE, targets = c(11, 12, 13))
+            # USN Rank, Forbes Rank — simple integer display, "" for NA.
+            list(targets = c(4, 6),
+                 render = DT::JS(
+                   "function(data, type, row) {",
+                   "  if (type !== 'display') return data;",
+                   "  if (data === null || data === undefined) return '';",
+                   "  return data;",
+                   "}")),
+            # WM Rank — integer + " (LA)" / " (Mas)" / etc. from row[11].
+            list(targets = 5,
+                 render = DT::JS(
+                   "function(data, type, row) {",
+                   "  if (type !== 'display') return data;",
+                   "  if (data === null || data === undefined) return '';",
+                   "  var cat = row[11];",
+                   "  return cat ? (data + ' (' + cat + ')') : String(data);",
+                   "}")),
+            # Hide the helper column.
+            list(visible = FALSE, targets = 11)
           ),
           rowCallback = DT::JS(
             "function(row, data) {",
