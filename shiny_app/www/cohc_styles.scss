@@ -316,6 +316,145 @@ a {
 /* Compact diagnostic grid used by the Mahalanobis panel in the
  * Diagnostics tab. Smaller cards than .stat-card because we have 6 of
  * them and they hold a number + tiny annotation, not headline stats. */
+/* "Which distance metric should I use?" guide in the Advanced
+ * accordion. First thing the user sees when they expand Advanced. */
+.distance-metric-guide {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.55rem 0.75rem 0.4rem 0.75rem;
+  margin-bottom: 0.7rem;
+  border-radius: 3px;
+
+  .distance-metric-guide-headline {
+    margin: 0 0 0.3rem 0;
+    color: #251230;
+    font-size: 0.85rem;
+  }
+  .distance-metric-guide-list {
+    margin: 0 0 0.4rem 0;
+    padding-left: 1.1rem;
+    font-size: 0.78rem;
+    color: #251230;
+    line-height: 1.4;
+
+    li { margin-bottom: 0.35rem; }
+  }
+  .distance-metric-guide-cta {
+    margin: 0;
+    color: #7A6E66;
+  }
+}
+
+/* Color-coded verdict band at the top of the Mahalanobis diagnostics
+ * section. Translates the condition-number band into an action-
+ * oriented sentence the user can act on without parsing the math. */
+.mah-verdict {
+  padding: 0.55rem 0.75rem;
+  border-radius: 3px;
+  margin: 0.5rem 0 0.7rem 0;
+  border-left: 3px solid;
+  font-size: 0.85rem;
+
+  &.mah-verdict-ok {
+    background: #DCFCE7;
+    border-left-color: #16A34A;
+    color: #14532D;
+  }
+  &.mah-verdict-caution {
+    background: #FEF3C7;
+    border-left-color: #D9A437;
+    color: #78350F;
+  }
+  &.mah-verdict-danger {
+    background: #FEE2E2;
+    border-left-color: #C44;
+    color: #7F1D1D;
+  }
+
+  .mah-verdict-text { margin: 0; }
+}
+
+/* Compare Metrics tab: side-by-side top-K under each metric */
+.cmp-summary {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.4rem 0.65rem;
+  margin: 0.6rem 0;
+  border-radius: 3px;
+}
+.cmp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 0.6rem 0 0.8rem 0;
+}
+.cmp-col {
+  h6 {
+    color: #602D89;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    margin: 0 0 0.2rem 0;
+  }
+}
+.cmp-col-sub {
+  margin: 0 0 0.5rem 0;
+  color: #7A6E66;
+}
+.cmp-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+.cmp-school {
+  display: grid;
+  grid-template-columns: 1.8rem 1fr 2rem 4.5rem;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  margin-bottom: 0.15rem;
+
+  &:hover { background: #F8F5F9; }
+
+  &.cmp-school-overlap {
+    background: #F4EDEC;
+    border-color: #602D89;
+    font-weight: 600;
+
+    &:hover { background: #ECE2EE; }
+  }
+
+  .cmp-rank {
+    color: #7A6E66;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .cmp-name { color: #251230; }
+  .cmp-state {
+    color: #7A6E66;
+    text-align: center;
+    font-size: 0.78rem;
+  }
+  .cmp-dist {
+    color: #7A6E66;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.78rem;
+  }
+}
+.cmp-reading-note {
+  background: #FFFCEF;
+  border-left: 3px solid #D9A437;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
 /* Mahalanobis "variable set: …" callout. Sits between the intro
  * paragraph and the diagnostic-card grid in the Diagnostics tab. */
 .mah-diag-varset-note {

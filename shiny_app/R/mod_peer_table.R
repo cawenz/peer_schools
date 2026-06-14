@@ -959,6 +959,123 @@ peerTableServer <- function(id, sidebar_state) {
       uiOutput(ns("diagnostics_ui"))
     })
 
+    # ---- Compare Metrics tab --------------------------------------------
+    # Runs compute_peers twice (once Euclidean, once Mahalanobis) with
+    # the user's other current settings and shows the top-K under each
+    # side by side. The overlap is the robust peer set.
+    output$compare_metrics_section <- renderUI({
+      res <- peer_result()
+      if (is.null(res)) return(.needs_search_notice("Compare Metrics"))
+      uiOutput(ns("compare_metrics_ui"))
+    })
+
+    compare_metrics_results <- reactive({
+      res <- peer_result(); req(res)
+      st  <- sidebar_state$state()
+      # Show fewer rows than the main search for readability; the user
+      # is here for a quick comparison, not the full ranking.
+      k_show <- min(10, nrow(res$peers))
+      euc <- tryCatch(
+        compute_peers_cached(
+          anchor_unitid    = st$anchor_unitid,
+          candidate_pool   = st$candidate_pool,
+          theme_weights    = st$theme_weights,
+          variable_weights = st$variable_weights %||% list(),
+          distance_metric  = "euclidean",
+          mahalanobis_use_compact = st$mahalanobis_use_compact %||% TRUE,
+          k                = k_show
+        ),
+        error = function(e) NULL)
+      mah <- tryCatch(
+        compute_peers_cached(
+          anchor_unitid    = st$anchor_unitid,
+          candidate_pool   = st$candidate_pool,
+          theme_weights    = st$theme_weights,
+          variable_weights = st$variable_weights %||% list(),
+          distance_metric  = "mahalanobis",
+          mahalanobis_use_compact = st$mahalanobis_use_compact %||% TRUE,
+          k                = k_show
+        ),
+        error = function(e) NULL)
+      list(euc = euc, mah = mah, k = k_show)
+    })
+
+    output$compare_metrics_ui <- renderUI({
+      cmp <- compare_metrics_results(); req(cmp)
+      .school_pill <- function(p, in_both) {
+        cls <- if (in_both) "cmp-school cmp-school-overlap" else "cmp-school"
+        tags$li(class = cls,
+          tags$span(class = "cmp-rank", paste0(p$rank, ".")),
+          tags$span(class = "cmp-name",  p$instnm),
+          tags$span(class = "cmp-state", p$stabbr),
+          tags$span(class = "cmp-dist",
+                    sprintf("d = %.2f", p$distance)))
+      }
+      # Build the lists. If either compute_peers call errored, show
+      # the working one alone with a brief message instead of bailing.
+      euc <- cmp$euc; mah <- cmp$mah
+      euc_uids <- if (!is.null(euc)) euc$peers$unitid else integer(0)
+      mah_uids <- if (!is.null(mah)) mah$peers$unitid else integer(0)
+      overlap  <- intersect(euc_uids, mah_uids)
+
+      tagList(
+        tags$hr(class = "peer-section-divider"),
+        h4("Compare Metrics"),
+        p(class = "section-intro",
+          sprintf("Top %d peers under each distance metric, ", cmp$k),
+          "using your current anchor, candidate pool, and weights. ",
+          tags$strong("Schools highlighted in both columns"),
+          " are your robust peer set — they show up no matter which ",
+          "lens you use."),
+
+        if (length(overlap)) tags$div(class = "cmp-summary",
+          tags$small(
+            tags$strong(sprintf("%d schools", length(overlap))),
+            " appear under both metrics",
+            sprintf(" (out of top %d each)", cmp$k))),
+
+        tags$div(class = "cmp-grid",
+          tags$div(class = "cmp-col",
+            tags$h6("Euclidean"),
+            tags$p(class = "cmp-col-sub",
+              tags$small(
+                "Variable-by-variable similarity, weighted by your themes.")),
+            if (!is.null(euc) && nrow(euc$peers) > 0)
+              tags$ol(class = "cmp-list",
+                lapply(seq_len(nrow(euc$peers)), function(i) {
+                  p <- euc$peers[i, ]
+                  .school_pill(p, p$unitid %in% overlap)
+                }))
+            else tags$p(tags$small(tags$em(
+              "Euclidean search did not return results.")))),
+          tags$div(class = "cmp-col",
+            tags$h6("Mahalanobis"),
+            tags$p(class = "cmp-col-sub",
+              tags$small(
+                "Pattern-matching across correlated variable bundles.")),
+            if (!is.null(mah) && nrow(mah$peers) > 0)
+              tags$ol(class = "cmp-list",
+                lapply(seq_len(nrow(mah$peers)), function(i) {
+                  p <- mah$peers[i, ]
+                  .school_pill(p, p$unitid %in% overlap)
+                }))
+            else tags$p(tags$small(tags$em(
+              "Mahalanobis search did not return results."))))
+        ),
+
+        tags$div(class = "cmp-reading-note",
+          tags$strong("Reading this: "),
+          "Schools that show up only in Euclidean are similar on the ",
+          "specific dimensions you weighted. Schools only in Mahalanobis ",
+          "are archetypal peers that share your overall institutional ",
+          "pattern. The overlap is the robust peer set — citable under ",
+          "either lens. For most benchmarking purposes (NECHE, IPEDS ",
+          "peer reports), defer to Euclidean. See the Help tab's ",
+          tags$em("Which distance metric should I use?"),
+          " section for more.")
+      )
+    })
+
     # ---- Map tab data + render -------------------------------------------
     # Build a single tibble with anchor + peers, lat/long, and a popup
     # HTML chunk. anchor flag drives the marker style choice below.
@@ -2143,6 +2260,12 @@ peerTableServer <- function(id, sidebar_state) {
             ),
 
             tabPanel(
+              title = "Compare Metrics",
+              value = "compare_metrics",
+              uiOutput(ns("compare_metrics_section"))
+            ),
+
+            tabPanel(
               title = "Diagnostics",
               value = "diagnostics",
               uiOutput(ns("diagnostics_accordion"))
@@ -2183,16 +2306,32 @@ peerTableServer <- function(id, sidebar_state) {
                      else if (mdg$condition_number < 1e3)  "well-conditioned"
                      else if (mdg$condition_number < 1e6)  "marginal"
                      else                                   "ill-conditioned"
+        # Translate the condition-number band to an action-oriented
+        # verdict the user can use without parsing the math.
+        mah_verdict <- if (!is.finite(mdg$condition_number))
+          list(level = "danger",
+               text  = "Mahalanobis didn't converge cleanly on this pool. The rankings above are unreliable — switch back to Euclidean or check the diagnostic cards below.")
+        else if (mdg$condition_number < 1e3)
+          list(level = "ok",
+               text  = "Mahalanobis is mathematically well-behaved on this pool. Rankings are trustworthy.")
+        else if (mdg$condition_number < 1e6)
+          list(level = "caution",
+               text  = "Mahalanobis is on the edge of numerical stability. Rankings are usable but slightly noisier than Euclidean; cross-check anything you'd cite in a presentation.")
+        else
+          list(level = "danger",
+               text  = "Mahalanobis is amplifying noise on this pool — there's a near-collinear bundle in the data. Rankings are unreliable; switch back to Euclidean.")
         tagList(
-          h5("Mahalanobis numerics"),
+          h5("How is Mahalanobis behaving?"),
+          tags$div(class = paste0("mah-verdict mah-verdict-", mah_verdict$level),
+            tags$p(class = "mah-verdict-text", mah_verdict$text)),
           p(class = "text-muted",
             tags$small(
-              "Mahalanobis adjusts distance for variable correlation. ",
-              "These numbers show whether the candidate-pool covariance ",
-              "matrix is well-behaved enough to make that adjustment ",
-              "reliable. Big condition numbers, lots of near-zero ",
-              "eigenvalues, or negative eigenvalues all mean Mahalanobis ",
-              "is amplifying noise — switch back to Euclidean.")),
+              tags$strong("What to look for: "),
+              "the verdict above is the headline. Below, the smallest-",
+              "eigendirection table tells you which variables are most ",
+              "tied together in the data — that's the institutional ",
+              "bundle Mahalanobis is matching on. The numeric cards are ",
+              "for verifying the math is well-behaved.")),
           # Variable-set callout. Pulled from meta$mahalanobis_diagnostics
           # so the user can see at a glance whether the search ran on the
           # curated 16-var subset or the full clustering set.

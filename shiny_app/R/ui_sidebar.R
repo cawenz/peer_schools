@@ -260,6 +260,35 @@ peerSearchSidebarUI <- function(id) {
       open = FALSE,
       accordion_panel(
         "Advanced",
+        # "Which metric should I use?" guidance — first thing the user
+        # reads when they open the Advanced panel. Two short
+        # recommendations frame the decision before they see the
+        # checkbox. Full explainer is on the Help tab.
+        tags$div(class = "distance-metric-guide",
+          tags$p(class = "distance-metric-guide-headline",
+            tags$strong("Which distance metric should I use?")),
+          tags$ul(class = "distance-metric-guide-list",
+            tags$li(
+              tags$strong("Euclidean (default)"),
+              " — schools that match the anchor variable by variable, ",
+              "weighted by your theme priorities. The standard for ",
+              "accreditation, NECHE, IPEDS peer benchmarking."),
+            tags$li(
+              tags$strong("Mahalanobis"),
+              " — schools that share the anchor's institutional ",
+              "pattern (archetype matching). Useful as a second ",
+              "opinion, ",
+              tags$em("but theme weights have no effect under "),
+              tags$em("Mahalanobis"),
+              " — the metric is scale-invariant. Use Euclidean if ",
+              "you want your slider choices to drive the ranking.")
+          ),
+          tags$p(class = "distance-metric-guide-cta",
+            tags$small(
+              "Once you have a search, the ",
+              tags$strong("Compare Metrics"),
+              " tab below the results runs both side by side."))
+        ),
         checkboxInput(ns("mahalanobis"),
                       "Use Mahalanobis distance instead of Euclidean",
                       value = FALSE),
@@ -280,14 +309,9 @@ peerSearchSidebarUI <- function(id) {
           ))
         ),
         helpText(tags$small(
-          "Mahalanobis adjusts for correlation between variables. ",
-          tags$strong("Theme and variable weights have no effect under "),
-          tags$strong("Mahalanobis"),
-          " — the metric is scale-invariant, so the weight sliders ",
-          "cancel out in the ranking. Only variable INCLUSION (weight ",
-          "> 0) matters. Falls back to Euclidean automatically if the ",
+          "Falls back to weighted Euclidean automatically if the ",
           "covariance matrix is singular. Numerical-stability ",
-          "diagnostics live in the Diagnostics tab."
+          "diagnostics live in the Diagnostics tab below the results."
         ))
       )
     ),

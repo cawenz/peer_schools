@@ -214,6 +214,96 @@ institutional-character similarity we would want.
 
 ---
 
+## Which distance metric should I use?
+
+The app offers two distance metrics. They answer different questions
+about "similar." Most users should default to **Euclidean**.
+
+### Euclidean distance — the standard IR peer-search metric
+
+Euclidean is what almost every IPEDS comparison group, accreditation
+peer set, and budget benchmarking analysis uses. It treats each
+variable as an independent dimension and asks:
+
+> Which schools are close to the anchor on each variable separately,
+> weighted by the importance I've assigned each theme?
+
+If you boost the **Outcomes** slider, Euclidean will draw schools with
+similar grad rates, retention, and earnings closer. Your theme weights
+have real, predictable effects on the ranking.
+
+**Use Euclidean when:**
+
+- You want the peer set for benchmarking specific operational metrics
+  (cost per FTE, faculty salaries, ratios)
+- You're producing a peer group for accreditation, NECHE, board
+  presentations, IPEDS comparison reports
+- You want your theme-weight choices to drive the ranking
+
+### Mahalanobis distance — the "institutional pattern" metric
+
+Mahalanobis is more sophisticated mathematically. It de-correlates the
+variables before measuring distance, so instead of treating each
+variable independently, it asks:
+
+> Which schools share the underlying institutional pattern that the
+> anchor fits into?
+
+It's good at recognising archetypes: "selective Catholic D-I Northeast
+LACs," "large urban research universities," "small rural Master's
+institutions." Schools that share the anchor's archetype cluster
+together even when individual variables differ.
+
+**Important caveat — theme weights don't actually affect Mahalanobis
+rankings.** This is a property of how the metric works mathematically
+(it's *scale-invariant*: the math cancels out any pre-scaling you apply
+to the variables). The theme-weight sliders still let you *include* or
+*exclude* themes (zero excludes), but moving a slider from 1.0 to 2.5
+doesn't change what Mahalanobis ranks first. If you want your weight
+choices to matter, use Euclidean.
+
+**Use Mahalanobis when:**
+
+- You want a "second opinion" on whether a peer set you've already
+  built (with Euclidean) holds up under a different lens
+- You're exploring institutional archetype — "schools that share our
+  *character* in some intuitive sense"
+- You're deliberately looking for schools that share the anchor's
+  *correlated* patterns across variable bundles
+
+### What if the two metrics disagree?
+
+That's the most informative result. When Euclidean and Mahalanobis
+produce overlapping top-K lists, you have high-confidence peers — they
+match on individual benchmarks AND share the institutional pattern.
+When the two disagree, the overlap is your **robust peer set**, and
+the schools that appear in only one list tell you something:
+
+- In Euclidean only → similar on the specific dimensions you weighted,
+  even if not pattern-matched
+- In Mahalanobis only → archetypal peers (share your overall
+  institutional character) that happen to differ on some specific
+  measures
+
+The "Compare Metrics" tab below the peer table (when results exist)
+runs both metrics with your current settings and shows the top-K under
+each side by side.
+
+### Practical tips
+
+- **Start with Euclidean.** It's the standard, your theme weights work
+  the way you'd expect, and the result is interpretable.
+- **If Euclidean's results feel off**, before switching to Mahalanobis,
+  try **narrowing the candidate pool**. Pool filters (US News class,
+  religious tradition, region) often shift the ranking more than weight
+  sliders do.
+- **Use the Diagnostics tab** to see which variables were dropped from
+  the calculation and why. If a variable you care about isn't in the
+  "Variables used" list, the coverage threshold (default 70%) may have
+  excluded it for this pool.
+
+---
+
 ## Data sources
 
 | Source | What it provides | Vintage |
