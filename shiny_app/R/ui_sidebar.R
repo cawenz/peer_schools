@@ -93,9 +93,15 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
   affordability     = list(size = 1.0, selectivity = 1.0, resources = 1.0,
                            finance = 1.5, outcomes = 1.0, aid = 2.0,
                            student_body = 1.0, athletics = 0),
-  athletics_active  = list(size = 1.0, selectivity = 1.0, resources = 1.0,
-                           finance = 1.0, outcomes = 1.0, aid = 1.0,
-                           student_body = 1.0, athletics = 2.0),
+  # Athletics-active: dominant athletics weight + light context from
+  # student body + outcomes. Zeroing the other themes means D1 / D2 /
+  # D3 division is the primary similarity signal, with mission-fit and
+  # success-trajectory as the tiebreakers. Result: peer set spans
+  # institution sizes (a small D-I LAC and a large D-I research uni can
+  # both surface) but all share the athletics tier the user cares about.
+  athletics_active  = list(size = 0, selectivity = 0, resources = 0,
+                           finance = 0, outcomes = 1.0, aid = 0,
+                           student_body = 1.0, athletics = 3.0),
   research_focused  = list(size = 1.5, selectivity = 1.0, resources = 1.0,
                            finance = 1.5, outcomes = 2.0, aid = 1.0,
                            student_body = 1.0, athletics = 0)
@@ -112,7 +118,7 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
   size_heavy         = "Size-similar — UG enrollment + UG share",
   student_body_heavy = "Student body match — demographics, residential, etc.",
   affordability      = "Affordability — aid + finance combined",
-  athletics_active   = "Athletics-active — turn on athletics (default is 0)",
+  athletics_active   = "Athletics-active — division level dominates the match",
   research_focused   = "Research-focused — outcomes + scale + research $"
 )
 
