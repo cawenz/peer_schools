@@ -156,6 +156,10 @@ THEME_VARS <- list(
   athletics = c(
     # Clustering (in peer distance):
     "pct_athletes_overall", "total_varsity_sports", "multi_sport_ratio",
+    # Synthetic ordinal var: D1=3, D2/NAIA=2, D3=1, Other/none=NA.
+    # Derived in compute_peers from cdat$athletics_division, not from
+    # the ath_facts CSV.
+    "athletics_division_numeric",
     # Descriptive (visible in Side-by-Side and the inspector, no weight):
     "mens_varsity_sports", "womens_varsity_sports",
     "male_athletes_undup", "female_athletes_undup", "total_athletes_undup",
@@ -212,9 +216,10 @@ MAHALANOBIS_VARS <- c(
   "grad_rate_6yr", "retention_rate", "median_earnings_10yr",
   # Student body — three orthogonal demographic axes
   "pct_bipoc", "pct_first_generation", "pct_part_time",
-  # Athletics — single representative (avoids the trio collinearity
-  # that was driving the Mahalanobis instability before audit round 0)
-  "pct_athletes_overall"
+  # Athletics — division-level (ordinal D1=3, D2/NAIA=2, D3=1) is
+  # the cleanest single signal of "level of competition," cleaner
+  # than pct_athletes_overall which conflates with size at LACs.
+  "athletics_division_numeric"
 )
 
 # -----------------------------------------------------------------------------
@@ -335,6 +340,17 @@ ASPIRANT_LABELS <- list(
     s$religious_affiliation_code <- NA_integer_
     s$religious_affiliation      <- NA_character_
     s$religious_tradition        <- NA_character_
+  }
+  # Join the EADA-derived schools_athletics.csv if present so
+  # athletics_division (D1/D2/D3/NAIA/Other) reaches the clustering
+  # math. Used to derive the synthetic athletics_division_numeric
+  # variable. Missing file is fine — downstream guards on column
+  # presence handle it.
+  ath_path <- file.path(dirname(schools_path), "schools_athletics.csv")
+  if (file.exists(ath_path)) {
+    sa <- suppressMessages(read_csv(ath_path, show_col_types = FALSE))
+    sa$unitid <- as.integer(sa$unitid)
+    s <- s %>% dplyr::left_join(sa, by = "unitid")
   }
   s
 }
@@ -505,7 +521,7 @@ compute_peers <- function(
            usnews_classification, in_ranked_universe, stabbr,
            religious_affiliation, religious_tradition,
            any_of(c("usnews_rank", "wamo_rank", "wamo_category",
-                    "forbes_rank"))) %>%
+                    "forbes_rank", "athletics_division"))) %>%
     left_join(wide, by = "unitid")
   
   # -- 4b. Build the same_religious_tradition clustering variable from the
@@ -528,6 +544,26 @@ compute_peers <- function(
     cdat$same_religious_tradition <- NA_integer_
   }
   
+  # -- 4c. Synthetic athletics_division_numeric: ordinal encoding of the
+  # categorical athletics_division so the clustering math can use
+  # "level of competition" as a similarity signal. Higher = more
+  # athletics intensity:
+  #   D1   -> 3
+  #   D2   -> 2
+  #   NAIA -> 2  (alternative governance body, similar intensity to D2)
+  #   D3   -> 1
+  #   Other -> NA (mix of unaffiliated programs; we don't want to
+  #               conflate it with a specific intensity tier)
+  if ("athletics_division" %in% names(cdat)) {
+    div <- cdat$athletics_division
+    div_n <- rep(NA_real_, length(div))
+    div_n[!is.na(div) & div == "D1"]   <- 3
+    div_n[!is.na(div) & div == "D2"]   <- 2
+    div_n[!is.na(div) & div == "NAIA"] <- 2
+    div_n[!is.na(div) & div == "D3"]   <- 1
+    cdat$athletics_division_numeric <- div_n
+  }
+
   # -- 5. Available variables in the data --
   candidate_metrics <- intersect(loaded$available_metrics, names(cdat))
   # The synthetic same_religious_tradition variable lives in cdat (not in
@@ -537,6 +573,11 @@ compute_peers <- function(
   if ("same_religious_tradition" %in% names(cdat) &&
       any(!is.na(cdat$same_religious_tradition)))
     candidate_metrics <- union(candidate_metrics, "same_religious_tradition")
+  # Same pattern for athletics_division_numeric — synthetic clustering
+  # var derived inline rather than read from a facts CSV.
+  if ("athletics_division_numeric" %in% names(cdat) &&
+      any(!is.na(cdat$athletics_division_numeric)))
+    candidate_metrics <- union(candidate_metrics, "athletics_division_numeric")
   if (!is.null(exclude_variables))
     candidate_metrics <- setdiff(candidate_metrics, exclude_variables)
   
