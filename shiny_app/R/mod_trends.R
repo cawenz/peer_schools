@@ -655,30 +655,65 @@ trendsServer <- function(id,
         100 * mean(pool < v)
       }, numeric(1))
 
+      # Numeric raw data flows to DT for sort, render formats for display.
+      # Same pattern used in the peer table's rank columns — sidesteps
+      # the string-sort traps (Range "X — Y" was lexically ordered before;
+      # IQR retired entirely since the chart's purple band already shows
+      # the 25-75 spread visually).
+      anchor_v <- tbl$school_value
+      median_v <- tbl$median
+      min_v    <- tbl$minv
+      max_v    <- tbl$maxv
+      pct_v    <- tbl$pct
+      n_v      <- ifelse(is.na(tbl$n_comparison), 0L,
+                          as.integer(tbl$n_comparison))
+
       out <- data.frame(
-        Year       = tbl$year,
-        School     = vapply(tbl$school_value,
-                             function(v) .format_value(v, fmt), character(1)),
-        Median     = vapply(tbl$median,
-                             function(v) .format_value(v, fmt), character(1)),
-        Range      = mapply(function(lo, hi) {
-                              if (!is.finite(lo) || !is.finite(hi)) return("—")
-                              sprintf("%s — %s",
-                                      .format_value(lo, fmt),
-                                      .format_value(hi, fmt))
-                            }, tbl$minv, tbl$maxv, USE.NAMES = FALSE),
-        IQR        = mapply(function(lo, hi) {
-                              if (!is.finite(lo) || !is.finite(hi)) return("—")
-                              sprintf("%s — %s",
-                                      .format_value(lo, fmt),
-                                      .format_value(hi, fmt))
-                            }, tbl$q1, tbl$q3, USE.NAMES = FALSE),
-        Percentile = ifelse(is.na(tbl$pct), "—",
-                            sprintf("%.0f", tbl$pct)),
-        `N pool`   = ifelse(is.na(tbl$n_comparison), 0,
-                            tbl$n_comparison),
+        Year   = tbl$year,
+        Anchor = anchor_v,
+        Median = median_v,
+        Min    = min_v,
+        Max    = max_v,
+        Pctile = pct_v,
+        N      = n_v,
         check.names = FALSE,
         stringsAsFactors = FALSE
+      )
+
+      # Display formatter that respects each variable's format type
+      # (currency, percentage, count, ratio, etc.). NA renders as the
+      # em-dash. Returns raw numeric for sort and the formatted string
+      # for display.
+      fmt_js <- DT::JS(
+        sprintf(
+          paste(
+            "function(data, type, row) {",
+            "  if (type !== 'display') return data;",
+            "  if (data === null || data === undefined || isNaN(data))",
+            "    return '\\u2014';",
+            "  var fmt = %s;",
+            "  var n = Number(data);",
+            "  if (fmt === 'currency') return '$' + n.toLocaleString(",
+            "    undefined, {maximumFractionDigits: 0});",
+            "  if (fmt === 'percentage') return n.toFixed(1) + '%%';",
+            "  if (fmt === 'count') return n.toLocaleString(",
+            "    undefined, {maximumFractionDigits: 0});",
+            "  if (fmt === 'ratio') return n.toFixed(2);",
+            "  if (fmt === 'score') return n.toFixed(0);",
+            "  return n.toLocaleString();",
+            "}", sep = "\n"),
+          # Inject the active fmt as a literal JS string.
+          shQuote(fmt %||% "")
+        )
+      )
+      # Percentile is always plain "X" 0-100, no fmt lookup needed.
+      pct_js <- DT::JS(
+        "function(data, type, row) {",
+        "  if (type !== 'display') return data;",
+        "  if (data === null || data === undefined || isNaN(data))",
+        "    return '\\u2014';",
+        "  return Math.round(Number(data));",
+        "}"
       )
 
       DT::datatable(
@@ -691,7 +726,11 @@ trendsServer <- function(id,
           order = list(list(0, "asc")),
           columnDefs = list(
             list(className = "dt-center", targets = 0),
-            list(className = "dt-right",  targets = c(1, 2, 5, 6))
+            list(className = "dt-right",  targets = c(1, 2, 3, 4, 5, 6)),
+            # Anchor + Median + Min + Max use the metric's fmt; Pctile
+            # is plain 0-100; N is bare integer (default render).
+            list(targets = c(1, 2, 3, 4), render = fmt_js),
+            list(targets = 5, render = pct_js)
           )
         ),
         class = "compact stripe hover"
