@@ -682,24 +682,16 @@ peerTableServer <- function(id, sidebar_state) {
       }
       df <- df_visible
 
-      # Sort-safe cell builder: DataTables honours the data-order
-      # attribute on the cell's outer element for sorting (the cell still
-      # *displays* the inner text). Without this, an integer rank column
-      # rendered as character string-sorts "10" < "2" < "27"; with it,
-      # DT sorts by the underlying numeric value. NA values get a sentinel
-      # of 999999 so they sink to the bottom on ascending sort.
-      .sort_html_num <- function(value, display = NULL) {
-        if (is.null(display))
-          display <- ifelse(is.na(value), "", as.character(value))
-        ifelse(is.na(value),
-               '<span data-order="999999"></span>',
-               sprintf('<span data-order="%g">%s</span>',
-                       as.numeric(value),
-                       htmltools::htmlEscape(display)))
-      }
+      # Display text for rank columns. Plain strings — sort is driven
+      # by the per-column DT::JS render function in columnDefs below
+      # (parses each cell's leading number; NAs / blanks go to +Inf so
+      # they sink to the bottom on ascending sort). Earlier attempts
+      # used data-order span wrappers, but DataTables only honours
+      # data-order on the <td> itself, not on child <span> nodes.
       .rank_disp <- function(col) {
-        if (col %in% names(df)) .sort_html_num(df[[col]])
-        else rep('<span data-order="999999"></span>', nrow(df))
+        if (col %in% names(df))
+          ifelse(is.na(df[[col]]), "", as.character(df[[col]]))
+        else rep("", nrow(df))
       }
       usn_rank_disp    <- .rank_disp("usnews_rank")
       forbes_rank_disp <- .rank_disp("forbes_rank")
@@ -709,13 +701,11 @@ peerTableServer <- function(id, sidebar_state) {
         cat <- if ("wamo_category" %in% names(df)) df$wamo_category
                else rep(NA_character_, nrow(df))
         sfx <- ifelse(is.na(cat), "", paste0(" (", wamo_short[cat], ")"))
-        # Display text combines rank + category suffix; sort key is the
-        # bare numeric rank so columns like "2 (LA)" still sort right.
-        disp_text <- ifelse(is.na(df$wamo_rank), "",
-                             paste0(as.character(df$wamo_rank), sfx))
-        .sort_html_num(df$wamo_rank, disp_text)
+        # "2 (LA)" — leading parseFloat catches the 2 for sort.
+        ifelse(is.na(df$wamo_rank), "",
+               paste0(as.character(df$wamo_rank), sfx))
       } else {
-        rep('<span data-order="999999"></span>', nrow(df))
+        rep("", nrow(df))
       }
 
       # ---- Build Status badges ----
@@ -768,12 +758,8 @@ peerTableServer <- function(id, sidebar_state) {
       if (nrow(a) == 1) {
         .one <- function(v) if (is.null(v) || length(v) == 0 ||
                                   is.na(v)) "" else as.character(v)
-        # Anchor row uses the same sort-safe rank format as peer rows so
-        # the column sorts consistently even when the anchor's USN /
-        # WM / Forbes rank is itself a number that would otherwise be
-        # string-sorted vs the peer rows.
-        a_wamo_disp_text <- if (!is.na(a$wamo_rank) &&
-                                   !is.na(a$wamo_category %||% NA)) {
+        a_wamo <- if (!is.na(a$wamo_rank) &&
+                       !is.na(a$wamo_category %||% NA)) {
           paste0(a$wamo_rank, " (",
                   wamo_short[a$wamo_category] %||% a$wamo_category, ")")
         } else if (!is.na(a$wamo_rank)) {
@@ -784,9 +770,9 @@ peerTableServer <- function(id, sidebar_state) {
           School        = paste0("★ ", a$instnm, "  (anchor)"),
           Status        = '<span class="peer-status-badge peer-status-anchor">Anchor</span>',
           `Class.`      = .prettify_classification(a$usnews_classification),
-          `USN Rank`    = .sort_html_num(a$usnews_rank),
-          `WM Rank`     = .sort_html_num(a$wamo_rank, a_wamo_disp_text),
-          `Forbes Rank` = .sort_html_num(a$forbes_rank),
+          `USN Rank`    = .one(a$usnews_rank),
+          `WM Rank`     = a_wamo,
+          `Forbes Rank` = .one(a$forbes_rank),
           Sector        = .prettify_control(a$control_grp),
           State         = .one(a$stabbr),
           Distance      = 0,
@@ -818,6 +804,22 @@ peerTableServer <- function(id, sidebar_state) {
                    "  if (type === 'display' && data === 0) return '\\u2014';",
                    "  if (type === 'display' && data === null) return '+';",
                    "  return data;",
+                   "}")),
+            # USN Rank / Forbes Rank / WM Rank are formatted strings
+            # ("27", "" for missing, "2 (LA)" for WM). Sort by parsing
+            # the leading numeric; blanks / non-numeric sort to the
+            # bottom on both directions so missing-rank schools don't
+            # crowd the top.
+            list(targets = c("USN Rank", "Forbes Rank", "WM Rank"),
+                 type   = "num",
+                 render = DT::JS(
+                   "function(data, type, row) {",
+                   "  if (type === 'display' || type === 'filter') return data;",
+                   "  if (data === null || data === undefined) return Infinity;",
+                   "  var s = String(data).trim();",
+                   "  if (s === '' || s === '\\u2014') return Infinity;",
+                   "  var n = parseFloat(s);",
+                   "  return isNaN(n) ? Infinity : n;",
                    "}"))
           ),
           rowCallback = DT::JS(
@@ -1765,32 +1767,19 @@ peerTableServer <- function(id, sidebar_state) {
         100 * mean(pool_vals < v)
       }, numeric(1))
 
-      # Value + Percentile are formatted strings; wrap each in a
-      # data-order span so DT sorts by the underlying numeric value
-      # when the user clicks the column header (without changing the
-      # rendered text). NA -> sentinel data-order so NAs sink to the
-      # bottom of either sort direction.
+      # Value + Percentile are formatted strings. Sort is driven by
+      # the parseFloat-based render function in columnDefs below
+      # (works because the formatted strings start with a number).
       val_display <- vapply(raw_vals, function(v) .format_value(v, fmt),
                              character(1))
-      val_html <- ifelse(
-        is.finite(raw_vals),
-        sprintf('<span data-order="%g">%s</span>',
-                raw_vals,
-                vapply(val_display, htmltools::htmlEscape, character(1))),
-        '<span data-order="-1e15">&#8212;</span>'
-      )
-      pct_html <- ifelse(
-        is.na(pct),
-        '<span data-order="-1e15">&#8212;</span>',
-        sprintf('<span data-order="%g">%.0f</span>', pct, pct)
-      )
+      pct_display <- ifelse(is.na(pct), "—", sprintf("%.0f", pct))
 
       tbl <- data.frame(
         Action      = actions,
         School      = names_v,
         State       = states,
-        Value       = val_html,
-        Percentile  = pct_html,
+        Value       = val_display,
+        Percentile  = pct_display,
         `_sort`     = ifelse(is.finite(raw_vals), raw_vals, -Inf),
         stringsAsFactors = FALSE,
         check.names = FALSE
@@ -1800,11 +1789,6 @@ peerTableServer <- function(id, sidebar_state) {
         tbl,
         rownames = FALSE,
         selection = "none",
-        # escape = FALSE lets the Value/Percentile data-order span
-        # wrappers render as real HTML so DT picks up the sort hint.
-        # Action / School / State are simple text; harmless to leave
-        # them in the unescaped set.
-        escape = FALSE,
         options = list(
           pageLength = 50,
           dom = "tip",
@@ -1812,7 +1796,21 @@ peerTableServer <- function(id, sidebar_state) {
           columnDefs = list(
             list(visible = FALSE, targets = 5),
             list(className = "dt-right", targets = c(3, 4)),
-            list(className = "dt-center", targets = 2)
+            list(className = "dt-center", targets = 2),
+            # Value (col 3) + Percentile (col 4) are formatted strings;
+            # parse the leading number for sort. NA / "—" / "" -> -Inf
+            # so they sink to the bottom of both directions.
+            list(targets = c(3, 4),
+                 type   = "num",
+                 render = DT::JS(
+                   "function(data, type, row) {",
+                   "  if (type === 'display' || type === 'filter') return data;",
+                   "  if (data === null || data === undefined) return -Infinity;",
+                   "  var s = String(data).replace(/[,$%]/g, '').trim();",
+                   "  if (s === '' || s === '\\u2014') return -Infinity;",
+                   "  var n = parseFloat(s);",
+                   "  return isNaN(n) ? -Infinity : n;",
+                   "}"))
           )
         ),
         class = "compact stripe hover"
@@ -2643,26 +2641,22 @@ peerTableServer <- function(id, sidebar_state) {
         fmt <- if (nrow(fmt_row)) fmt_row$format else NA
         col_label <- ASPIRANT_LABELS[[m]] %||% m
         vals <- df[[m]]
+        # Each cell renders "85.5%  ▲ +12.3%". The sort is driven by
+        # the per-target render function added to the datatable() call
+        # below — it parses the leading number out of each cell, and
+        # treats "—" (NA) as sort-to-bottom in both directions.
         cells <- vapply(seq_along(vals), function(i) {
           v <- vals[i]
-          # NA value: sentinel sort-order so it sinks to the bottom on
-          # both ascending and descending sorts (no real value beats
-          # 1e15).
-          if (!is.finite(v))
-            return('<span data-order="1e15">&#8212;</span>')
+          if (!is.finite(v)) return("—")
           gap <- v - a_val
           beats <- if (dir == "higher") gap > 0 else gap < 0
           arrow <- if (is.na(beats)) ""
                    else if (beats) "<span class=\"asp-up\">&#9650;</span>"
                    else            "<span class=\"asp-down\">&#9660;</span>"
-          display_text <- sprintf("%s  %s",
-                                   .format_value(v, fmt),
-                                   paste0(arrow, " ",
-                                           sprintf("%+s",
-                                                   .format_value(abs(gap), fmt))))
-          # data-order = the raw numeric value so DT sorts by metric
-          # value, not by string-of-formatted-text.
-          sprintf('<span data-order="%g">%s</span>', v, display_text)
+          sprintf("%s  %s",
+                  .format_value(v, fmt),
+                  paste0(arrow, " ",
+                          sprintf("%+s", .format_value(abs(gap), fmt))))
         }, character(1))
         cols[[col_label]] <- cells
       }
@@ -2683,7 +2677,23 @@ peerTableServer <- function(id, sidebar_state) {
                          list(className = "dt-right",  targets = c(0, 3)),
                          list(className = "dt-center", targets = c(2, 4)),
                          list(className = "asp-metric-cell",
-                              targets = target_cols))),
+                              targets = target_cols),
+                         # Sort metric columns by the leading numeric
+                         # value parsed out of the cell ("85.5%  ▲
+                         # +12.3%" sorts as 85.5). "—" / "" -> -Inf so
+                         # NA cells sink to the bottom either way.
+                         list(targets = target_cols,
+                              type   = "num",
+                              render = DT::JS(
+                                "function(data, type, row) {",
+                                "  if (type === 'display' || type === 'filter') return data;",
+                                "  if (data === null || data === undefined) return -Infinity;",
+                                "  var s = String(data).replace(/<[^>]*>/g, '').replace(/[,$%]/g, '').trim();",
+                                "  if (s === '' || s === '\\u2014') return -Infinity;",
+                                "  var n = parseFloat(s);",
+                                "  return isNaN(n) ? -Infinity : n;",
+                                "}"))
+                       )),
         class = "compact stripe hover"
       )
     }
