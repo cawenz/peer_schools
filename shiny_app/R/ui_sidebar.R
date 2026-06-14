@@ -104,13 +104,19 @@ peerSearchSidebarUI <- function(id) {
     tags$hr(),
 
     # ---------------- Candidate pool ----------------
+    # Universe is fixed: every search runs over the ranked universe
+    # (US News National Universities, National Liberal Arts Colleges,
+    # Regional Universities, Regional Colleges). The previous
+    # "Ranked universe only" checkbox + info modal is retired —
+    # global.R filters .SCHOOLS to in_ranked_universe at app start,
+    # so the unranked specialty / very-small / for-profit
+    # institutions never enter the app's data scope.
     tags$h6("Candidate pool"),
-    tags$div(class = "pool-checkbox-row",
-      checkboxInput(ns("pool_ranked"), "Ranked universe only", value = TRUE),
-      actionLink(ns("ranked_info_btn"),
-                  label = HTML("&#9432;"),
-                  class = "pool-info-btn",
-                  title = "What is the ranked universe?")
+    tags$div(class = "pool-universe-banner",
+      tags$small(class = "pool-universe-label",
+        "Universe: ", tags$strong("US News ranked schools"),
+        " — ~1,460 four-year non-profits across the four ranked",
+        " categories. Narrow further with the filters below.")
     ),
 
     tags$div(
@@ -666,65 +672,11 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
       }
     }, ignoreInit = TRUE)
 
-    # --- Ranked-universe info modal ---------------------------------------
-    observeEvent(input$ranked_info_btn, {
-      showModal(modalDialog(
-        title = "About the ranked universe",
-        size = "m",
-        easyClose = TRUE,
-        footer = modalButton("Close"),
-        div(class = "pool-info-body",
-          p("The ", tags$strong("ranked universe"),
-            " is the set of institutions for which US News publishes a ",
-            "numeric overall rank. Across the four categories US News ",
-            "ranks, that covers four groups of schools:"),
-          tags$ul(
-            tags$li(tags$strong("National Universities"),
-                    " — research universities with a full range of ",
-                    "undergrad and graduate programs."),
-            tags$li(tags$strong("National Liberal Arts Colleges"),
-                    " — bachelor's-focused colleges drawing students ",
-                    "nationally."),
-            tags$li(tags$strong("Regional Universities"),
-                    " — master's-granting institutions, ranked within ",
-                    "four geographic regions (North / South / Midwest / West)."),
-            tags$li(tags$strong("Regional Colleges"),
-                    " — bachelor's-focused regional schools, also ranked ",
-                    "within the four geographic regions.")
-          ),
-          tags$p(
-            tags$strong("Ranked universe only"),
-            " (the default) restricts the candidate pool to schools with ",
-            "a published US News overall rank. This is usually what you ",
-            "want for peer comparison: it keeps the pool to schools US ",
-            "News actively benchmarks."),
-
-          tags$h6("What you'd add by unchecking"),
-          tags$ul(
-            tags$li(tags$strong("Schools that appear in IPEDS but aren't ranked"),
-                    " — institutions US News doesn't assign a numeric ",
-                    "overall rank to. This is a mixed group: some are ",
-                    "specialty schools (art, music, military), some are ",
-                    "very small, and some sit in US News categories that ",
-                    "aren't part of the ranked set at all.")
-          ),
-
-          tags$h6("Effect on the results table"),
-          tags$ul(
-            tags$li("The ", tags$strong("Class."),
-                    " column shows the published US News category for each ",
-                    "row (blank when the school has no classification at all)."),
-            tags$li("The ", tags$strong("USN Rank"),
-                    " column is blank only for schools US News didn't ",
-                    "assign a numeric overall rank to."),
-            tags$li("Categories are not directly comparable: rank #5 in ",
-                    "National Liberal Arts is not equivalent to rank #5 ",
-                    "in National Universities, Regional Universities, or ",
-                    "Regional Colleges.")
-          )
-        )
-      ))
-    })
+    # The ranked-universe info modal was retired with the checkbox.
+    # The universe is now fixed (every search runs over US News ranked
+    # schools) so there's no opt-out for users to learn about. The
+    # small static banner under "Candidate pool" carries the headline
+    # context; full detail moved to the Help tab if a user wants it.
 
     # --- Preset buttons update the theme sliders ---
     apply_preset <- function(preset_name) {
@@ -757,8 +709,9 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                                selected = state$anchor_unitid)
 
         pool <- state$candidate_pool %||% list()
-        updateCheckboxInput(session, "pool_ranked",
-                            value = isTRUE(pool$in_ranked_universe))
+        # pool$in_ranked_universe is ignored on restore — the universe is
+        # always ranked now. Saved searches from the old codebase carry
+        # it harmlessly; new ones omit it.
 
         if (!is.null(pool$usnews_classification)) {
           updateCheckboxInput(session, "pool_class_same", value = FALSE)
@@ -810,9 +763,11 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                     else .DEFAULT_ANCHOR_UNITID
 
       # ---- Build candidate_pool argument ----
-      pool <- list()
-      if (isTRUE(input$pool_ranked))
-        pool$in_ranked_universe <- TRUE
+      # Universe is always ranked-only (filtered in global.R). We still
+      # set in_ranked_universe = TRUE here for the saved-search audit
+      # trail and so compute_peers's candidate_pool filter remains a
+      # no-op rather than a missing-column edge case.
+      pool <- list(in_ranked_universe = TRUE)
 
       # Classification: same-as-anchor uses anchor row; otherwise user picks.
       # Sentinel "All ..." values expand to their constituent raw codes

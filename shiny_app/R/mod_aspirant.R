@@ -84,8 +84,7 @@ aspirantUI <- function(id) {
           # Candidate pool
           tags$div(class = "asp-advanced-section",
             tags$h6("Candidate pool"),
-            checkboxInput(ns("pool_ranked"),
-                          "Ranked universe only", value = TRUE),
+            # Universe is fixed to ranked schools — see global.R.
             tags$div(class = "asp-pool-row",
               checkboxInput(ns("pool_class_same"),
                             "Same US News classification as anchor",
@@ -197,8 +196,7 @@ aspirantServer <- function(id) {
       anchor_uid <- as.integer(input$anchor_unitid)
       if (is.na(anchor_uid)) anchor_uid <- .DEFAULT_ANCHOR_UNITID
 
-      pool <- list()
-      if (isTRUE(input$pool_ranked)) pool$in_ranked_universe <- TRUE
+      pool <- list(in_ranked_universe = TRUE)
       if (isTRUE(input$pool_class_same)) {
         if (!is.null(ar) && !is.na(ar$usnews_classification))
           pool$usnews_classification <- ar$usnews_classification

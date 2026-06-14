@@ -862,6 +862,23 @@ a {
 
 /* ---------- Sidebar: info button + label hints ---------- */
 /* "Ranked universe only" + a small info icon to its right. */
+/* Static banner that replaces the retired "Ranked universe only"
+ * checkbox + info modal. Shows the fixed universe scope and primes
+ * the user that the filters below narrow within it. */
+.pool-universe-banner {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.45rem 0.65rem;
+  margin-bottom: 0.6rem;
+  border-radius: 3px;
+
+  .pool-universe-label {
+    color: #251230;
+    line-height: 1.35;
+    display: block;
+  }
+}
+
 .pool-checkbox-row {
   display: flex;
   align-items: center;

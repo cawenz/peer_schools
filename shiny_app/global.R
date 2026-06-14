@@ -72,6 +72,25 @@ stopifnot(exists("compute_peers", mode = "function"),
   mutate(unitid = as.integer(unitid),
          in_ranked_universe = as.logical(in_ranked_universe))
 
+# Filter to the ranked universe up front. The app's entire purpose is
+# institutional benchmarking among schools US News actively ranks
+# (National Universities, National Liberal Arts Colleges, Regional
+# Universities, Regional Colleges) — the ~1,100 unranked specialty /
+# small / for-profit institutions in IPEDS aren't meaningful peers for
+# the apps users (IR shops at US 4-year non-profits). Filtering here
+# instead of via a sidebar checkbox:
+#   - simplifies the candidate-pool UI (one less switch)
+#   - raises coverage of CDS-sourced vars (most pass the 70% threshold
+#     in the ranked universe but failed in the full universe)
+#   - shrinks .SCHOOLS_WIDE / .FACTS for downstream perf
+# in_ranked_universe is now always TRUE in .SCHOOLS; saved searches
+# carrying candidate_pool$in_ranked_universe = TRUE remain compatible
+# (the filter becomes a no-op against the already-filtered pool).
+.SCHOOLS <- .SCHOOLS %>%
+  filter(!is.na(in_ranked_universe) & in_ranked_universe)
+message(sprintf("[shiny global] filtered to ranked universe: %d schools",
+                nrow(.SCHOOLS)))
+
 # Join EADA-derived categorical extras (athletics body / division /
 # conference / has_football / classification) if the file is present.
 # Produced by R/athletics_module_pipeline.R. Graceful fallback when the
