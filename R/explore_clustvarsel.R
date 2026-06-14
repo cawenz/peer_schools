@@ -87,25 +87,29 @@ suppressMessages({
     "earnings_ratio", "doctoral_degrees_awarded", "grad_rate_men_vs_women"
   ),
   aid = c(
-    "avg_net_price", "avg_net_price_income_0_30k", "pct_pell", "pell_count",
+    # pell_count removed per audit round 2 (peer_pipeline.R has rationale).
+    "avg_net_price", "avg_net_price_income_0_30k", "pct_pell",
     "pct_grant_aid", "avg_inst_grant", "inst_discount_rate",
     "pct_borrowing", "avg_fed_loan", "pct_need_met", "pct_need_fully_met"
   ),
   student_body = c(
-    # pct_undergrad relocated to `size` — institutional shape lives there now.
+    # Race-variable reformulation per audit round 2:
+    #   - pct_white removed (algebraic complement)
+    #   - pct_asian PROMOTED to full weight
+    #   - detail race vars (pct_black/hispanic/nhpi/aian/two_or_more) dropped
+    #     from clustering (descriptive only)
     "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
-    "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
+    "pct_international", "pct_bipoc", "pct_asian", "pct_race_unknown",
     "transfer_in_enrollment", "residential_share"
     # same_religious_tradition deliberately excluded here — it's anchor-relative
     # and not meaningful for unsupervised variable selection.
   )
 )
 
-.STUDENT_BODY_HALF_WEIGHT <- c(
-  "pct_black", "pct_hispanic", "pct_asian",
-  "pct_nhpi", "pct_aian", "pct_two_or_more"
-)
+# Half-weight system retired in audit round 2. Kept as character(0) so
+# any downstream logic that still references it degrades cleanly.
+.STUDENT_BODY_HALF_WEIGHT <- character(0)
 
 .LOG_TRANSFORM_VARS <- c(
   "total_enrollment", "undergraduate_enrollment",

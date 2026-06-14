@@ -99,7 +99,10 @@ THEME_VARS <- list(
     "earnings_ratio", "doctoral_degrees_awarded", "grad_rate_men_vs_women"
   ),
   aid = c(
-    "avg_net_price_aided", "avg_net_price_income_0_30k", "pct_pell", "pell_count",
+    # pell_count removed in audit round 2: R^2 = 0.92 predicted from
+    # pct_pell + UG enrollment — no marginal signal. Still in the data
+    # as descriptive in aid_variables.csv.
+    "avg_net_price_aided", "avg_net_price_income_0_30k", "pct_pell",
     "pct_any_grant", "avg_inst_grant", "inst_discount_rate",
     "pct_federal_loan", "avg_federal_loan", "pct_need_met", "pct_need_fully_met"
   ),
@@ -108,9 +111,25 @@ THEME_VARS <- list(
     # (UG-focused vs research-university), not a student-demographic
     # attribute, and pairs well with undergraduate_enrollment to give
     # the size theme one scale + one shape signal.
+    #
+    # Race-variable reformulation (audit round 2):
+    #   - pct_white removed (algebraic complement of the other three race-
+    #     trio vars; sum-to-100 constraint was causing a near-zero
+    #     eigendirection that destabilised Mahalanobis). Still in
+    #     enr_variables.csv as descriptive.
+    #   - pct_asian PROMOTED from half-weight to full weight — r = 0.20
+    #     with pct_bipoc means Asian share moves on a different axis,
+    #     and at ~10% of schools Asian is > 30% of BIPOC enrollment.
+    #     Giving it explicit dimensional weight captures the "Asian-not-
+    #     always-underrepresented" IR distinction.
+    #   - Detail race vars (pct_black, pct_hispanic, pct_nhpi, pct_aian,
+    #     pct_two_or_more) dropped from clustering entirely. Aggregate
+    #     pct_bipoc + explicit pct_asian carries the IR-meaningful race
+    #     signal at this level; granular breakdowns remain visible on
+    #     Side-by-Side and Variables tabs for descriptive comparisons.
     "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
-    "pct_white", "pct_international", "pct_bipoc", "pct_race_unknown",
+    "pct_international", "pct_bipoc", "pct_asian", "pct_race_unknown",
     "transfer_in_enrollment", "residential_share",
     # Religious affiliation match with anchor (binary 0/1). Added via
     # the candidates-side join in compute_peers; not in any facts CSV.
@@ -134,16 +153,20 @@ THEME_VARS <- list(
   )
 )
 
-# 6 detail race variables get half weight in the Student body theme
-# (kept legacy constant name `COMPOSITION_HALF_WEIGHT` available below
-# as an alias so any external scripts that referenced it keep working.)
-STUDENT_BODY_HALF_WEIGHT <- c(
-  "pct_black", "pct_hispanic", "pct_asian",
-  "pct_nhpi", "pct_aian", "pct_two_or_more"
-)
-# Alias kept so any older code/scripts that referenced the prior name
-# continue to work. Safe to remove once we're sure nothing reads it.
-COMPOSITION_HALF_WEIGHT <- STUDENT_BODY_HALF_WEIGHT
+# Half-weight system retired in audit round 2. The 6 detail race
+# variables (pct_black, pct_hispanic, pct_asian, pct_nhpi, pct_aian,
+# pct_two_or_more) used to contribute at 0.5x weight; pct_asian was
+# promoted to full weight (now in THEME_VARS$student_body) and the
+# other 5 left clustering entirely (they remain as descriptive in
+# enr_variables.csv for Side-by-Side / Variables-tab display).
+#
+# Keep the constant defined as character(0) so every existing reference
+# (compute_peers's theme_n and half_factor logic, .var_theme's fallback
+# branch, and the COMPOSITION_HALF_WEIGHT back-compat alias) still works
+# without rewriting downstream code — they all degrade cleanly to "no
+# half-weight vars" rather than throwing.
+STUDENT_BODY_HALF_WEIGHT <- character(0)
+COMPOSITION_HALF_WEIGHT  <- STUDENT_BODY_HALF_WEIGHT
 
 # -----------------------------------------------------------------------------
 # LOG TRANSFORM ASSIGNMENTS
