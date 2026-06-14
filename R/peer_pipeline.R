@@ -179,6 +179,45 @@ STUDENT_BODY_HALF_WEIGHT <- character(0)
 COMPOSITION_HALF_WEIGHT  <- STUDENT_BODY_HALF_WEIGHT
 
 # -----------------------------------------------------------------------------
+# COMPACT MAHALANOBIS VARIABLE SET
+# -----------------------------------------------------------------------------
+# Curated 16-variable subset for Mahalanobis distance. Picked by audit
+# (output/audits/full_variable_audit.xlsx) for three properties:
+#   1. Well-conditioned covariance matrix — no near-collinear bundles.
+#      Condition number ~72 on the ranked universe vs ~860 for the full
+#      51-var clustering set — 12x more stable inverse, distances no
+#      longer dominated by noise-amplifying directions.
+#   2. Broad theme coverage — every theme is represented, no major
+#      institutional dimension is missing.
+#   3. High coverage on the ranked universe (>90% per variable).
+#
+# Used by compute_peers() when distance_metric = "mahalanobis" and
+# mahalanobis_use_compact = TRUE (the default). Pass FALSE to run
+# Mahalanobis on the full clustering set if you want comparability with
+# Euclidean. User-driven variable exclusions (variable_weights[v] = 0)
+# still apply on top of this set.
+MAHALANOBIS_VARS <- c(
+  # Size — single representative
+  "undergraduate_enrollment",
+  # Selectivity — admit funnel
+  "acceptance_rate", "yield_rate",
+  # Aid — affordability + access
+  "pct_pell", "avg_net_price_aided",
+  # Resources — class size + faculty investment, skipping the
+  # core_expenses / instruction / instructional_share collinear trio
+  "student_faculty_ratio", "avg_ft_faculty_salary",
+  # Finance — wealth + sticker price
+  "endowment_per_fte", "published_tuition_fees",
+  # Outcomes — persistence + completion + earnings
+  "grad_rate_6yr", "retention_rate", "median_earnings_10yr",
+  # Student body — three orthogonal demographic axes
+  "pct_bipoc", "pct_first_generation", "pct_part_time",
+  # Athletics — single representative (avoids the trio collinearity
+  # that was driving the Mahalanobis instability before audit round 0)
+  "pct_athletes_overall"
+)
+
+# -----------------------------------------------------------------------------
 # LOG TRANSFORM ASSIGNMENTS
 # -----------------------------------------------------------------------------
 # Variables that span multiple orders of magnitude or are heavily right-skewed.
@@ -409,6 +448,7 @@ compute_peers <- function(
     coverage_threshold = 0.70,
     log_transform     = "default",
     distance_metric   = "euclidean",
+    mahalanobis_use_compact = TRUE,
     k                 = 20,
     output_dir        = "output"
 ) {
@@ -639,6 +679,24 @@ compute_peers <- function(
     # to active_idx) and lets users actually test Mahalanobis without
     # specific theme bundles.
     mah_vars     <- vars_final[active_idx]
+    # Optional restriction to the curated MAHALANOBIS_VARS subset (the
+    # default — see compute_peers()'s `mahalanobis_use_compact` arg and
+    # the constant definition near the top of this file). Cuts the
+    # ranked-universe covariance condition number from ~860 to ~70 by
+    # dropping the remaining near-collinear bundles (the finance trio,
+    # the duplicate selectivity ratios). User-driven exclusions
+    # (variable_weights[v] = 0 → not in active_idx) are still honoured
+    # — the compact set is the *upper bound* on variables, not a
+    # mandatory list.
+    mah_var_set <- if (isTRUE(mahalanobis_use_compact))
+                     intersect(mah_vars, MAHALANOBIS_VARS) else mah_vars
+    if (length(mah_var_set) < 2) {
+      # Compact set was over-trimmed for this pool (extremely unusual —
+      # would require the user to exclude most of MAHALANOBIS_VARS). Fall
+      # back to the full active set so the search still runs.
+      mah_var_set <- mah_vars
+    }
+    mah_vars     <- mah_var_set
     sqrt_weights <- sqrt(weights[mah_vars])
     Xw <- as.matrix(data_mat[, mah_vars, drop = FALSE]) %*%
           diag(sqrt_weights, nrow = length(sqrt_weights))
@@ -659,6 +717,16 @@ compute_peers <- function(
     mah_diag <- list(
       n_vars            = length(mah_vars),
       n_active_dims     = length(active_idx),
+      # Surface the variable-set choice so the Diagnostics tab can
+      # show "Variable set: Compact (16 vars)" vs "Full (51 vars)".
+      variable_set      = if (isTRUE(mahalanobis_use_compact))
+                            "compact" else "full",
+      variable_set_label = if (isTRUE(mahalanobis_use_compact))
+        sprintf("Compact (%d vars) — curated for covariance stability",
+                length(mah_vars))
+      else
+        sprintf("Full (%d vars) — every variable that survived coverage filtering",
+                length(mah_vars)),
       theme_weights_active_note =
         "Mahalanobis is scale-invariant: theme/variable WEIGHTS cancel in the final distance. Only variable INCLUSION (weight > 0) matters. Use Euclidean if you want weights to drive rankings.",
       condition_number  = NA_real_,

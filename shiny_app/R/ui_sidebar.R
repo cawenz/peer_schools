@@ -222,6 +222,22 @@ peerSearchSidebarUI <- function(id) {
         checkboxInput(ns("mahalanobis"),
                       "Use Mahalanobis distance instead of Euclidean",
                       value = FALSE),
+        # Sub-option: only meaningful when Mahalanobis is on. We always
+        # render it (kept simple via a CSS class for visual hierarchy)
+        # so saved-search restore can hydrate the checkbox value
+        # regardless of the parent Mahalanobis state at restore time.
+        tags$div(class = "mah-suboption",
+          checkboxInput(ns("mahalanobis_compact"),
+                        "Use compact variable set (recommended for stability)",
+                        value = TRUE),
+          helpText(tags$small(
+            "Runs Mahalanobis on a curated 16-variable subset chosen so ",
+            "the covariance matrix is well-conditioned (no near-collinear ",
+            "bundles). Condition number drops from ~860 (full ~50-var ",
+            "set) to ~70, making distances genuinely interpretable. ",
+            "Uncheck to use the full clustering set instead."
+          ))
+        ),
         helpText(tags$small(
           "Mahalanobis adjusts for correlation between variables. ",
           tags$strong("Theme and variable weights have no effect under "),
@@ -750,6 +766,11 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         updateCheckboxInput(session, "mahalanobis",
                             value = identical(state$distance_metric,
                                               "mahalanobis"))
+        # Saved searches from before this option existed don't carry
+        # mahalanobis_use_compact; default it to TRUE so older Mahalanobis
+        # searches restore with the safer methodology.
+        updateCheckboxInput(session, "mahalanobis_compact",
+                            value = state$mahalanobis_use_compact %||% TRUE)
       }, ignoreNULL = TRUE)
     }
 
@@ -850,7 +871,10 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         variable_weights = variable_w,
         k                = input$k,
         distance_metric  = if (isTRUE(input$mahalanobis)) "mahalanobis"
-                           else "euclidean"
+                           else "euclidean",
+        # Only meaningful when distance_metric == "mahalanobis", but we
+        # always emit it so saved searches carry the choice forward.
+        mahalanobis_use_compact = isTRUE(input$mahalanobis_compact)
       )
     })
 

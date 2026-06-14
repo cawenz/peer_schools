@@ -316,6 +316,27 @@ a {
 /* Compact diagnostic grid used by the Mahalanobis panel in the
  * Diagnostics tab. Smaller cards than .stat-card because we have 6 of
  * them and they hold a number + tiny annotation, not headline stats. */
+/* Mahalanobis "variable set: …" callout. Sits between the intro
+ * paragraph and the diagnostic-card grid in the Diagnostics tab. */
+.mah-diag-varset-note {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.45rem 0.65rem;
+  margin: 0.4rem 0 0.6rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
+/* Sub-option indent for the "Use compact variable set" checkbox under
+ * the Mahalanobis checkbox in Advanced. */
+.mah-suboption {
+  margin-left: 1.3rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid #E8DAEA;
+  margin-bottom: 0.5rem;
+}
+
 .mah-diag-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));

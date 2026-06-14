@@ -247,6 +247,9 @@ peerTableServer <- function(id, sidebar_state) {
               theme_weights    = st$theme_weights,
               variable_weights = st$variable_weights %||% list(),
               distance_metric  = st$distance_metric,
+              # Compact variable set when Mahalanobis is selected;
+              # ignored on Euclidean searches by compute_peers.
+              mahalanobis_use_compact = st$mahalanobis_use_compact %||% TRUE,
               k                = st$k
             ),
             error = function(e) {
@@ -2190,6 +2193,13 @@ peerTableServer <- function(id, sidebar_state) {
               "reliable. Big condition numbers, lots of near-zero ",
               "eigenvalues, or negative eigenvalues all mean Mahalanobis ",
               "is amplifying noise — switch back to Euclidean.")),
+          # Variable-set callout. Pulled from meta$mahalanobis_diagnostics
+          # so the user can see at a glance whether the search ran on the
+          # curated 16-var subset or the full clustering set.
+          if (!is.null(mdg$variable_set_label))
+            tags$div(class = "mah-diag-varset-note",
+              tags$strong("Variable set: "),
+              mdg$variable_set_label),
           tags$div(class = "mah-diag-grid",
             tags$div(class = "mah-diag-card",
               tags$div(class = "mah-diag-label", "Condition number"),
@@ -2497,6 +2507,7 @@ peerTableServer <- function(id, sidebar_state) {
             variable_weights = st$variable_weights %||% list(),
             distance_metric  = if (isTRUE(st$mahalanobis)) "mahalanobis"
                                else (st$distance_metric %||% "euclidean"),
+            mahalanobis_use_compact = st$mahalanobis_use_compact %||% TRUE,
             k                = as.integer(pool_k)
           ),
           error = function(e) NULL
@@ -2947,6 +2958,7 @@ peerTableServer <- function(id, sidebar_state) {
                 variable_weights = st$variable_weights %||% list(),
                 distance_metric  = if (isTRUE(st$mahalanobis))
                                      "mahalanobis" else "euclidean",
+                mahalanobis_use_compact = st$mahalanobis_use_compact %||% TRUE,
                 k                = per_value_k
               )),
               error = function(e) {

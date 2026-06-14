@@ -44,6 +44,7 @@ compute_peers_cached <- memoise::memoise(function(
     coverage_threshold = 0.70,
     log_transform     = "default",
     distance_metric   = "euclidean",
+    mahalanobis_use_compact = TRUE,
     k                 = 20
 ) {
   compute_peers(
@@ -55,6 +56,7 @@ compute_peers_cached <- memoise::memoise(function(
     coverage_threshold = coverage_threshold,
     log_transform      = log_transform,
     distance_metric    = distance_metric,
+    mahalanobis_use_compact = mahalanobis_use_compact,
     k                  = k,
     output_dir         = .OUTPUT_DIR
   )
