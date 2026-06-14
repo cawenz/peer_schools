@@ -61,16 +61,15 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
 # Sliders default to 1.0; presets only override the listed themes.
 # -----------------------------------------------------------------------------
 .THEME_PRESETS <- list(
-  # Balanced: every academic theme at 1.0. Athletics stays at 0 by default
-  # to preserve the locked methodology — flip the slider explicitly to opt in.
+  # ---- Balanced (the natural baseline) -----------------------------------
+  # Every academic theme at 1.0. Athletics defaults to 0 to preserve the
+  # locked methodology — flip the slider explicitly or use the
+  # "Athletics-active" preset to opt in.
   balanced       = setNames(
                      lapply(.THEMES, .theme_default_weight),
                      .THEMES),
-  # Each non-balanced preset boosts exactly one theme to 2.5 and leaves
-  # the rest at 1.0 — symmetric, easy to reason about, and aid + selectivity
-  # both get their own preset so users can lean into either dimension.
-  # (Replaces the prior "mission_similar" preset, which boosted composition
-  # but had a misleading name for a Jesuit institution.)
+
+  # ---- Single-theme emphasis (boost one theme to 2.5x) ------------------
   outcomes_heavy    = list(size = 1.0, selectivity = 1.0, resources = 1.0,
                            finance = 1.0, outcomes = 2.5, aid = 1.0,
                            student_body = 1.0, athletics = 0),
@@ -82,7 +81,38 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
                            student_body = 1.0, athletics = 0),
   aid_heavy         = list(size = 1.0, selectivity = 1.0, resources = 1.0,
                            finance = 1.0, outcomes = 1.0, aid = 2.5,
+                           student_body = 1.0, athletics = 0),
+  size_heavy        = list(size = 2.5, selectivity = 1.0, resources = 1.0,
+                           finance = 1.0, outcomes = 1.0, aid = 1.0,
+                           student_body = 1.0, athletics = 0),
+  student_body_heavy = list(size = 1.0, selectivity = 1.0, resources = 1.0,
+                             finance = 1.0, outcomes = 1.0, aid = 1.0,
+                             student_body = 2.5, athletics = 0),
+
+  # ---- Multi-theme presets (themes that often matter together) ----------
+  affordability     = list(size = 1.0, selectivity = 1.0, resources = 1.0,
+                           finance = 1.5, outcomes = 1.0, aid = 2.0,
+                           student_body = 1.0, athletics = 0),
+  athletics_active  = list(size = 1.0, selectivity = 1.0, resources = 1.0,
+                           finance = 1.0, outcomes = 1.0, aid = 1.0,
+                           student_body = 1.0, athletics = 2.0),
+  research_focused  = list(size = 1.5, selectivity = 1.0, resources = 1.0,
+                           finance = 1.5, outcomes = 2.0, aid = 1.0,
                            student_body = 1.0, athletics = 0)
+)
+
+# Display labels for the preset dropdown (matches .THEME_PRESETS order).
+.THEME_PRESET_LABELS <- c(
+  balanced           = "Balanced (all themes equal)",
+  outcomes_heavy     = "Outcomes-heavy",
+  resources_heavy    = "Resources-heavy",
+  selectivity_heavy  = "Selectivity-heavy",
+  aid_heavy          = "Aid-heavy",
+  size_heavy         = "Size-similar",
+  student_body_heavy = "Student body match",
+  affordability      = "Affordability (aid + finance)",
+  athletics_active   = "Athletics-active",
+  research_focused   = "Research-focused"
 )
 
 # -----------------------------------------------------------------------------
@@ -168,20 +198,30 @@ peerSearchSidebarUI <- function(id) {
 
     # ---------------- Theme weights ----------------
     tags$h6("Theme weights"),
-    tags$div(
-      class = "d-flex flex-wrap gap-1 mb-2",
-      actionButton(ns("preset_balanced"),          "Balanced",
-                   class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_outcomes_heavy"),    "Outcomes-heavy",
-                   class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_resources_heavy"),   "Resources-heavy",
-                   class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_selectivity_heavy"), "Selectivity-heavy",
-                   class = "btn btn-sm btn-outline-secondary"),
-      actionButton(ns("preset_aid_heavy"),         "Aid-heavy",
-                   class = "btn btn-sm btn-outline-secondary")
+    tags$div(class = "theme-preset-row",
+      tags$div(class = "theme-preset-select",
+        selectizeInput(ns("theme_preset"),
+                        label    = NULL,
+                        choices  = c("Quick preset…" = "",
+                                      .THEME_PRESET_LABELS %>%
+                                        { setNames(names(.), unname(.)) }),
+                        selected = "",
+                        options  = list(
+                          placeholder = "Quick preset…",
+                          onInitialize =
+                            I('function() { this.setValue(""); }')
+                        ))
+      ),
+      actionLink(ns("preset_info_btn"),
+                  label = HTML("&#9432;"),
+                  class = "preset-info-btn",
+                  title = "What do these presets do?")
     ),
-
+    helpText(class = "theme-preset-help",
+      tags$small(
+        "Pick a preset to emphasize certain themes. ",
+        "After applying, you can still fine-tune any slider individually."
+      )),
     # One slider per theme. Athletics defaults to 0 (opt-in) so existing
     # peer searches behave identically until the user dials it up.
     lapply(.THEMES, function(th) {
@@ -694,18 +734,99 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
     # small static banner under "Candidate pool" carries the headline
     # context; full detail moved to the Help tab if a user wants it.
 
-    # --- Preset buttons update the theme sliders ---
+    # --- Preset dropdown applies to the theme sliders ---
     apply_preset <- function(preset_name) {
       vals <- .THEME_PRESETS[[preset_name]]
       for (th in names(vals)) {
         updateSliderInput(session, paste0("weight_", th), value = vals[[th]])
       }
     }
-    observeEvent(input$preset_balanced,          apply_preset("balanced"))
-    observeEvent(input$preset_outcomes_heavy,    apply_preset("outcomes_heavy"))
-    observeEvent(input$preset_resources_heavy,   apply_preset("resources_heavy"))
-    observeEvent(input$preset_selectivity_heavy, apply_preset("selectivity_heavy"))
-    observeEvent(input$preset_aid_heavy,         apply_preset("aid_heavy"))
+    # Fires on each change. The "" (placeholder) value is a no-op so
+    # the initial selection state doesn't reset sliders.
+    observeEvent(input$theme_preset, {
+      sel <- input$theme_preset
+      if (is.null(sel) || !nzchar(sel)) return()
+      if (!sel %in% names(.THEME_PRESETS)) return()
+      apply_preset(sel)
+    }, ignoreInit = TRUE)
+
+    # --- Info modal for the preset dropdown ---
+    observeEvent(input$preset_info_btn, {
+      preset_row <- function(label, desc, weights) {
+        tags$tr(
+          tags$td(class = "preset-modal-name", label),
+          tags$td(class = "preset-modal-desc",
+                  tags$small(desc)),
+          tags$td(class = "preset-modal-weights",
+                  tags$small(tags$code(weights)))
+        )
+      }
+      showModal(modalDialog(
+        title = "Theme weight presets",
+        size  = "l",
+        easyClose = TRUE,
+        footer = modalButton("Close"),
+        div(class = "preset-modal-body",
+          p("Each preset sets the eight theme weight sliders to a ",
+            "specific configuration. After applying, you can still ",
+            "fine-tune any individual slider before running the ",
+            "search."),
+          tags$h6("Single-theme emphasis"),
+          tags$p(tags$small(
+            "Boost one theme to 2.5x while leaving the others at the ",
+            "1.0 default. Athletics stays at 0 unless explicitly turned on.")),
+          tags$table(class = "preset-modal-table",
+            preset_row("Balanced",
+                       "Every theme at 1.0. Athletics opt-out (0).",
+                       "all = 1.0; athletics = 0"),
+            preset_row("Outcomes-heavy",
+                       "Schools with similar graduation, retention, earnings.",
+                       "outcomes = 2.5"),
+            preset_row("Resources-heavy",
+                       "Faculty + per-FTE instructional spending priority.",
+                       "resources = 2.0, finance = 1.5"),
+            preset_row("Selectivity-heavy",
+                       "Admit-rate / yield / entering-class similarity.",
+                       "selectivity = 2.5"),
+            preset_row("Aid-heavy",
+                       "Pell, net price, discount-rate matched peers.",
+                       "aid = 2.5"),
+            preset_row("Size-similar",
+                       "Scale (UG enrollment + UG share) drives the match.",
+                       "size = 2.5"),
+            preset_row("Student body match",
+                       "Demographic mix: race, age, first-gen, etc.",
+                       "student_body = 2.5")
+          ),
+          tags$h6("Multi-theme presets"),
+          tags$p(tags$small(
+            "Bundle themes that often matter together.")),
+          tags$table(class = "preset-modal-table",
+            preset_row("Affordability",
+                       "Pell + net price + tuition-revenue mix.",
+                       "aid = 2.0, finance = 1.5"),
+            preset_row("Athletics-active",
+                       "Turns athletics on (athletics defaults to 0 otherwise).",
+                       "athletics = 2.0"),
+            preset_row("Research-focused",
+                       "Scale + research expenditure + outcomes profile.",
+                       "outcomes = 2.0, size = 1.5, finance = 1.5")
+          ),
+          tags$h6("Things to know"),
+          tags$ul(
+            tags$li(tags$strong("Athletics defaults to 0"),
+                    " — Athletics-active is the only preset that turns it on."),
+            tags$li(tags$strong("Mahalanobis ignores theme weights"),
+                    " — preset choices have no effect under that metric. ",
+                    "Use Euclidean if you want presets to drive the ranking."),
+            tags$li("Presets only set theme sliders. ",
+                    tags$strong("Variable-level overrides"),
+                    " (from the Customize variables modal) persist across ",
+                    "preset changes.")
+          )
+        )
+      ))
+    })
 
     # --- Restore from a saved search ---
     # When sessionServer puts a saved sidebar_state into restore_signal,

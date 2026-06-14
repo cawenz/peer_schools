@@ -886,6 +886,98 @@ a {
 /* Static banner that replaces the retired "Ranked universe only"
  * checkbox + info modal. Shows the fixed universe scope and primes
  * the user that the filters below narrow within it. */
+/* Theme-weight preset dropdown row: a selectizeInput plus a small
+ * info trigger that opens an explanatory modal. */
+.theme-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+
+  .theme-preset-select { flex: 1 1 auto; min-width: 0; }
+  /* Override Shiny's default form-group bottom margin since we're
+   * inside a tight row of controls. */
+  .theme-preset-select .form-group { margin-bottom: 0; }
+}
+.theme-preset-help {
+  margin-top: 0.15rem;
+  margin-bottom: 0.7rem;
+  color: #7A6E66;
+}
+.preset-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid #AC9E94;
+  color: #602D89;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+
+  &:hover, &:focus {
+    background: #F4EDEC;
+    border-color: #602D89;
+    color: #251230;
+    text-decoration: none;
+  }
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.18);
+    outline: none;
+  }
+}
+
+/* Preset-explanation modal body */
+.preset-modal-body {
+  h6 {
+    color: #602D89;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.78rem;
+    margin-top: 1rem;
+    margin-bottom: 0.2rem;
+  }
+  ul li { margin-bottom: 0.25rem; }
+}
+.preset-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.4rem 0 0.7rem 0;
+
+  td {
+    padding: 0.4rem 0.55rem;
+    border-bottom: 1px solid #F4EDEC;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: 0; }
+
+  .preset-modal-name {
+    font-weight: 600;
+    color: #251230;
+    width: 14em;
+    white-space: nowrap;
+  }
+  .preset-modal-desc {
+    color: #475569;
+    line-height: 1.35;
+  }
+  .preset-modal-weights {
+    color: #7A6E66;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    code {
+      background: transparent;
+      color: #602D89;
+      padding: 0;
+    }
+  }
+}
+
 .pool-universe-banner {
   background: #F4EDEC;
   border-left: 3px solid #602D89;
