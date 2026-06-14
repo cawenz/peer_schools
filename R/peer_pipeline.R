@@ -82,14 +82,20 @@ THEME_VARS <- list(
     "instructional_share", "pct_classes_under_20", "pct_classes_50plus"
   ),
   finance = c(
+    # net_assets_per_fte removed (audit: r = 0.998 with endowment_per_fte;
+    # still in the data as descriptive in fin_variables.csv).
     "endowment_per_fte", "endowment_coverage_years", "tuition_share_of_expenses",
     "core_expenses_per_fte", "operating_margin_ex_inv_return_per_fte",
-    "net_assets_per_fte", "published_tuition_fees", "herd_avg"
+    "published_tuition_fees", "herd_avg"
   ),
   outcomes = c(
-    "grad_rate_6yr", "grad_rate_4yr", "retention_rate", "transfer_out_rate",
+    # grad_rate_4yr removed (audit: r = 0.93 with grad_rate_6yr — 6-yr is
+    # IPEDS standard; 4-yr is still in the data as descriptive).
+    # median_earnings_6yr removed (audit: r = 0.94 with median_earnings_10yr —
+    # 10-yr is standard; 6-yr remains as descriptive).
+    "grad_rate_6yr", "retention_rate", "transfer_out_rate",
     "pell_grad_gap", "first_gen_grad_rate_6yr",
-    "median_earnings_10yr", "median_earnings_6yr", "loan_repayment_rate",
+    "median_earnings_10yr", "loan_repayment_rate",
     "earnings_ratio", "doctoral_degrees_awarded", "grad_rate_men_vs_women"
   ),
   aid = c(
