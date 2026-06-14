@@ -732,6 +732,21 @@ peerTableServer <- function(id, sidebar_state) {
         '<span class="peer-remove-btn" title="Remove from main list">&#10005;</span>',
         nrow(df))
 
+      # Hidden numeric sort columns for USN / WM / Forbes Rank. The
+      # visible columns are formatted strings ("27", "2 (LA)", ""); the
+      # underlying sort uses these numeric columns instead via the
+      # columnDefs orderData option below. NAs replaced with a large
+      # sentinel so missing-rank schools sink to the bottom on ascending
+      # sort. (Multiple earlier attempts to make DataTables parse the
+      # leading number out of the formatted strings — data-order spans,
+      # type: 'num' + render parseFloat — both silently no-op'd. The
+      # orderData pattern is DataTables's canonical solution and the
+      # only one that actually fires for these columns.)
+      .sort_key <- function(v) ifelse(is.na(v), 1e9, as.numeric(v))
+      usn_sort    <- .sort_key(df$usnews_rank %||% rep(NA_real_, nrow(df)))
+      wamo_sort   <- .sort_key(df$wamo_rank   %||% rep(NA_real_, nrow(df)))
+      forbes_sort <- .sort_key(df$forbes_rank %||% rep(NA_real_, nrow(df)))
+
       # Religious-affiliation column was retired here — same information
       # is available on the Side-by-Side tab's classifications block.
       display_df <- data.frame(
@@ -746,6 +761,11 @@ peerTableServer <- function(id, sidebar_state) {
         State         = df$stabbr,
         Distance      = round(df$distance, 3),
         Actions       = action_html,
+        # Hidden sort keys (must stay last so the visible columns'
+        # 0-indexed positions don't shift).
+        `_usn_sort`    = usn_sort,
+        `_wamo_sort`   = wamo_sort,
+        `_forbes_sort` = forbes_sort,
         check.names = FALSE,
         stringsAsFactors = FALSE
       )
@@ -777,6 +797,10 @@ peerTableServer <- function(id, sidebar_state) {
           State         = .one(a$stabbr),
           Distance      = 0,
           Actions       = "",
+          # Hidden sort keys, matching the visible row schema.
+          `_usn_sort`    = if (is.na(a$usnews_rank)) 1e9 else as.numeric(a$usnews_rank),
+          `_wamo_sort`   = if (is.na(a$wamo_rank))   1e9 else as.numeric(a$wamo_rank),
+          `_forbes_sort` = if (is.na(a$forbes_rank)) 1e9 else as.numeric(a$forbes_rank),
           check.names = FALSE,
           stringsAsFactors = FALSE
         )
@@ -792,17 +816,19 @@ peerTableServer <- function(id, sidebar_state) {
           pageLength = 150,
           dom        = "tip",
           order      = list(list(0, "asc")),
-          # NOTE: targets use 0-based COLUMN INDICES (not display-name
-          # strings). DT R passes targets straight to DataTables, and
-          # name-string matching against column headers with spaces
-          # (e.g. "USN Rank") silently no-ops on some DT / DataTables
-          # versions — the render never fires and the columns
-          # string-sort the underlying HTML / formatted text. Indices
-          # are unambiguous.
-          # Column layout for reference (0-indexed):
+          # Column layout (0-indexed):
           #   0 Rank | 1 School | 2 Status | 3 Class.
           #   4 USN Rank | 5 WM Rank | 6 Forbes Rank
           #   7 Sector | 8 State | 9 Distance | 10 Actions
+          #   11 _usn_sort | 12 _wamo_sort | 13 _forbes_sort  (HIDDEN)
+          #
+          # USN/WM/Forbes Rank are display strings. Their sort is
+          # redirected to the hidden numeric columns via orderData —
+          # the canonical DataTables pattern when display and sort
+          # values diverge. Prior attempts (data-order spans,
+          # type: 'num' + render parseFloat, name-string targets) all
+          # failed to actually intercept the sort; orderData on a
+          # numeric column does.
           columnDefs = list(
             list(className = "dt-right",  targets = c(0, 4, 5, 6, 9)),
             list(className = "dt-center", targets = c(8, 10)),
@@ -813,22 +839,12 @@ peerTableServer <- function(id, sidebar_state) {
                    "  if (type === 'display' && data === null) return '+';",
                    "  return data;",
                    "}")),
-            # USN Rank / WM Rank / Forbes Rank are formatted strings
-            # ("27", "" for missing, "2 (LA)" for WM). Sort by parsing
-            # the leading numeric; blanks / non-numeric sort to the
-            # bottom of ascending order so missing-rank schools don't
-            # crowd the top.
-            list(targets = c(4, 5, 6),
-                 type   = "num",
-                 render = DT::JS(
-                   "function(data, type, row) {",
-                   "  if (type === 'display' || type === 'filter') return data;",
-                   "  if (data === null || data === undefined) return Infinity;",
-                   "  var s = String(data).trim();",
-                   "  if (s === '' || s === '\\u2014') return Infinity;",
-                   "  var n = parseFloat(s);",
-                   "  return isNaN(n) ? Infinity : n;",
-                   "}"))
+            # Redirect sort of visible columns to the hidden numeric ones.
+            list(targets = 4, orderData = 11),
+            list(targets = 5, orderData = 12),
+            list(targets = 6, orderData = 13),
+            # Hide the sort columns from the table view.
+            list(visible = FALSE, targets = c(11, 12, 13))
           ),
           rowCallback = DT::JS(
             "function(row, data) {",
