@@ -1,8 +1,8 @@
 metric,category,display_name,source,ipeds_table_or_formula,use_type,comparison_scope,format,neche_peer_set,neche_dashboard,coverage_note,notes
-total_enrollment,enrollment,Total fall enrollment,ipeds,DRVEF.ENRTOT,clustering,cross_category,count,TRUE,TRUE,,
+total_enrollment,enrollment,Total fall enrollment,ipeds,DRVEF.ENRTOT,descriptive,cross_category,count,TRUE,TRUE,,Reclassified to descriptive (audit round 3): no longer in THEME_VARS — the size theme was trimmed to undergraduate_enrollment + pct_undergrad. Still here so its visible on the Variables tab and Side-by-Side.
 undergraduate_enrollment,enrollment,Undergraduate fall enrollment,ipeds,DRVEF.EFUG,clustering,cross_category,count,TRUE,TRUE,,
-first_time_enrollment,enrollment,First-time degree-seeking UG enrollment,ipeds,DRVEF.EFUG1ST,clustering,cross_category,count,TRUE,TRUE,,
-full_time_enrollment,enrollment,Full-time fall enrollment,ipeds,DRVEF.ENRFT,clustering,cross_category,count,TRUE,TRUE,,
+first_time_enrollment,enrollment,First-time degree-seeking UG enrollment,ipeds,DRVEF.EFUG1ST,descriptive,cross_category,count,TRUE,TRUE,,Reclassified to descriptive (audit round 3): no longer in THEME_VARS after the size theme trim. Total/UG/first-time enrollments were ~0.94 correlated; UG enrollment is the kept anchor.
+full_time_enrollment,enrollment,Full-time fall enrollment,ipeds,DRVEF.ENRFT,descriptive,cross_category,count,TRUE,TRUE,,Reclassified to descriptive (audit round 3): no longer in THEME_VARS after the size theme trim. Captured implicitly by UG enrollment + pct_part_time (the latter in Student body).
 pct_undergrad,enrollment,Undergraduate share of total enrollment,ipeds_derived,DRVEF.EFUG / ENRTOT,clustering,cross_category,percentage,FALSE,FALSE,,
 pct_graduate,enrollment,Graduate share of total enrollment,ipeds_derived,100 - (DRVEF.EFUG / ENRTOT),descriptive,cross_category,percentage,FALSE,FALSE,Algebraic complement of pct_undergrad; tagged descriptive to avoid double-counting in clustering.,
 pct_part_time,enrollment,Part-time share of total enrollment,ipeds_derived,DRVEF.ENRPT / ENRTOT,clustering,cross_category,percentage,FALSE,FALSE,,

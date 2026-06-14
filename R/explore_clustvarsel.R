@@ -64,14 +64,15 @@ suppressMessages({
     "pct_undergrad"
   ),
   selectivity = c(
+    # ED + class-size vars dropped per round 3 (peer_pipeline.R has rationale).
     "acceptance_rate", "yield_rate", "application_volume",
     "pct_submitting_sat", "pct_submitting_act", "pct_top10_hs",
-    "ed_acceptance_rate", "ed_share_of_applications", "yield_gap_men_women"
+    "yield_gap_men_women"
   ),
   resources = c(
     "student_faculty_ratio", "tenure_track_share", "avg_ft_faculty_salary",
     "instruction_per_fte", "academic_support_per_fte", "student_services_per_fte",
-    "instructional_share", "pct_classes_under_20", "pct_classes_50plus"
+    "instructional_share"
   ),
   finance = c(
     # Trimmed per audit (peer_pipeline.R has the rationale comments).

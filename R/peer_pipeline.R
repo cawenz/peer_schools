@@ -72,14 +72,24 @@ THEME_VARS <- list(
     "pct_undergrad"
   ),
   selectivity = c(
+    # ED vars (ed_acceptance_rate, ed_share_of_applications) removed in
+    # round 3: ~14% coverage in the ranked universe — they always fail
+    # the 70% threshold so never contribute to distance. Still in
+    # adm_variables.csv as descriptive for Side-by-Side display.
     "acceptance_rate", "yield_rate", "application_volume",
     "pct_submitting_sat", "pct_submitting_act", "pct_top10_hs",
-    "ed_acceptance_rate", "ed_share_of_applications", "yield_men_vs_women"
+    "yield_men_vs_women"
   ),
   resources = c(
+    # Class-size vars (pct_classes_under_20, pct_classes_50plus) removed
+    # in round 3: 0%% coverage everywhere because their AI metric IDs
+    # are unset. They were silently dropped on every search and just
+    # cluttering the Customize Variables modal. Tagged descriptive in
+    # fin_variables.csv. If the AI metric IDs are wired up in the
+    # future, re-promote to clustering.
     "student_faculty_ratio", "tenure_track_share", "avg_ft_faculty_salary",
     "instruction_per_fte", "academic_support_per_fte", "student_services_per_fte",
-    "instructional_share", "pct_classes_under_20", "pct_classes_50plus"
+    "instructional_share"
   ),
   finance = c(
     # net_assets_per_fte removed (audit: r = 0.998 with endowment_per_fte;
