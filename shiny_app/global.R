@@ -91,6 +91,22 @@ stopifnot(exists("compute_peers", mode = "function"),
 message(sprintf("[shiny global] filtered to ranked universe: %d schools",
                 nrow(.SCHOOLS)))
 
+# Join AJCU (Association of Jesuit Colleges and Universities) membership
+# as a boolean flag. Independent of religious_tradition: a school can be
+# both Catholic AND Jesuit; the sidebar exposes them as separate filters
+# so users can narrow to "Catholic peers" or "Jesuit peers" or "Catholic
+# AND Jesuit peers". Source list lives in data/ajcu_members.csv.
+.ajcu_path <- file.path(.PROJECT_ROOT, "data", "ajcu_members.csv")
+if (file.exists(.ajcu_path)) {
+  .AJCU_UNITIDS <- read_csv(.ajcu_path, show_col_types = FALSE)$unitid
+  .SCHOOLS$is_jesuit <- .SCHOOLS$unitid %in% .AJCU_UNITIDS
+  message(sprintf("[shiny global] AJCU flag set on %d schools",
+                  sum(.SCHOOLS$is_jesuit)))
+} else {
+  .SCHOOLS$is_jesuit <- FALSE
+  message("[shiny global] data/ajcu_members.csv not found; is_jesuit = FALSE for all")
+}
+
 # Join EADA-derived categorical extras (athletics body / division /
 # conference / has_football / classification) if the file is present.
 # Produced by R/athletics_module_pipeline.R. Graceful fallback when the

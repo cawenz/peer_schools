@@ -46,6 +46,7 @@ output/previews/
 !data/variables_descriptions.csv
 !data/neche_cohort.csv
 !data/stratum_descriptions.csv
+!data/ajcu_members.csv
 !data/eada_conferences.csv
 !data/eada_conferences_unmatched.csv
 !data/forbes_top_colleges_*.csv

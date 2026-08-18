@@ -330,6 +330,22 @@ ASPIRANT_LABELS <- list(
       unitid = as.integer(unitid),
       in_ranked_universe = as.logical(in_ranked_universe)
     )
+  # AJCU (Jesuit) membership flag. Sourced from data/ajcu_members.csv which
+  # is kept alongside the raw IPEDS bundles (not derived from schools.csv,
+  # so it doesn't require a schools rebuild to add or update). Looks for
+  # the file in the two most likely locations (data/ next to output/, or
+  # ../data/ if called from another cwd); silent FALSE fallback if missing.
+  .ajcu_candidates <- c(
+    file.path(dirname(schools_path), "..", "data", "ajcu_members.csv"),
+    "data/ajcu_members.csv"
+  )
+  .ajcu_path <- .ajcu_candidates[file.exists(.ajcu_candidates)][1]
+  if (!is.na(.ajcu_path)) {
+    .ajcu_ids <- read_csv(.ajcu_path, show_col_types = FALSE)$unitid
+    s$is_jesuit <- s$unitid %in% .ajcu_ids
+  } else {
+    s$is_jesuit <- FALSE
+  }
   # Religious affiliation columns are added by a later version of
   # schools_pipeline.R. If the user is running peers_pipeline on an older
   # schools.csv, fill the missing columns with NA so downstream code works

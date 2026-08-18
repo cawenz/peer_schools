@@ -219,7 +219,16 @@ peerSearchSidebarUI <- function(id) {
                              "(leave empty to include all traditions)")),
       selectInput(ns("pool_religious"), label = NULL,
                   choices = NULL, multiple = TRUE,
-                  selectize = TRUE)
+                  selectize = TRUE),
+      # AJCU (Jesuit) membership is an INDEPENDENT axis, not a religious-
+      # tradition value — a school is both Catholic and Jesuit. Kept as a
+      # checkbox alongside (not inside) the religious tradition picker so
+      # users can combine filters: "Catholic tradition + AJCU member" =
+      # the Jesuit universe with fallback to any Catholic peer if AJCU
+      # is unchecked; "AJCU only" ignores the religious tradition picker.
+      checkboxInput(ns("pool_ajcu_only"),
+                    label = "AJCU (Jesuit) members only",
+                    value = FALSE)
     ),
 
     tags$hr(),
@@ -844,6 +853,9 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
                           selected = pool$stabbr %||% character(0))
         updateSelectInput(session, "pool_religious",
                           selected = pool$religious_tradition %||% character(0))
+        # AJCU checkbox: saved as pool$is_jesuit = TRUE when set.
+        updateCheckboxInput(session, "pool_ajcu_only",
+                            value = isTRUE(pool$is_jesuit))
 
         for (th in names(state$theme_weights %||% list())) {
           updateSliderInput(session, paste0("weight_", th),
@@ -946,6 +958,15 @@ peerSearchSidebarServer <- function(id, restore_signal = NULL) {
         } else {
           pool$religious_tradition <- rel_vals
         }
+      }
+
+      # AJCU (Jesuit) narrow-to-only. Independent of religious_tradition,
+      # so this combines multiplicatively with it: checking AJCU alone
+      # yields the 26 Jesuit institutions; checking AJCU + Catholic
+      # tradition yields the same 26 (they overlap); AJCU + a non-Catholic
+      # tradition yields the empty set (correctly).
+      if (isTRUE(input$pool_ajcu_only)) {
+        pool$is_jesuit <- TRUE
       }
 
       # ---- Theme weights ----
