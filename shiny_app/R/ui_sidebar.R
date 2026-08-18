@@ -306,9 +306,12 @@ peerSearchSidebarUI <- function(id) {
           ),
           tags$p(class = "distance-metric-guide-cta",
             tags$small(
-              "Once you have a search, the ",
+              "Once you have a search, open the ",
               tags$strong("Compare Metrics"),
-              " tab below the results runs both side by side."))
+              " sub-tab in the results tab strip (between ",
+              tags$em("Refine: Stratified"), " and ",
+              tags$em("Diagnostics"),
+              ") to run both metrics side by side."))
         ),
         checkboxInput(ns("mahalanobis"),
                       "Use Mahalanobis distance instead of Euclidean",

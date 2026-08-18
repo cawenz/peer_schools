@@ -120,12 +120,10 @@ peerTableUI <- function(id) {
   ns <- NS(id)
   tagList(
     h4("Peer Search"),
-    # Tagline only — full onboarding lives in the empty-state hero
-    # rendered inline below so the explanation is right where the
-    # user's eye is once they're ready to read.
-    p(class = "section-intro",
-      "Rank institutions by similarity to an anchor school across IPEDS, ",
-      "US News, Carnegie, EADA, and Scorecard data."),
+    # The persistent tagline that used to sit here has been retired.
+    # The empty-state hero (rendered inline below, before first search)
+    # carries the full onboarding; once results exist, the summary chip
+    # + peer table are the primary content and don't need a re-explainer.
 
     # Empty-state hero now lives in the static UI (wrapped in a
     # conditionalPanel that hides it once results land) so it paints
@@ -317,25 +315,18 @@ peerTableServer <- function(id, sidebar_state) {
       n_dropped_c <- nrow(res$meta$variables_dropped_coverage)
       n_dropped_a <- length(res$meta$variables_dropped_anchor_na)
 
-      div(class = "stats-grid",
-          div(class = "stat-card",
-              div(class = "stat-title", "Anchor"),
-              div(class = "stat-value", style = "font-size: 1.1rem;",
-                  anchor_name)),
-          div(class = "stat-card",
-              div(class = "stat-title", "Candidate pool"),
-              div(class = "stat-value", format(pool_n, big.mark = ",")),
-              div(class = "stat-subtitle", "schools after filter")),
-          div(class = "stat-card",
-              div(class = "stat-title", "Peers returned"),
-              div(class = "stat-value", k_actual),
-              div(class = "stat-subtitle",
-                  sprintf("of %d requested",
-                          isolate(sidebar_state$state()$k))))
-          # Distance card retired — the distance metric + var counts
-          # live in the Diagnostics accordion below, which is where users
-          # need them when interpreting results. Top-of-page should
-          # surface the headline counts, not methodology details.
+      # Compact single-line summary chip. Replaces the earlier 3-card
+      # grid so the peer table appears higher on the page. Anchor name
+      # is emphasized; the two count facts are secondary text.
+      div(class = "peer-summary-chip",
+          tags$span(class = "peer-summary-anchor", anchor_name),
+          tags$span(class = "peer-summary-dot", "·"),
+          tags$span(class = "peer-summary-meta",
+                    sprintf("%s candidates in pool",
+                            format(pool_n, big.mark = ","))),
+          tags$span(class = "peer-summary-dot", "·"),
+          tags$span(class = "peer-summary-meta",
+                    sprintf("top %d peers", k_actual))
       )
     })
 
@@ -1142,12 +1133,24 @@ peerTableServer <- function(id, sidebar_state) {
       anchor_pts <- pts[pts$is_anchor, , drop = FALSE]
       peer_pts   <- pts[!pts$is_anchor, , drop = FALSE]
 
+      # Color + size by rank band so closer peers stand out visually.
+      # Top 5 = deep rust, 6-10 = orange, 11+ = pale peach with darker
+      # stroke so the low-contrast pale fill still reads on the map tiles.
+      .rank_band_color  <- function(r) ifelse(r <= 5,  "#7C2D12",
+                                       ifelse(r <= 10, "#EA580C", "#FED7AA"))
+      .rank_band_stroke <- function(r) ifelse(r <= 5,  "#7C2D12",
+                                       ifelse(r <= 10, "#EA580C", "#C2410C"))
+      .rank_band_radius <- function(r) ifelse(r <= 5, 9,
+                                       ifelse(r <= 10, 7, 5))
+
       if (nrow(peer_pts)) {
         m <- m %>% leaflet::addCircleMarkers(
           data = peer_pts,
           lng = ~longitud, lat = ~latitude,
-          color = "#602D89", fillColor = "#602D89",
-          radius = 7, weight = 2, opacity = 1, fillOpacity = 0.7,
+          color       = .rank_band_stroke(peer_pts$peer_rank),
+          fillColor   = .rank_band_color(peer_pts$peer_rank),
+          radius      = .rank_band_radius(peer_pts$peer_rank),
+          weight = 2, opacity = 1, fillOpacity = 0.85,
           label = lapply(peer_pts$tip, htmltools::HTML),
           popup = lapply(peer_pts$popup, htmltools::HTML),
           labelOptions = leaflet::labelOptions(
@@ -1179,8 +1182,8 @@ peerTableServer <- function(id, sidebar_state) {
       ) %>%
         leaflet::addLegend(
           position = "bottomright",
-          colors   = c("#581C87", "#602D89"),
-          labels   = c("Anchor", "Peer"),
+          colors   = c("#602D89", "#7C2D12", "#EA580C", "#FED7AA"),
+          labels   = c("Anchor",  "Top 5",   "6-10",    "11+"),
           opacity  = 0.85
         )
     })
