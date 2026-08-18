@@ -140,10 +140,11 @@ THEME_VARS <- list(
     "pct_part_time", "pct_age_25plus",
     "pct_first_generation", "median_family_income",
     "pct_international", "pct_bipoc", "pct_asian", "pct_race_unknown",
-    "transfer_in_enrollment", "residential_share",
-    # Religious affiliation match with anchor (binary 0/1). Added via
-    # the candidates-side join in compute_peers; not in any facts CSV.
-    "same_religious_tradition"
+    "transfer_in_enrollment", "residential_share"
+    # Religious affiliation is handled via the Religious Tradition sidebar
+    # filter, NOT as a clustering variable. Keeping it out of the theme
+    # keeps student_body focused on demographics; users who want mission
+    # fit narrow the pool via the filter instead.
   ),
   # Athletics theme (EADA-derived). Default weight is 0 in compute_peers —
   # existing peer searches behave identically until a user dials it up.
@@ -155,13 +156,13 @@ THEME_VARS <- list(
   # view rather than dumping the descriptive ones into "Descriptive".
   athletics = c(
     # Clustering (in peer distance):
-    "pct_athletes_overall", "total_varsity_sports", "multi_sport_ratio",
+    "pct_athletes_overall", "multi_sport_ratio",
     # Synthetic ordinal var: D1=3, D2/NAIA=2, D3=1, Other/none=NA.
     # Derived in compute_peers from cdat$athletics_division, not from
     # the ath_facts CSV.
     "athletics_division_numeric",
     # Descriptive (visible in Side-by-Side and the inspector, no weight):
-    "mens_varsity_sports", "womens_varsity_sports",
+    "mens_varsity_sports", "womens_varsity_sports", "total_varsity_sports",
     "male_athletes_undup", "female_athletes_undup", "total_athletes_undup",
     "pct_male_athletes",   "pct_female_athletes"
   )
@@ -566,13 +567,11 @@ compute_peers <- function(
 
   # -- 5. Available variables in the data --
   candidate_metrics <- intersect(loaded$available_metrics, names(cdat))
-  # The synthetic same_religious_tradition variable lives in cdat (not in
-  # any facts CSV) but is a clustering variable - include it explicitly
-  # when the anchor has a defined affiliation (it's all NA otherwise and
-  # will fall out via the coverage threshold).
-  if ("same_religious_tradition" %in% names(cdat) &&
-      any(!is.na(cdat$same_religious_tradition)))
-    candidate_metrics <- union(candidate_metrics, "same_religious_tradition")
+  # same_religious_tradition is no longer a clustering variable - it stays
+  # in cdat so the sidebar's Religious Tradition filter can act on it, but
+  # it does not enter the weighted distance calculation. See THEME_VARS
+  # student_body definition for the rationale (mission fit belongs to the
+  # filter, not the weight).
   # Same pattern for athletics_division_numeric — synthetic clustering
   # var derived inline rather than read from a facts CSV.
   if ("athletics_division_numeric" %in% names(cdat) &&

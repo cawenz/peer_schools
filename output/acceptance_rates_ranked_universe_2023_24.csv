@@ -1,0 +1,1464 @@
+unitid,instnm,stabbr,usnews_classification,usnews_rank,wamo_rank,forbes_rank,applications_2023_24,admissions_2023_24,enrollment_2023_24,ipeds_year,acceptance_rate_pct,yield_rate_pct
+168342,Williams College,MA,national-liberal-arts-colleges,1,2,7,11465,1145,541,2023-24,10,47.2
+164465,Amherst College,MA,national-liberal-arts-colleges,2,9,19,12727,1250,488,2023-24,9.8,39
+164155,United States Naval Academy,MD,national-liberal-arts-colleges,3,NA,NA,14727,1379,1175,2023-24,9.4,85.2
+216287,Swarthmore College,PA,national-liberal-arts-colleges,4,10,23,14287,992,415,2023-24,6.9,41.8
+161004,Bowdoin College,ME,national-liberal-arts-colleges,5,12,39,10966,879,504,2023-24,8,57.3
+128328,United States Air Force Academy,CO,national-liberal-arts-colleges,5,NA,NA,9543,1329,1054,2023-24,13.9,79.3
+112260,Claremont McKenna College,CA,national-liberal-arts-colleges,7,11,26,5799,645,321,2023-24,11.1,49.8
+121345,Pomona College,CA,national-liberal-arts-colleges,7,7,36,12121,819,408,2023-24,6.8,49.8
+168218,Wellesley College,MA,national-liberal-arts-colleges,7,26,29,8184,1138,573,2023-24,13.9,50.4
+173258,Carleton College,MN,national-liberal-arts-colleges,10,19,128,6464,1440,538,2023-24,22.3,37.4
+115409,Harvey Mudd College,CA,national-liberal-arts-colleges,10,20,84,4792,626,224,2023-24,13.1,35.8
+197036,United States Military Academy,NY,national-liberal-arts-colleges,10,NA,NA,11430,1598,1210,2023-24,14,75.7
+189097,Barnard College,NY,national-liberal-arts-colleges,13,56,104,11803,940,711,2023-24,8,75.6
+198385,Davidson College,NC,national-liberal-arts-colleges,13,16,59,7347,1064,519,2023-24,14.5,48.8
+153384,Grinnell College,IA,national-liberal-arts-colleges,13,25,116,9988,1266,457,2023-24,12.7,36.1
+191515,Hamilton College,NY,national-liberal-arts-colleges,13,23,73,9643,1135,462,2023-24,11.8,40.7
+230959,Middlebury College,VT,national-liberal-arts-colleges,13,8,52,13297,1379,615,2023-24,10.4,44.6
+167835,Smith College,MA,national-liberal-arts-colleges,13,27,89,9869,1947,649,2023-24,19.7,33.3
+197133,Vassar College,NY,national-liberal-arts-colleges,13,22,115,12145,2153,689,2023-24,17.7,32
+130697,Wesleyan University,CT,national-liberal-arts-colleges,13,13,51,14500,2479,782,2023-24,17.1,31.5
+234207,Washington and Lee University,VA,national-liberal-arts-colleges,21,5,47,6820,1184,502,2023-24,17.4,42.4
+190099,Colgate University,NY,national-liberal-arts-colleges,22,24,48,21130,2526,807,2023-24,12,31.9
+233374,University of Richmond,VA,national-liberal-arts-colleges,22,53,92,15121,3525,833,2023-24,23.3,23.6
+160977,Bates College,ME,national-liberal-arts-colleges,24,14,100,8937,1164,505,2023-24,13,43.4
+161086,Colby College,ME,national-liberal-arts-colleges,24,29,71,17786,1215,605,2023-24,6.8,49.8
+212911,Haverford College,PA,national-liberal-arts-colleges,24,3,56,6391,825,373,2023-24,12.9,45.2
+166124,College of the Holy Cross,MA,national-liberal-arts-colleges,27,61,74,8670,1829,823,2023-24,21.1,45
+173902,Macalester College,MN,national-liberal-arts-colleges,28,4,207,8099,2285,518,2023-24,28.2,22.7
+166939,Mount Holyoke College,MA,national-liberal-arts-colleges,29,48,237,5030,1926,587,2023-24,38.3,30.5
+211273,Bryn Mawr College,PA,national-liberal-arts-colleges,30,28,167,3278,1018,361,2023-24,31.1,35.5
+211291,Bucknell University,PA,national-liberal-arts-colleges,30,93,85,11010,3524,1030,2023-24,32,29.2
+126678,Colorado College,CO,national-liberal-arts-colleges,30,40,138,7532,1509,517,2023-24,20,34.3
+213385,Lafayette College,PA,national-liberal-arts-colleges,30,21,91,9874,3107,697,2023-24,31.5,22.4
+202523,Denison University,OH,national-liberal-arts-colleges,34,36,315,14580,2468,636,2023-24,16.9,25.8
+212577,Franklin and Marshall College,PA,national-liberal-arts-colleges,35,43,158,9231,2938,553,2023-24,31.8,18.8
+120254,Occidental College,CA,national-liberal-arts-colleges,35,66,110,6573,2622,532,2023-24,39.9,20.3
+121257,Pitzer College,CA,national-liberal-arts-colleges,37,45,129,3464,577,275,2023-24,16.7,47.7
+123165,Scripps College,CA,national-liberal-arts-colleges,37,73,155,3082,1046,275,2023-24,33.9,26.3
+195526,Skidmore College,NY,national-liberal-arts-colleges,37,72,174,12144,2784,735,2023-24,22.9,26.4
+399911,Soka University of America,CA,national-liberal-arts-colleges,37,39,367,397,276,126,2023-24,69.5,45.7
+141060,Spelman College,GA,national-liberal-arts-colleges,37,96,398,10610,3617,727,2023-24,34.1,20.1
+130590,Trinity College,CT,national-liberal-arts-colleges,37,57,88,6396,2144,579,2023-24,33.5,27
+229267,Trinity University,TX,national-liberal-arts-colleges,37,92,82,11425,3217,659,2023-24,28.2,20.5
+196866,Union College,NY,national-liberal-arts-colleges,44,118,164,9295,4070,550,2023-24,43.8,13.5
+156295,Berea College,KY,national-liberal-arts-colleges,45,1,321,2073,678,413,2023-24,32.7,60.9
+212009,Dickinson College,PA,national-liberal-arts-colleges,45,31,109,7185,3095,525,2023-24,43.1,17
+218070,Furman University,SC,national-liberal-arts-colleges,45,69,211,8406,4419,620,2023-24,52.6,14
+203535,Kenyon College,OH,national-liberal-arts-colleges,45,38,142,8218,2524,455,2023-24,30.7,18
+221519,The University of the South,TN,national-liberal-arts-colleges,45,49,NA,5018,2554,449,2023-24,50.9,17.6
+128902,Connecticut College,CT,national-liberal-arts-colleges,50,59,145,9397,3597,555,2023-24,38.3,15.4
+170286,Hillsdale College,MI,national-liberal-arts-colleges,50,NA,NA,2773,571,353,2023-24,20.6,61.8
+174844,St Olaf College,MN,national-liberal-arts-colleges,50,41,189,5956,3106,825,2023-24,52.1,26.6
+152673,Wabash College,IN,national-liberal-arts-colleges,50,74,209,1897,1191,229,2023-24,62.8,19.2
+149781,Wheaton College,IL,national-liberal-arts-colleges,50,65,159,1866,1679,553,2023-24,90,32.9
+156408,Centre College,KY,national-liberal-arts-colleges,55,50,234,3226,1753,361,2023-24,54.3,20.6
+221351,Rhodes College,TN,national-liberal-arts-colleges,55,51,178,6025,2993,483,2023-24,49.7,16.1
+124292,Thomas Aquinas College,CA,national-liberal-arts-colleges,55,148,NA,263,207,143,2023-24,78.7,69.1
+150400,DePauw University,IN,national-liberal-arts-colleges,58,79,173,7197,3891,500,2023-24,54.1,12.9
+212674,Gettysburg College,PA,national-liberal-arts-colleges,58,33,177,7123,3384,604,2023-24,47.5,17.8
+204501,Oberlin College,OH,national-liberal-arts-colleges,58,108,199,11039,3641,779,2023-24,33,21.4
+195216,St Lawrence University,NY,national-liberal-arts-colleges,58,76,184,5367,3138,545,2023-24,58.5,17.4
+237057,Whitman College,WA,national-liberal-arts-colleges,58,47,204,6185,3092,444,2023-24,50,14.4
+148016,Principia College,IL,national-liberal-arts-colleges,63,NA,NA,268,119,84,2023-24,44.4,70.6
+209922,Reed College,OR,national-liberal-arts-colleges,63,82,226,10045,2728,351,2023-24,27.2,12.9
+239017,Lawrence University,WI,national-liberal-arts-colleges,65,86,312,3489,2199,336,2023-24,63,15.3
+234085,Virginia Military Institute,VA,national-liberal-arts-colleges,65,67,306,1171,957,469,2023-24,81.7,49
+138600,Agnes Scott College,GA,national-liberal-arts-colleges,67,81,463,1857,1250,241,2023-24,67.3,19.3
+170532,Kalamazoo College,MI,national-liberal-arts-colleges,67,30,153,3656,2787,370,2023-24,76.2,13.3
+218973,Wofford College,SC,national-liberal-arts-colleges,67,111,202,4183,2451,510,2023-24,58.6,20.8
+189088,Bard College,NY,national-liberal-arts-colleges,70,32,372,6628,3466,402,2023-24,52.3,11.6
+173647,Gustavus Adolphus College,MN,national-liberal-arts-colleges,70,34,279,4450,2750,499,2023-24,61.8,18.1
+214175,Muhlenberg College,PA,national-liberal-arts-colleges,70,46,295,4348,2783,427,2023-24,64,15.3
+174747,College of Saint Benedict,MN,national-liberal-arts-colleges,73,70,397,1852,1692,379,2023-24,91.4,22.4
+191630,Hobart William Smith Colleges,NY,national-liberal-arts-colleges,73,17,248,5560,3185,462,2023-24,57.3,14.5
+146481,Lake Forest College,IL,national-liberal-arts-colleges,75,136,390,4811,2858,425,2023-24,59.4,14.9
+210669,Allegheny College,PA,national-liberal-arts-colleges,76,44,NA,5045,2953,283,2023-24,58.5,9.6
+150455,Earlham College,IN,national-liberal-arts-colleges,76,134,NA,1765,1310,202,2023-24,74.2,15.4
+146427,Knox College,IL,national-liberal-arts-colleges,76,37,NA,4136,2942,249,2023-24,71.1,8.5
+206589,The College of Wooster,OH,national-liberal-arts-colleges,76,95,350,7031,3819,452,2023-24,54.3,11.8
+168281,Wheaton College (Massachusetts),MA,national-liberal-arts-colleges,76,140,NA,4702,3354,522,2023-24,71.3,15.6
+210401,Willamette University,OR,national-liberal-arts-colleges,76,60,340,4107,3249,504,2023-24,79.1,15.5
+174792,Saint Johns University,MN,national-liberal-arts-colleges,82,75,245,1597,1445,365,2023-24,90.5,25.3
+167996,Stonehill College,MA,national-liberal-arts-colleges,82,135,365,7915,5743,647,2023-24,72.6,11.3
+222983,Austin College,TX,national-liberal-arts-colleges,84,156,419,5474,2554,296,2023-24,46.7,11.6
+184348,Drew University,NJ,national-liberal-arts-colleges,84,62,412,4604,3197,404,2023-24,69.4,12.6
+170301,Hope College,MI,national-liberal-arts-colleges,84,147,265,5206,3949,834,2023-24,75.9,21.1
+152390,Saint Mary's College,IN,national-liberal-arts-colleges,84,68,497,2377,1928,419,2023-24,81.1,21.7
+228343,Southwestern University,TX,national-liberal-arts-colleges,84,150,304,6585,2573,403,2023-24,39.1,15.7
+163976,St. John's College,MD,national-liberal-arts-colleges,84,NA,NA,1059,469,133,2023-24,44.3,28.4
+216524,Ursinus College,PA,national-liberal-arts-colleges,84,172,332,3443,3008,405,2023-24,87.4,13.5
+216667,Washington & Jefferson College,PA,national-liberal-arts-colleges,84,128,402,3218,2624,314,2023-24,81.5,12
+238333,Beloit College,WI,national-liberal-arts-colleges,92,94,472,3914,2245,216,2023-24,57.4,9.6
+213251,Juniata College,PA,national-liberal-arts-colleges,92,54,NA,2917,2090,390,2023-24,71.6,18.7
+164216,Washington College,MD,national-liberal-arts-colleges,92,120,450,2539,1664,230,2023-24,65.5,13.8
+125763,Whittier College,CA,national-liberal-arts-colleges,92,90,NA,2797,2388,145,2023-24,85.4,6.1
+143084,Augustana College,IL,national-liberal-arts-colleges,96,153,346,7424,5022,723,2023-24,67.6,14.4
+107080,Hendrix College,AR,national-liberal-arts-colleges,96,103,453,2616,1386,275,2023-24,53,19.8
+209056,Lewis & Clark College,OR,national-liberal-arts-colleges,96,58,371,6334,4721,553,2023-24,74.5,11.7
+213668,Lycoming College,PA,national-liberal-arts-colleges,96,122,NA,3225,2189,293,2023-24,67.9,13.4
+140553,Morehouse College,GA,national-liberal-arts-colleges,96,159,NA,5610,2883,682,2023-24,51.4,23.7
+233295,Randolph-Macon College,VA,national-liberal-arts-colleges,96,188,NA,2620,2185,431,2023-24,83.4,19.7
+183239,Saint Anselm College,NH,national-liberal-arts-colleges,96,165,NA,4165,3262,572,2023-24,78.3,17.5
+245652,St. John's College,NM,national-liberal-arts-colleges,96,110,NA,463,229,79,2023-24,49.5,34.5
+163912,St. Mary's College of Maryland,MD,national-liberal-arts-colleges,96,98,299,3109,2344,442,2023-24,75.4,18.9
+216278,Susquehanna University,PA,national-liberal-arts-colleges,96,139,439,5974,4702,578,2023-24,78.7,12.3
+236328,University of Puget Sound,WA,national-liberal-arts-colleges,96,100,349,5548,4232,463,2023-24,76.3,10.9
+232256,Hampden-Sydney College,VA,national-liberal-arts-colleges,107,180,318,2224,1115,240,2023-24,50.1,21.5
+195304,Sarah Lawrence College,NY,national-liberal-arts-colleges,109,162,357,4819,2840,411,2023-24,58.9,14.5
+157818,Transylvania University,KY,national-liberal-arts-colleges,109,130,NA,1986,1688,281,2023-24,85,16.6
+145691,Illinois College,IL,national-liberal-arts-colleges,111,126,NA,3660,2733,253,2023-24,74.7,9.3
+209065,Linfield University,OR,national-liberal-arts-colleges,111,55,331,1963,1726,345,2023-24,87.9,20
+153834,Luther College,IA,national-liberal-arts-colleges,111,125,489,2447,1793,352,2023-24,73.3,19.6
+239716,Saint Norbert College,WI,national-liberal-arts-colleges,111,112,NA,3338,3076,490,2023-24,92.2,15.9
+150756,Hanover College,IN,national-liberal-arts-colleges,115,141,NA,2702,2269,264,2023-24,84,11.6
+167288,Massachusetts College of Liberal Arts,MA,national-liberal-arts-colleges,115,123,NA,1543,1425,191,2023-24,92.4,13.4
+198950,Meredith College,NC,national-liberal-arts-colleges,115,107,NA,1563,1167,325,2023-24,74.7,27.8
+231059,Saint Michael's College,VT,national-liberal-arts-colleges,115,132,NA,2639,2424,325,2023-24,91.9,13.4
+174251,University of Minnesota-Morris,MN,national-liberal-arts-colleges,115,18,461,3477,2450,273,2023-24,70.5,11.1
+125727,Westmont College,CA,national-liberal-arts-colleges,115,146,325,2244,1792,320,2023-24,79.9,17.9
+230816,Bennington College,VT,national-liberal-arts-colleges,121,77,NA,2825,1357,216,2023-24,48,15.9
+153162,Cornell College,IA,national-liberal-arts-colleges,121,83,NA,3087,2490,298,2023-24,80.7,12
+204909,Ohio Wesleyan University,OH,national-liberal-arts-colleges,121,117,494,5708,2892,428,2023-24,50.7,14.8
+215798,Saint Vincent College,PA,national-liberal-arts-colleges,121,145,NA,2374,1403,293,2023-24,59.1,20.9
+216807,Westminster College,PA,national-liberal-arts-colleges,121,63,NA,2650,2266,310,2023-24,85.5,13.7
+153144,Coe College,IA,national-liberal-arts-colleges,126,106,NA,7171,5068,359,2023-24,70.7,7.1
+139393,Covenant College,GA,national-liberal-arts-colleges,126,164,NA,751,614,246,2023-24,81.8,40.1
+162654,Goucher College,MD,national-liberal-arts-colleges,126,42,NA,3520,2566,261,2023-24,72.9,10.2
+233426,Roanoke College,VA,national-liberal-arts-colleges,126,144,NA,6829,5468,531,2023-24,80.1,9.7
+168546,Albion College,MI,national-liberal-arts-colleges,131,78,469,5438,4522,363,2023-24,83.2,8
+153108,Central College,IA,national-liberal-arts-colleges,131,151,NA,1978,1562,274,2023-24,79,17.5
+196219,SUNY at Purchase College,NY,national-liberal-arts-colleges,131,115,477,7221,5259,777,2023-24,72.8,14.8
+232681,University of Mary Washington,VA,national-liberal-arts-colleges,131,88,316,4606,3973,758,2023-24,86.3,19.1
+217873,Claflin University,SC,national-liberal-arts-colleges,135,80,NA,6999,5078,456,2023-24,72.6,9
+173300,Concordia College at Moorhead,MN,national-liberal-arts-colleges,135,160,466,4434,2796,438,2023-24,63.1,15.7
+133492,Eckerd College,FL,national-liberal-arts-colleges,135,183,NA,4664,3670,537,2023-24,78.7,14.6
+165671,Emmanuel College,MA,national-liberal-arts-colleges,135,186,415,5937,4785,537,2023-24,80.6,11.2
+232308,Hollins University,VA,national-liberal-arts-colleges,135,138,NA,2992,2120,192,2023-24,70.9,9.1
+262129,New College of Florida,FL,national-liberal-arts-colleges,135,6,294,2119,1568,221,2023-24,74,14.1
+199111,University of North Carolina Asheville,NC,national-liberal-arts-colleges,135,71,NA,5465,5131,630,2023-24,93.9,12.3
+158477,Centenary College of Louisiana,LA,national-liberal-arts-colleges,143,170,NA,1834,998,255,2023-24,54.4,25.6
+239628,Ripon College,WI,national-liberal-arts-colleges,143,52,NA,1797,1508,195,2023-24,83.9,12.9
+199607,Salem College,NC,national-liberal-arts-colleges,143,35,NA,1951,1698,156,2023-24,87,9.2
+168786,Aquinas College,MI,national-liberal-arts-colleges,146,171,NA,1748,1628,296,2023-24,93.1,18.2
+150604,Franklin College,IN,national-liberal-arts-colleges,146,142,NA,2264,1598,256,2023-24,70.6,16
+191676,Houghton University,NY,national-liberal-arts-colleges,146,109,NA,1068,990,235,2023-24,92.7,23.7
+175980,Millsaps College,MS,national-liberal-arts-colleges,146,133,NA,2058,1009,153,2023-24,49,15.2
+191533,Hartwick College,NY,national-liberal-arts-colleges,151,167,NA,4278,2939,360,2023-24,68.7,12.2
+107512,Ouachita Baptist University,AR,national-liberal-arts-colleges,151,169,NA,2138,1465,469,2023-24,68.5,32
+243151,University of Puerto Rico at Cayey,PR,national-liberal-arts-colleges,151,NA,NA,722,692,566,2023-24,95.8,81.8
+173142,Bethany Lutheran College,MN,national-liberal-arts-colleges,154,155,NA,881,449,190,2023-24,51,42.3
+147341,Monmouth College,IL,national-liberal-arts-colleges,154,174,NA,1614,1398,211,2023-24,86.6,15.1
+158802,Dillard University,LA,national-liberal-arts-colleges,156,104,NA,8065,3267,248,2023-24,40.5,7.6
+220181,Fisk University,TN,national-liberal-arts-colleges,156,149,NA,7982,4622,320,2023-24,57.9,6.9
+165936,Gordon College,MA,national-liberal-arts-colleges,156,178,NA,2579,1516,327,2023-24,58.8,21.6
+166018,Hampshire College,MA,national-liberal-arts-colleges,156,15,NA,2216,1559,259,2023-24,70.4,16.6
+140696,Oglethorpe University,GA,national-liberal-arts-colleges,156,181,NA,2854,1714,391,2023-24,60.1,22.8
+233301,Randolph College,VA,national-liberal-arts-colleges,156,114,NA,1935,1837,200,2023-24,94.9,10.9
+154527,Wartburg College,IA,national-liberal-arts-colleges,156,137,NA,3577,2554,424,2023-24,71.4,16.6
+218539,Presbyterian College,SC,national-liberal-arts-colleges,163,101,481,3359,2430,265,2023-24,72.3,10.9
+233718,Sweet Briar College,VA,national-liberal-arts-colleges,164,187,NA,1136,815,138,2023-24,71.7,16.9
+179946,Westminster College,MO,national-liberal-arts-colleges,164,89,NA,2279,1768,160,2023-24,77.6,9
+206525,Wittenberg University,OH,national-liberal-arts-colleges,164,121,NA,2956,2691,383,2023-24,91,14.2
+231581,Bridgewater College,VA,national-liberal-arts-colleges,167,157,NA,3984,3618,429,2023-24,90.8,11.9
+106342,Lyon College,AR,national-liberal-arts-colleges,167,176,NA,2522,1653,237,2023-24,65.5,14.3
+233897,University of Virginia's College at Wise,VA,national-liberal-arts-colleges,167,116,NA,1414,1328,290,2023-24,93.9,21.8
+210571,Albright College,PA,national-liberal-arts-colleges,170,113,NA,5366,4623,348,2023-24,86.2,7.5
+220710,Maryville College,TN,national-liberal-arts-colleges,170,154,NA,2809,1845,317,2023-24,65.7,17.2
+198613,Guilford College,NC,national-liberal-arts-colleges,172,91,NA,3775,3162,366,2023-24,83.8,11.6
+198756,Johnson C Smith University,NC,national-liberal-arts-colleges,173,131,NA,4273,1832,283,2023-24,42.9,15.4
+123457,Simpson University,CA,national-liberal-arts-colleges,173,85,NA,823,815,151,2023-24,99,18.5
+446048,Ave Maria University,FL,national-liberal-arts-colleges,175,185,NA,2448,1097,318,2023-24,44.8,29
+190646,CUNY Medgar Evers College,NY,national-liberal-arts-colleges,176,64,NA,11239,9372,757,2023-24,83.4,8.1
+455770,Providence Christian College,CA,national-liberal-arts-colleges,176,NA,NA,107,99,28,2023-24,92.5,28.3
+192864,Marymount Manhattan College,NY,national-liberal-arts-colleges,178,184,NA,8138,6419,509,2023-24,78.9,7.9
+234173,Virginia Wesleyan University,VA,national-liberal-arts-colleges,178,143,NA,2651,1890,373,2023-24,71.3,19.7
+210492,Bryn Athyn College of the New Church,PA,national-liberal-arts-colleges,180,NA,NA,593,440,75,2023-24,74.2,17
+156745,Georgetown College,KY,national-liberal-arts-colleges,180,166,NA,1815,1341,307,2023-24,73.9,22.9
+176406,Tougaloo College,MS,national-liberal-arts-colleges,180,102,NA,1976,1051,129,2023-24,53.2,12.3
+207722,University of Science and Arts of Oklahoma,OK,national-liberal-arts-colleges,183,84,NA,1465,817,272,2023-24,55.8,33.3
+483018,Antioch College,OH,national-liberal-arts-colleges,184,NA,NA,251,205,35,2023-24,81.7,17.1
+101912,Oakwood University,AL,national-liberal-arts-colleges,184,182,NA,2370,1197,290,2023-24,50.5,24.2
+233611,Southern Virginia University,VA,national-liberal-arts-colleges,184,152,NA,1101,1097,295,2023-24,99.6,26.9
+199865,Warren Wilson College,NC,national-liberal-arts-colleges,184,163,NA,943,732,196,2023-24,77.6,26.8
+215275,University of Pittsburgh-Greensburg,PA,national-liberal-arts-colleges,188,158,NA,2936,2875,388,2023-24,97.9,13.5
+234164,Virginia Union University,VA,national-liberal-arts-colleges,188,173,NA,2771,2708,415,2023-24,97.7,15.3
+132602,Bethune-Cookman University,FL,national-liberal-arts-colleges,190,87,NA,6844,6834,702,2023-24,99.9,10.3
+211608,Cheyney University of Pennsylvania,PA,national-liberal-arts-colleges,191,119,NA,NA,NA,NA,2023-24,NA,NA
+237181,Bethany College,WV,national-liberal-arts-colleges,192,177,NA,2435,1473,243,2023-24,60.5,16.5
+176318,Rust College,MS,national-liberal-arts-colleges,192,129,NA,1715,595,103,2023-24,34.7,17.3
+145497,Hebrew Theological College,IL,national-liberal-arts-colleges,194,NA,NA,25,23,19,2023-24,92,82.6
+150774,Holy Cross College,IN,national-liberal-arts-colleges,195,127,NA,1670,1231,250,2023-24,73.7,20.3
+141361,Young Harris College,GA,national-liberal-arts-colleges,196,168,NA,1926,1233,242,2023-24,64,19.6
+197993,Bennett College,NC,national-liberal-arts-colleges,197,97,NA,723,243,49,2023-24,33.6,20.2
+220598,Lane College,TN,national-liberal-arts-colleges,199,124,NA,NA,NA,NA,2023-24,NA,NA
+217624,Allen University,SC,national-liberal-arts-colleges,200,175,NA,3658,1175,170,2023-24,32.1,14.5
+144883,East-West University,IL,national-liberal-arts-colleges,201,161,NA,NA,NA,NA,2023-24,NA,NA
+186131,Princeton University,NJ,national-universities,1,5,3,39644,1782,1366,2023-24,4.5,76.7
+166683,Massachusetts Institute of Technology,MA,national-universities,2,10,1,26914,1291,1092,2023-24,4.8,84.6
+166027,Harvard University,MA,national-universities,3,28,6,56937,1965,1645,2023-24,3.5,83.7
+243744,Stanford University,CA,national-universities,4,13,4,53733,2099,1699,2023-24,3.9,80.9
+130794,Yale University,CT,national-universities,4,31,9,51803,2332,1641,2023-24,4.5,70.4
+144050,University of Chicago,IL,national-universities,6,54,13,38631,1849,1626,2023-24,4.8,87.9
+198419,Duke University,NC,national-universities,7,16,22,46365,3145,1742,2023-24,6.8,55.4
+162928,Johns Hopkins University,MD,national-universities,7,33,8,38926,2943,1418,2023-24,7.6,48.2
+147767,Northwestern University,IL,national-universities,7,128,16,51769,3703,2111,2023-24,7.2,57
+215062,University of Pennsylvania,PA,national-universities,7,15,10,59465,3489,2416,2023-24,5.9,69.2
+110404,California Institute of Technology,CA,national-universities,11,58,24,13107,412,266,2023-24,3.1,64.6
+190415,Cornell University,NY,national-universities,12,21,14,65635,5358,3537,2023-24,8.2,66
+217156,Brown University,RI,national-universities,13,29,18,51316,2686,1695,2023-24,5.2,63.1
+182670,Dartmouth College,NH,national-universities,13,75,17,28841,1797,1206,2023-24,6.2,67.1
+240329,University of Wisconsin-La Crosse,WI,national-universities,14,764,375,7312,5356,2301,2023-24,73.2,43
+190150,Columbia University in the City of New York,NY,national-universities,15,34,166,57613,2439,1540,2023-24,4.2,63.1
+110635,University of California-Berkeley,CA,national-universities,15,42,5,125910,14677,6641,2023-24,11.7,45.2
+227757,Rice University,TX,national-universities,17,63,12,31059,2447,1125,2023-24,7.9,46
+110662,University of California-Los Angeles,CA,national-universities,17,47,15,145903,12736,6585,2023-24,8.7,51.7
+221999,Vanderbilt University,TN,national-universities,17,74,11,45313,2844,1622,2023-24,6.3,57
+211440,Carnegie Mellon University,PA,national-universities,20,189,43,33707,3843,1708,2023-24,11.4,44.4
+170976,University of Michigan-Ann Arbor,MI,national-universities,20,118,21,87632,15722,7466,2023-24,17.9,47.5
+152080,University of Notre Dame,IN,national-universities,20,38,33,28353,3510,2075,2023-24,12.4,59.1
+179867,Washington University in St Louis,MO,national-universities,20,69,25,32240,3855,1828,2023-24,12,47.4
+139658,Emory University,GA,national-universities,24,81,27,31929,3543,1426,2023-24,11.1,40.2
+131496,Georgetown University,DC,national-universities,24,49,41,25485,3334,1599,2023-24,13.1,48
+199120,University of North Carolina at Chapel Hill,NC,national-universities,26,43,35,57902,10850,4699,2023-24,18.7,43.3
+234076,University of Virginia-Main Campus,VA,national-universities,26,113,34,56528,9533,3966,2023-24,16.9,41.6
+123961,University of Southern California,CA,national-universities,28,181,28,80808,8094,3633,2023-24,10,44.9
+110680,University of California-San Diego,CA,national-universities,29,71,20,130771,32062,7005,2023-24,24.5,21.8
+228778,The University of Texas at Austin,TX,national-universities,30,152,46,66109,19253,9385,2023-24,29.1,48.7
+134130,University of Florida,FL,national-universities,30,70,30,65375,15707,6762,2023-24,24,43.1
+139755,Georgia Institute of Technology-Main Campus,GA,national-universities,32,441,32,52377,8622,3763,2023-24,16.5,43.6
+193900,New York University,NY,national-universities,32,155,49,113578,10693,5818,2023-24,9.4,54.4
+110644,University of California-Davis,CA,national-universities,32,35,44,94637,39400,6578,2023-24,41.6,16.7
+110653,University of California-Irvine,CA,national-universities,32,101,31,121101,30962,6796,2023-24,25.6,21.9
+164924,Boston College,MA,national-universities,36,112,54,36069,5645,2335,2023-24,15.7,41.4
+168148,Tufts University,MA,national-universities,36,144,58,34003,3444,1739,2023-24,10.1,50.5
+145637,University of Illinois Urbana-Champaign,IL,national-universities,36,77,38,67398,29446,8325,2023-24,43.7,28.3
+240444,University of Wisconsin-Madison,WI,national-universities,36,52,53,63505,27529,7964,2023-24,43.3,28.9
+110705,University of California-Santa Barbara,CA,national-universities,40,110,42,110871,30804,5043,2023-24,27.8,16.4
+204796,Ohio State University-Main Campus,OH,national-universities,41,162,83,70028,35588,8062,2023-24,50.8,22.7
+164988,Boston University,MA,national-universities,42,365,45,80495,8733,3145,2023-24,10.8,36
+186380,Rutgers University-New Brunswick,NJ,national-universities,42,102,NA,43347,28326,7681,2023-24,65.3,27.1
+163286,University of Maryland-College Park,MD,national-universities,42,254,37,59377,26625,6197,2023-24,44.8,23.3
+236948,University of Washington-Seattle Campus,WA,national-universities,42,96,50,62428,26552,7011,2023-24,42.5,26.4
+213543,Lehigh University,PA,national-universities,46,188,64,18415,5389,1531,2023-24,29.3,28.4
+167358,Northeastern University,MA,national-universities,46,398,113,96631,5459,2744,2023-24,5.6,50.3
+243780,Purdue University-Main Campus,IN,national-universities,46,234,62,73083,36763,9381,2023-24,50.3,25.5
+139959,University of Georgia,GA,national-universities,46,169,57,43419,16151,6146,2023-24,37.2,38.1
+195030,University of Rochester,NY,national-universities,46,243,69,21680,7773,1543,2023-24,35.9,19.9
+201645,Case Western Reserve University,OH,national-universities,51,401,131,39033,11193,1544,2023-24,28.7,13.8
+134097,Florida State University,FL,national-universities,51,84,72,74038,18793,5890,2023-24,25.4,31.3
+228723,Texas A&M University-College Station,TX,national-universities,51,193,61,50832,32149,13753,2023-24,63.2,42.8
+233921,Virginia Polytechnic Institute and State University,VA,national-universities,51,218,81,47208,26923,7196,2023-24,57,26.7
+199847,Wake Forest University,NC,national-universities,51,163,98,17479,3768,1385,2023-24,21.6,36.8
+231624,William & Mary,VA,national-universities,51,108,60,17548,5741,1619,2023-24,32.7,28.2
+445188,University of California-Merced,CA,national-universities,57,89,190,67891,26598,2416,2023-24,39.2,9.1
+216597,Villanova University,PA,national-universities,57,488,75,23127,5810,1740,2023-24,25.1,29.9
+131469,George Washington University,DC,national-universities,59,132,67,27094,11798,2539,2023-24,43.5,21.5
+214777,Pennsylvania State University-Main Campus,PA,national-universities,59,795,338,85956,46605,9040,2023-24,54.2,19.4
+122931,Santa Clara University,CA,national-universities,59,541,65,18843,8261,1552,2023-24,43.8,18.8
+196097,Stony Brook University,NY,national-universities,59,172,361,50341,24670,3569,2023-24,49,14.5
+174066,University of Minnesota-Twin Cities,MN,national-universities,59,99,78,39863,30705,6736,2023-24,77,21.9
+171100,Michigan State University,MI,national-universities,64,135,79,58879,49414,9533,2023-24,83.9,19.3
+199193,North Carolina State University at Raleigh,NC,national-universities,64,179,66,40049,15958,5728,2023-24,39.8,35.9
+194824,Rensselaer Polytechnic Institute,NY,national-universities,64,662,170,16283,9517,1552,2023-24,58.4,16.3
+166629,University of Massachusetts-Amherst,MA,national-universities,64,235,152,50424,29129,5286,2023-24,57.8,18.1
+135726,University of Miami,FL,national-universities,64,496,76,48286,8940,2328,2023-24,18.5,26
+165015,Brandeis University,MA,national-universities,69,499,117,11282,3984,865,2023-24,35.3,21.7
+160755,Tulane University of Louisiana,LA,national-universities,69,1322,151,27936,4077,1867,2023-24,14.6,45.8
+129020,University of Connecticut,CT,national-universities,69,201,119,46645,25164,4189,2023-24,53.9,16.6
+215293,University of Pittsburgh-Pittsburgh Campus,PA,national-universities,69,492,176,58416,29034,4549,2023-24,49.7,15.7
+207582,Oral Roberts University,OK,national-universities,72,1291,NA,3639,3588,853,2023-24,98.6,23.8
+196079,Binghamton University,NY,national-universities,73,319,68,49513,18683,3095,2023-24,37.7,16.6
+151351,Indiana University-Bloomington,IN,national-universities,73,115,94,54279,43624,9550,2023-24,80.4,21.9
+217882,Clemson University,SC,national-universities,75,465,86,60122,22879,4494,2023-24,38.1,19.6
+186399,Rutgers University-Newark,NJ,national-universities,75,142,212,17779,13997,1408,2023-24,78.7,10.1
+196413,Syracuse University,NY,national-universities,75,258,106,42089,17545,3672,2023-24,41.7,20.9
+196088,University at Buffalo,NY,national-universities,75,308,154,38210,26481,4271,2023-24,69.3,16.1
+110671,University of California-Riverside,CA,national-universities,75,50,77,62807,39758,5521,2023-24,63.3,13.9
+126775,Colorado School of Mines,CO,national-universities,80,472,127,9821,5864,1445,2023-24,59.7,24.6
+212054,Drexel University,PA,national-universities,80,440,185,40204,31171,2883,2023-24,77.5,9.2
+185828,New Jersey Institute of Technology,NJ,national-universities,80,255,101,13993,9362,1762,2023-24,66.9,18.8
+186867,Stevens Institute of Technology,NJ,national-universities,80,967,132,14170,6156,1024,2023-24,43.4,16.6
+121150,Pepperdine University,CA,national-universities,84,884,123,12457,6210,732,2023-24,49.9,11.8
+145600,University of Illinois Chicago,IL,national-universities,84,40,108,25420,19955,4647,2023-24,78.5,23.3
+168421,Worcester Polytechnic Institute,MA,national-universities,84,1215,160,11809,6908,1360,2023-24,58.5,19.7
+197708,Yeshiva University,NY,national-universities,84,788,230,1713,1092,646,2023-24,63.7,59.2
+131159,American University,DC,national-universities,88,311,136,17786,8427,1856,2023-24,47.4,22
+223232,Baylor University,TX,national-universities,88,1020,188,39735,20262,3317,2023-24,51,16.4
+131520,Howard University,DC,national-universities,88,1236,383,30342,10587,2268,2023-24,34.9,21.4
+239105,Marquette University,WI,national-universities,88,279,135,15636,13672,1886,2023-24,87.4,13.8
+195003,Rochester Institute of Technology,NY,national-universities,88,874,195,24269,17328,3056,2023-24,71.4,17.6
+228246,Southern Methodist University,TX,national-universities,88,977,103,15092,9240,1592,2023-24,61.2,17.2
+110714,University of California-Santa Cruz,CA,national-universities,88,137,63,68845,43054,4381,2023-24,62.5,10.2
+130943,University of Delaware,DE,national-universities,88,315,149,37690,24541,4548,2023-24,65.1,18.5
+137351,University of South Florida,FL,national-universities,88,57,112,65187,26699,5803,2023-24,41,21.7
+133951,Florida International University,FL,national-universities,97,8,150,25034,14729,5169,2023-24,58.8,35.1
+191241,Fordham University,NY,national-universities,97,849,133,43663,24573,2426,2023-24,56.3,9.9
+186371,Rutgers University-Camden,NJ,national-universities,97,114,249,11951,9292,580,2023-24,77.8,6.2
+228875,Texas Christian University,TX,national-universities,97,922,120,20517,8740,2488,2023-24,42.6,28.5
+126614,University of Colorado Boulder,CO,national-universities,97,409,93,56069,46692,7546,2023-24,83.3,16.2
+100858,Auburn University,AL,national-universities,102,736,163,48178,24314,5935,2023-24,50.5,24.4
+235316,Gonzaga University,WA,national-universities,102,383,253,9530,7239,1254,2023-24,76,17.3
+117946,Loyola Marymount University,CA,national-universities,102,785,137,23361,9413,1535,2023-24,40.3,16.3
+179159,Saint Louis University,MO,national-universities,102,461,203,15377,12527,1775,2023-24,81.5,14.2
+216339,Temple University,PA,national-universities,102,341,232,36399,30181,3763,2023-24,82.9,12.5
+221759,The University of Tennessee-Knoxville,TN,national-universities,102,454,130,50488,23221,6694,2023-24,46,28.8
+153658,University of Iowa,IA,national-universities,102,429,256,25682,21746,5064,2023-24,84.7,23.3
+178396,University of Missouri-Columbia,MO,national-universities,102,106,126,21669,16690,5139,2023-24,77,30.8
+230038,Brigham Young University,UT,national-universities,110,22,40,11006,7615,6067,2023-24,69.2,79.7
+111948,Chapman University,CA,national-universities,110,1102,393,15914,8849,1806,2023-24,55.6,20.4
+228787,The University of Texas at Dallas,TX,national-universities,110,582,141,29366,19224,4160,2023-24,65.5,21.6
+207500,University of Oklahoma-Norman Campus,OK,national-universities,110,466,96,22337,17097,5198,2023-24,76.5,30.4
+209551,University of Oregon,OR,national-universities,110,415,187,39400,33532,5032,2023-24,85.1,15
+122436,University of San Diego,CA,national-universities,110,138,105,15953,7458,1245,2023-24,46.7,16.7
+122612,University of San Francisco,CA,national-universities,110,273,172,25709,13052,1124,2023-24,50.8,8.6
+104151,Arizona State University Campus Immersion,AZ,national-universities,117,32,NA,68840,62084,14102,2023-24,90.2,22.7
+181002,Creighton University,NE,national-universities,117,1196,168,7248,5241,1045,2023-24,72.3,19.9
+198516,Elon University,NC,national-universities,117,533,147,18791,12649,1677,2023-24,67.3,13.3
+232186,George Mason University,VA,national-universities,117,166,114,22579,20057,4451,2023-24,88.8,22.2
+145725,Illinois Institute of Technology,IL,national-universities,117,331,171,8912,4939,534,2023-24,55.4,10.8
+153603,Iowa State University,IA,national-universities,117,238,146,22995,20496,5859,2023-24,89.1,28.6
+122409,San Diego State University,CA,national-universities,117,86,87,82800,28517,6162,2023-24,34.4,21.6
+132903,University of Central Florida,FL,national-universities,117,17,156,60627,23961,8196,2023-24,39.5,34.2
+127060,University of Denver,CO,national-universities,117,320,169,19214,13679,1458,2023-24,71.2,10.7
+183044,University of New Hampshire-Main Campus,NH,national-universities,117,580,314,20887,18144,2607,2023-24,86.9,14.4
+110583,California State University-Long Beach,CA,national-universities,127,9,97,79680,37547,5756,2023-24,47.1,15.3
+196060,University at Albany,NY,national-universities,127,78,495,30740,21477,2836,2023-24,69.9,13.2
+104179,University of Arizona,AZ,national-universities,127,192,124,56466,48369,9158,2023-24,85.7,18.9
+163268,University of Maryland-Baltimore County,MD,national-universities,127,206,134,13150,9762,1977,2023-24,74.2,20.3
+218663,University of South Carolina-Columbia,SC,national-universities,127,396,NA,46682,28706,7319,2023-24,61.5,25.5
+190567,CUNY City College,NY,national-universities,132,103,NA,31988,18576,2666,2023-24,58.1,14.4
+165334,Clark University,MA,national-universities,132,670,263,10730,4471,629,2023-24,41.7,14.1
+146719,Loyola University Chicago,IL,national-universities,132,606,242,40468,32937,2951,2023-24,81.4,9
+216366,Thomas Jefferson University,PA,national-universities,132,634,430,6084,5241,783,2023-24,86.1,14.9
+100663,University of Alabama at Birmingham,AL,national-universities,132,386,313,10919,9655,2095,2023-24,88.4,21.7
+225511,University of Houston,TX,national-universities,132,157,107,30327,21087,5652,2023-24,69.5,26.8
+231174,University of Vermont,VT,national-universities,132,509,193,28236,16947,2896,2023-24,60,17.1
+110565,California State University-Fullerton,CA,national-universities,139,12,118,48591,42149,7070,2023-24,86.7,16.8
+129242,Fairfield University,CT,national-universities,139,1238,281,15463,6956,1436,2023-24,45,20.6
+120883,University of the Pacific,CA,national-universities,139,379,198,5763,5467,773,2023-24,94.9,14.1
+234030,Virginia Commonwealth University,VA,national-universities,139,170,274,19052,17729,4519,2023-24,93.1,25.5
+190044,Clarkson University,NY,national-universities,143,767,278,7347,5669,565,2023-24,77.2,10
+204024,Miami University-Oxford,OH,national-universities,143,827,NA,34498,28319,3937,2023-24,82.1,13.9
+209542,Oregon State University,OR,national-universities,143,340,122,29025,22886,4689,2023-24,78.8,20.5
+196592,Touro University,NY,national-universities,143,714,457,1657,1044,532,2023-24,63,51
+202480,University of Dayton,OH,national-universities,143,353,162,22747,14023,1904,2023-24,61.6,13.6
+155317,University of Kansas,KS,national-universities,143,367,165,19226,16958,5259,2023-24,88.2,31
+157085,University of Kentucky,KY,national-universities,143,794,233,28233,26083,6437,2023-24,92.4,24.7
+199139,University of North Carolina at Charlotte,NC,national-universities,143,171,236,22699,18208,4501,2023-24,80.2,24.7
+126818,Colorado State University-Fort Collins,CO,national-universities,151,262,243,36612,32801,5293,2023-24,89.6,16.1
+232423,James Madison University,VA,national-universities,151,266,121,35750,27258,4922,2023-24,76.2,18.1
+236595,Seattle University,WA,national-universities,151,457,240,8976,6826,1049,2023-24,76,15.4
+195809,St. John's University-New York,NY,national-universities,151,1179,NA,25223,20094,2674,2023-24,79.7,13.3
+166513,University of Massachusetts-Lowell,MA,national-universities,151,635,348,12628,10764,2083,2023-24,85.2,19.4
+217484,University of Rhode Island,RI,national-universities,151,498,322,25391,19568,3289,2023-24,77.1,16.8
+230764,University of Utah,UT,national-universities,151,241,99,22996,20046,5560,2023-24,87.2,27.7
+155399,Kansas State University,KS,national-universities,158,484,213,13437,10663,3187,2023-24,79.4,29.9
+171128,Michigan Technological University,MI,national-universities,158,473,250,12434,10935,1463,2023-24,87.9,13.4
+185590,Montclair State University,NJ,national-universities,158,100,298,23599,20629,4039,2023-24,87.4,19.6
+196103,SUNY College of Environmental Science and Forestry,NY,national-universities,158,394,432,3541,2937,398,2023-24,82.9,13.6
+186584,Seton Hall University,NJ,national-universities,158,702,206,23748,18738,1572,2023-24,78.9,8.4
+186876,Stockton University,NJ,national-universities,158,117,NA,9338,8233,1530,2023-24,88.2,18.6
+201885,University of Cincinnati-Main Campus,OH,national-universities,158,629,355,33165,29077,6922,2023-24,87.7,23.8
+157289,University of Louisville,KY,national-universities,158,372,309,14821,11937,3117,2023-24,80.5,26.1
+181464,University of Nebraska-Lincoln,NE,national-universities,158,346,220,18353,14145,4698,2023-24,77.1,33.2
+174914,University of St Thomas,MN,national-universities,158,503,194,8813,7486,1681,2023-24,84.9,22.5
+207971,University of Tulsa,OK,national-universities,158,803,205,6631,3845,594,2023-24,58,15.4
+144740,DePaul University,IL,national-universities,169,518,208,32176,23660,2943,2023-24,73.5,12.4
+212106,Duquesne University,PA,national-universities,169,539,297,14112,11128,1477,2023-24,78.9,13.3
+133650,Florida Agricultural and Mechanical University,FL,national-universities,169,349,NA,22713,4797,1391,2023-24,21.1,29
+159391,Louisiana State University and Agricultural & Mechanical College,LA,national-universities,169,376,157,42558,31491,7521,2023-24,74,23.9
+140447,Mercer University,GA,national-universities,169,390,364,11058,7349,1015,2023-24,66.5,13.8
+184782,Rowan University,NJ,national-universities,169,380,396,17923,13948,2555,2023-24,77.8,18.3
+131283,The Catholic University of America,DC,national-universities,169,748,286,5874,4925,861,2023-24,83.8,17.5
+100751,The University of Alabama,AL,national-universities,169,637,270,58418,44295,8279,2023-24,75.8,18.7
+141574,University of Hawaii at Manoa,HI,national-universities,169,618,219,19211,13388,3042,2023-24,69.7,22.7
+176017,University of Mississippi,MS,national-universities,169,534,225,27837,27218,5237,2023-24,97.8,19.2
+110510,California State University-San Bernardino,CA,national-universities,179,11,381,12772,12548,2244,2023-24,98.2,17.9
+130226,Quinnipiac University,CT,national-universities,179,1080,394,21323,16418,1797,2023-24,77,10.9
+102049,Samford University,AL,national-universities,179,1114,254,4541,3734,1080,2023-24,82.2,28.9
+172644,Wayne State University,MI,national-universities,179,175,264,15190,12461,2988,2023-24,82,24
+143358,Bradley University,IL,national-universities,183,883,305,10138,7772,833,2023-24,76.7,10.7
+110556,California State University-Fresno,CA,national-universities,183,2,192,20201,19469,3661,2023-24,96.4,18.8
+153269,Drake University,IA,national-universities,183,324,287,7741,4964,639,2023-24,64.1,12.9
+133669,Florida Atlantic University,FL,national-universities,183,39,214,27612,20279,4417,2023-24,73.4,21.8
+191649,Hofstra University,NY,national-universities,183,1279,311,22890,16157,1593,2023-24,70.6,9.9
+167783,Simmons University,MA,national-universities,183,293,459,4871,3215,363,2023-24,66,11.3
+106397,University of Arkansas,AR,national-universities,183,972,175,28186,20202,6337,2023-24,71.7,31.4
+169716,University of Detroit Mercy,MI,national-universities,183,631,282,5750,4608,552,2023-24,80.1,12
+142285,University of Idaho,ID,national-universities,183,176,320,12222,9666,1869,2023-24,79.1,19.3
+198464,East Carolina University,NC,national-universities,192,159,471,22289,20073,3941,2023-24,90.1,19.6
+151111,Indiana University-Indianapolis,IN,national-universities,192,133,319,15715,12791,3283,2023-24,81.4,25.7
+178411,Missouri University of Science and Technology,MO,national-universities,192,642,235,8181,5978,1196,2023-24,73.1,20
+195720,St. John Fisher University,NY,national-universities,192,595,380,4600,3119,611,2023-24,67.8,19.6
+182290,University of Nevada-Reno,NV,national-universities,192,281,181,10142,8652,3421,2023-24,85.3,39.5
+236939,Washington State University,WA,national-universities,192,174,139,26166,22335,4249,2023-24,85.4,19
+188429,Adelphi University,NY,national-universities,198,652,288,17111,13263,1377,2023-24,77.5,10.4
+131450,Gallaudet University,DC,national-universities,198,521,NA,425,259,149,2023-24,60.9,57.5
+139940,Georgia State University,GA,national-universities,198,95,498,30230,18826,4542,2023-24,62.3,24.1
+204857,Ohio University-Main Campus,OH,national-universities,198,408,475,25648,21739,4593,2023-24,84.8,21.1
+207388,Oklahoma State University-Main Campus,OK,national-universities,198,377,200,19612,13910,4670,2023-24,70.9,33.6
+229115,Texas Tech University,TX,national-universities,198,426,161,34020,24116,7217,2023-24,70.9,29.9
+199218,University of North Carolina Wilmington,NC,national-universities,198,248,440,17370,12856,2701,2023-24,74,21
+199148,University of North Carolina at Greensboro,NC,national-universities,198,79,NA,12379,11120,2613,2023-24,89.8,23.5
+227863,University of St Thomas,TX,national-universities,198,661,354,1591,1485,672,2023-24,93.3,45.3
+152600,Valparaiso University,IN,national-universities,198,1116,323,6374,5658,596,2023-24,88.8,10.5
+176080,Mississippi State University,MS,national-universities,208,474,292,20877,15934,3751,2023-24,76.3,23.5
+215655,Robert Morris University,PA,national-universities,208,1074,NA,7117,6446,766,2023-24,90.6,11.9
+122597,San Francisco State University,CA,national-universities,208,66,186,29878,28727,2985,2023-24,96.1,10.4
+227216,University of North Texas,TX,national-universities,208,187,238,36807,26671,6926,2023-24,72.5,26
+206622,Xavier University,OH,national-universities,208,1028,499,16750,14694,1229,2023-24,87.7,8.4
+150136,Ball State University,IN,national-universities,213,231,NA,28668,20525,3826,2023-24,71.6,18.6
+219709,Belmont University,TN,national-universities,213,540,378,8950,8624,1669,2023-24,96.4,19.4
+211556,Chatham University,PA,national-universities,213,706,NA,4169,2923,332,2023-24,70.1,11.4
+195128,Russell Sage College,NY,national-universities,213,787,NA,1655,1261,190,2023-24,76.2,15.1
+193654,The New School,NY,national-universities,213,1379,374,9148,5719,1470,2023-24,62.5,25.7
+229027,The University of Texas at San Antonio,TX,national-universities,213,72,300,22497,19900,5877,2023-24,88.5,29.5
+117140,University of La Verne,CA,national-universities,213,559,NA,10813,5242,743,2023-24,48.5,14.2
+166638,University of Massachusetts-Boston,MA,national-universities,213,249,444,20918,17353,2463,2023-24,83,14.2
+145813,Illinois State University,IL,national-universities,222,161,260,20884,18589,4147,2023-24,89,22.3
+219976,Lipscomb University,TN,national-universities,222,796,435,4244,2828,707,2023-24,66.6,25
+159656,Loyola University New Orleans,LA,national-universities,222,1056,NA,6142,5388,695,2023-24,87.7,12.9
+188030,New Mexico State University-Main Campus,NM,national-universities,222,371,NA,15201,11511,2391,2023-24,75.7,20.8
+209807,Portland State University,OR,national-universities,222,214,252,8877,8070,1580,2023-24,90.9,19.6
+175005,St Catherine University,MN,national-universities,222,305,464,1703,1602,377,2023-24,94.1,23.5
+228769,The University of Texas at Arlington,TX,national-universities,222,97,246,23126,18799,5233,2023-24,81.3,27.8
+136172,University of North Florida,FL,national-universities,222,125,330,21568,13430,2816,2023-24,62.3,21
+240727,University of Wyoming,WY,national-universities,222,233,244,5644,5498,1463,2023-24,97.4,26.6
+238032,West Virginia University,WV,national-universities,222,374,303,19857,17129,4377,2023-24,86.3,25.6
+173160,Bethel University,MN,national-universities,232,955,413,1642,1494,430,2023-24,91,28.8
+133881,Florida Institute of Technology,FL,national-universities,232,1373,NA,15205,9507,882,2023-24,62.5,9.3
+203517,Kent State University at Kent,OH,national-universities,232,665,NA,22365,19379,4278,2023-24,86.6,22.1
+199102,North Carolina A & T State University,NC,national-universities,232,250,NA,30717,14183,2755,2023-24,46.2,19.4
+200332,North Dakota State University-Main Campus,ND,national-universities,232,1018,368,7331,7024,2214,2023-24,95.8,31.5
+209612,Pacific University,OR,national-universities,232,833,NA,2817,2585,400,2023-24,91.8,15.5
+126562,University of Colorado Denver/Anschutz Medical Campus,CO,national-universities,232,506,NA,14569,11336,1628,2023-24,77.8,14.4
+178402,University of Missouri-Kansas City,MO,national-universities,232,601,339,5802,4351,1289,2023-24,75,29.6
+182281,University of Nevada-Las Vegas,NV,national-universities,232,104,335,12232,11774,4583,2023-24,96.3,38.9
+199999,Winston-Salem State University,NC,national-universities,232,236,NA,9273,6357,883,2023-24,68.6,13.9
+168740,Andrews University,MI,national-universities,242,1043,NA,1286,1124,272,2023-24,87.4,24.2
+110097,Biola University,CA,national-universities,242,1336,391,4003,2405,753,2023-24,60.1,31.3
+190716,D'Youville  University,NY,national-universities,242,327,333,2295,1890,242,2023-24,82.4,12.8
+170082,Grand Valley State University,MI,national-universities,242,437,417,24297,23008,4836,2023-24,94.7,21
+105330,Northern Arizona University,AZ,national-universities,242,245,353,37805,34383,5473,2023-24,90.9,15.9
+130253,Sacred Heart University,CT,national-universities,242,1244,NA,14284,9667,1905,2023-24,67.7,19.7
+236577,Seattle Pacific University,WA,national-universities,242,804,429,2806,2556,382,2023-24,91.1,14.9
+221971,Union University,TN,national-universities,242,1107,NA,3012,1421,323,2023-24,47.2,22.7
+100706,University of Alabama in Huntsville,AL,national-universities,242,1039,352,6074,4510,1176,2023-24,74.3,26.1
+167987,University of Massachusetts-Dartmouth,MA,national-universities,242,439,NA,9794,9026,1376,2023-24,92.2,15.2
+178420,University of Missouri-St Louis,MO,national-universities,242,366,NA,4627,2645,464,2023-24,57.2,17.5
+187985,University of New Mexico-Main Campus,NM,national-universities,242,300,462,12907,12320,3612,2023-24,95.5,29.3
+200280,University of North Dakota,ND,national-universities,242,636,296,7437,5733,1766,2023-24,77.1,30.8
+230728,Utah State University,UT,national-universities,242,90,307,19331,18097,4388,2023-24,93.6,24.2
+216764,West Chester University of Pennsylvania,PA,national-universities,242,295,NA,16467,13042,3087,2023-24,79.2,23.7
+110574,California State University-East Bay,CA,national-universities,257,183,308,13274,12851,994,2023-24,96.8,7.7
+212601,Gannon University,PA,national-universities,257,768,NA,6331,4856,619,2023-24,76.7,12.7
+213367,La Salle University,PA,national-universities,257,269,415,4845,4176,465,2023-24,86.2,11.1
+151786,Marian University,IN,national-universities,257,866,NA,3883,3702,620,2023-24,95.3,16.7
+220978,Middle Tennessee State University,TN,national-universities,257,428,467,14763,10039,3126,2023-24,68,31.1
+136215,Nova Southeastern University,FL,national-universities,257,953,NA,17621,12805,2029,2023-24,72.7,15.8
+152099,Oakland City University,IN,national-universities,257,825,NA,626,427,126,2023-24,68.2,29.5
+227881,Sam Houston State University,TX,national-universities,257,150,NA,17582,15014,3601,2023-24,85.4,24
+219356,South Dakota State University,SD,national-universities,257,1127,NA,5884,5808,2274,2023-24,98.7,39.2
+167899,Springfield College,MA,national-universities,257,1191,NA,3614,2538,476,2023-24,70.2,18.8
+168005,Suffolk University,MA,national-universities,257,781,NA,10101,8560,1214,2023-24,84.7,14.2
+221847,Tennessee Technological University,TN,national-universities,257,462,447,8772,7295,1988,2023-24,83.2,27.3
+228459,Texas State University,TX,national-universities,257,339,408,37183,33273,7930,2023-24,89.5,23.8
+228796,The University of Texas at El Paso,TX,national-universities,257,46,359,11171,11160,3940,2023-24,99.9,35.3
+161253,University of Maine,ME,national-universities,257,649,NA,13995,13395,1868,2023-24,95.7,13.9
+200004,Western Carolina University,NC,national-universities,257,165,NA,18183,15758,2103,2023-24,86.7,13.3
+482149,Augusta University,GA,national-universities,273,630,NA,5892,5262,1224,2023-24,89.3,23.3
+212832,Gwynedd Mercy University,PA,national-universities,273,1079,NA,1111,1040,184,2023-24,93.6,17.7
+232265,Hampton University,VA,national-universities,273,1255,NA,12119,5850,1207,2023-24,48.3,20.6
+232706,Marymount University,VA,national-universities,273,1229,418,3597,2896,409,2023-24,80.5,14.1
+214069,Misericordia University,PA,national-universities,273,1266,NA,2508,2129,408,2023-24,84.9,19.2
+194310,Pace University,NY,national-universities,273,733,441,28469,21961,1949,2023-24,77.1,8.9
+127918,Regis University,CO,national-universities,273,905,486,4997,4361,501,2023-24,87.3,11.5
+117751,The Master's University and Seminary,CA,national-universities,273,NA,NA,1157,878,413,2023-24,75.9,47
+220862,University of Memphis,TN,national-universities,273,184,NA,15640,14605,2591,2023-24,93.4,17.7
+156125,Wichita State University,KS,national-universities,273,329,NA,8637,8200,1786,2023-24,94.9,21.8
+143118,Aurora University,IL,national-universities,283,425,NA,5264,4482,829,2023-24,85.1,18.5
+109785,Azusa Pacific University,CA,national-universities,283,490,262,3850,3060,420,2023-24,79.5,13.7
+169248,Central Michigan University,MI,national-universities,283,562,NA,18102,16474,2044,2023-24,91,12.4
+210739,DeSales University,PA,national-universities,283,1164,NA,3636,2857,444,2023-24,78.6,15.5
+208822,George Fox University,OR,national-universities,283,898,NA,3737,3603,605,2023-24,96.4,16.8
+178059,Maryville University of Saint Louis,MO,national-universities,283,358,438,3916,3669,847,2023-24,93.7,23.1
+174817,Saint Mary's University of Minnesota,MN,national-universities,283,424,442,1350,1199,272,2023-24,88.8,22.7
+174899,The College of Saint Scholastica,MN,national-universities,283,310,480,1608,1508,349,2023-24,93.8,23.1
+219471,University of South Dakota,SD,national-universities,283,1148,NA,5349,5293,1359,2023-24,99,25.7
+168254,Western New England University,MA,national-universities,283,1396,NA,6534,5440,731,2023-24,83.3,13.4
+201441,Bowling Green State University-Main Campus,OH,national-universities,293,772,NA,18629,15016,3114,2023-24,80.6,20.7
+232982,Old Dominion University,VA,national-universities,293,226,NA,15216,13773,2717,2023-24,90.5,19.7
+161457,University of New England,ME,national-universities,293,1295,NA,4918,4523,589,2023-24,92,13
+243221,University of Puerto Rico-Rio Piedras,PR,national-universities,293,NA,NA,4665,2482,1839,2023-24,53.2,74.1
+148584,University of St Francis,IL,national-universities,293,713,NA,1888,1207,238,2023-24,63.9,19.7
+206084,University of Toledo,OH,national-universities,293,829,NA,11184,10606,2122,2023-24,94.8,20
+225627,University of the Incarnate Word,TX,national-universities,293,1140,NA,11162,10421,1067,2023-24,93.4,10.2
+172699,Western Michigan University,MI,national-universities,293,707,428,20100,17020,2472,2023-24,84.7,14.5
+156286,Bellarmine University,KY,national-universities,301,557,493,3462,3240,632,2023-24,93.6,19.5
+142115,Boise State University,ID,national-universities,301,780,483,15949,13391,3080,2023-24,84,23
+190761,Dominican University New York,NY,national-universities,301,1092,NA,2319,1828,299,2023-24,78.8,16.4
+220075,East Tennessee State University,TN,national-universities,301,370,NA,9903,8622,2141,2023-24,87.1,24.8
+238661,Edgewood College,WI,national-universities,301,587,NA,1315,1243,219,2023-24,94.5,17.6
+107044,Harding University,AR,national-universities,301,1222,NA,2202,2202,864,2023-24,100,39.2
+213011,Immaculata University,PA,national-universities,301,1143,NA,1958,1536,281,2023-24,78.4,18.3
+166452,Lesley University,MA,national-universities,301,1042,NA,2509,2369,189,2023-24,94.4,8
+147703,Northern Illinois University,IL,national-universities,301,268,379,24177,17033,2202,2023-24,70.5,12.9
+207458,Oklahoma City University,OK,national-universities,301,1104,NA,1432,1008,375,2023-24,70.4,37.2
+233541,Shenandoah University,VA,national-universities,301,1218,NA,3763,2929,485,2023-24,77.8,16.6
+149222,Southern Illinois University-Carbondale,IL,national-universities,301,591,NA,10401,9407,1621,2023-24,90.4,17.2
+129525,University of Hartford,CT,national-universities,301,1368,NA,14253,11832,1311,2023-24,83,11.1
+151263,University of Indianapolis,IN,national-universities,301,679,NA,9886,7193,804,2023-24,72.8,11.2
+181394,University of Nebraska at Omaha,NE,national-universities,301,203,468,9889,8594,2156,2023-24,86.9,25.1
+240453,University of Wisconsin-Milwaukee,WI,national-universities,301,325,NA,16662,14736,3366,2023-24,88.4,22.8
+216852,Widener University,PA,national-universities,301,800,NA,7167,6022,894,2023-24,84,14.8
+112075,Concordia University-Irvine,CA,national-universities,318,1182,NA,4564,2732,290,2023-24,59.9,10.6
+433660,Florida Gulf Coast University,FL,national-universities,318,209,341,16050,12318,2776,2023-24,76.7,22.5
+185262,Kean University,NJ,national-universities,318,288,NA,12142,9335,1968,2023-24,76.9,21.1
+159647,Louisiana Tech University,LA,national-universities,318,1263,470,9263,6722,2263,2023-24,72.6,33.7
+237525,Marshall University,WV,national-universities,318,530,NA,6499,6269,1739,2023-24,96.5,27.7
+180461,Montana State University,MT,national-universities,318,863,345,21975,19081,3634,2023-24,86.8,19
+171571,Oakland University,MI,national-universities,318,256,384,12398,8708,2236,2023-24,70.2,25.7
+215442,Point Park University,PA,national-universities,318,1089,NA,5291,5179,519,2023-24,97.9,10
+225414,University of Houston-Clear Lake,TX,national-universities,318,229,342,2348,1768,439,2023-24,75.3,24.8
+176372,University of Southern Mississippi,MS,national-universities,318,246,NA,8818,8763,1733,2023-24,99.4,19.8
+216931,Wilkes University,PA,national-universities,318,654,NA,6414,5866,513,2023-24,91.5,8.7
+222178,Abilene Christian University,TX,national-universities,329,1351,437,10510,6714,862,2023-24,63.9,12.8
+138947,Clark Atlanta University,GA,national-universities,329,813,NA,27672,17884,1069,2023-24,64.6,6
+238616,Concordia University-Wisconsin,WI,national-universities,329,1284,NA,4537,3064,452,2023-24,67.5,14.8
+156620,Eastern Kentucky University,KY,national-universities,329,423,NA,17082,13340,2782,2023-24,78.1,20.9
+169910,Ferris State University,MI,national-universities,329,511,NA,9548,7694,1595,2023-24,80.6,20.7
+487524,Husson University,ME,national-universities,329,984,NA,2543,2198,586,2023-24,86.4,26.7
+213020,Indiana University of Pennsylvania-Main Campus,PA,national-universities,329,942,NA,9422,8593,2032,2023-24,91.2,23.6
+163453,Morgan State University,MD,national-universities,329,427,NA,22741,18865,2282,2023-24,83,12.1
+233277,Radford University,VA,national-universities,329,230,NA,11072,10036,1103,2023-24,90.6,11
+229179,Texas Woman's University,TX,national-universities,329,220,NA,7584,7204,1473,2023-24,95,20.4
+221740,The University of Tennessee-Chattanooga,TN,national-universities,329,397,476,9096,7006,2381,2023-24,77,34
+228802,The University of Texas at Tyler,TX,national-universities,329,404,NA,5521,5054,1324,2023-24,91.5,26.2
+141565,University of Hawaii at Hilo,HI,national-universities,329,451,NA,2562,2300,367,2023-24,89.8,16
+232609,University of Lynchburg,VA,national-universities,329,761,NA,4813,3956,478,2023-24,82.2,12.1
+198136,Campbell University,NC,national-universities,343,853,NA,3680,3470,603,2023-24,94.3,17.4
+202134,Cleveland State University,OH,national-universities,343,257,NA,10274,9810,1593,2023-24,95.5,16.2
+139931,Georgia Southern University,GA,national-universities,343,381,448,14410,12916,4753,2023-24,89.6,36.8
+220631,Lincoln Memorial University,TN,national-universities,343,715,NA,4007,2375,335,2023-24,59.3,14.1
+204200,Mount St. Joseph University,OH,national-universities,343,1112,NA,2169,1226,324,2023-24,56.5,26.4
+241410,Pontifical Catholic University of Puerto Rico-Ponce,PR,national-universities,343,NA,NA,3020,2728,760,2023-24,90.3,27.9
+227526,Prairie View A & M University,TX,national-universities,343,284,NA,8777,6609,2112,2023-24,75.3,32
+200217,University of Mary,ND,national-universities,343,928,NA,1577,1234,559,2023-24,78.2,45.3
+127741,University of Northern Colorado,CO,national-universities,343,434,NA,10274,8880,1229,2023-24,86.4,13.8
+210775,Alvernia University,PA,national-universities,352,1007,NA,5491,3422,414,2023-24,62.3,12.1
+106458,Arkansas State University,AR,national-universities,352,403,NA,8019,5587,1660,2023-24,69.7,29.7
+153126,Clarke University,IA,national-universities,352,620,NA,3087,2104,199,2023-24,68.2,9.5
+154235,Saint Ambrose University,IA,national-universities,352,831,NA,3456,2534,422,2023-24,73.3,16.7
+228705,Texas A&M University-Kingsville,TX,national-universities,352,769,NA,7915,7305,1203,2023-24,92.3,16.5
+240365,University of Wisconsin-Oshkosh,WI,national-universities,352,826,NA,9082,7872,1751,2023-24,86.7,22.2
+219806,Carson-Newman University,TN,national-universities,358,483,NA,2991,2042,367,2023-24,68.3,18
+190725,Daemen University,NY,national-universities,358,418,NA,3041,2316,375,2023-24,76.2,16.2
+176053,Mississippi College,MS,national-universities,358,1307,NA,3315,1620,674,2023-24,48.9,41.6
+179566,Missouri State University-Springfield,MO,national-universities,358,337,NA,11901,10836,2841,2023-24,91.1,26.2
+159993,University of Louisiana at Monroe,LA,national-universities,358,689,NA,4878,3637,1049,2023-24,74.6,28.8
+151324,Indiana State University,IN,national-universities,363,421,NA,13601,12445,1568,2023-24,91.5,12.6
+175856,Jackson State University,MS,national-universities,363,276,NA,14141,12873,978,2023-24,91,7.6
+135081,Keiser University-Ft Lauderdale,FL,national-universities,363,806,NA,3375,3288,1958,2023-24,97.4,59.5
+149231,Southern Illinois University Edwardsville,IL,national-universities,363,493,NA,8937,8688,1602,2023-24,97.2,18.4
+180489,The University of Montana,MT,national-universities,363,210,454,9464,9048,1652,2023-24,95.6,18.3
+221892,Trevecca Nazarene University,TN,national-universities,363,811,NA,1958,1371,375,2023-24,70,27.4
+106704,University of Central Arkansas,AR,national-universities,363,433,NA,6589,5961,1737,2023-24,90.5,29.1
+102094,University of South Alabama,AL,national-universities,363,991,NA,12593,8247,1920,2023-24,65.5,23.3
+206437,Walsh University,OH,national-universities,363,1038,NA,2287,1788,337,2023-24,78.2,18.8
+157951,Western Kentucky University,KY,national-universities,363,568,NA,7720,7492,2822,2023-24,97,37.7
+169798,Eastern Michigan University,MI,national-universities,373,406,NA,20351,16555,1898,2023-24,81.3,11.5
+486840,Kennesaw State University,GA,national-universities,373,178,484,23138,16008,8234,2023-24,69.2,51.4
+231651,Regent University,VA,national-universities,373,929,NA,7261,2990,643,2023-24,41.2,21.5
+228529,Tarleton State University,TX,national-universities,373,285,NA,8746,8239,2702,2023-24,94.2,32.8
+202763,The University of Findlay,OH,national-universities,373,1246,NA,3760,3246,613,2023-24,86.3,18.9
+200800,University of Akron Main Campus,OH,national-universities,373,1096,NA,14982,10624,2091,2023-24,70.9,19.7
+160658,University of Louisiana at Lafayette,LA,national-universities,373,835,NA,10679,9486,3064,2023-24,88.8,32.3
+141334,University of West Georgia,GA,national-universities,373,306,NA,8399,4147,1361,2023-24,49.4,32.8
+176479,William Carey University,MS,national-universities,373,1076,NA,571,331,204,2023-24,58,61.6
+199962,Wingate University,NC,national-universities,373,585,NA,21210,18027,708,2023-24,85,3.9
+154688,Baker University,KS,national-universities,384,923,NA,911,839,236,2023-24,92.1,28.1
+152992,Briar Cliff University,IA,national-universities,384,1077,NA,NA,NA,NA,2023-24,NA,NA
+162061,Capitol Technology University,MD,national-universities,384,1277,386,349,272,70,2023-24,77.9,25.7
+224226,Dallas Baptist University,TX,national-universities,384,1323,NA,8018,7303,579,2023-24,91.1,7.9
+224554,East Texas A&M University,TX,national-universities,384,515,NA,8231,7621,1172,2023-24,92.6,15.4
+198561,Gardner-Webb University,NC,national-universities,384,741,NA,4670,4064,411,2023-24,87,10.1
+232672,Mary Baldwin University,VA,national-universities,384,513,NA,NA,NA,NA,2023-24,NA,NA
+157447,Northern Kentucky University,KY,national-universities,384,547,NA,6417,6162,1295,2023-24,96,21
+136330,Palm Beach Atlantic University,FL,national-universities,384,1204,NA,7657,6763,680,2023-24,88.3,10.1
+106245,University of Arkansas at Little Rock,AR,national-universities,384,716,NA,3661,2114,478,2023-24,57.7,22.6
+171146,University of Michigan-Flint,MI,national-universities,384,431,NA,8870,6105,533,2023-24,68.8,8.7
+225247,Hardin-Simmons University,TX,national-universities,395,1162,NA,2452,2367,356,2023-24,96.5,15
+232557,Liberty University,VA,national-universities,395,556,NA,36921,36671,6432,2023-24,99.3,17.5
+241395,Pontifical Catholic University of Puerto Rico-Arecibo,PR,national-universities,395,NA,NA,130,111,25,2023-24,85.4,22.5
+199759,Southeastern Baptist Theological Seminary,NC,national-universities,395,NA,NA,124,95,77,2023-24,76.6,81.1
+226471,University of Mary Hardin-Baylor,TX,national-universities,395,1128,NA,11407,10850,825,2023-24,95.1,7.6
+159939,University of New Orleans,LA,national-universities,395,904,NA,7253,4843,845,2023-24,66.8,17.4
+157535,University of Pikeville,KY,national-universities,395,510,NA,NA,NA,NA,2023-24,NA,NA
+179964,William Woods University,MO,national-universities,395,912,NA,1133,844,232,2023-24,74.5,27.5
+132471,Barry University,FL,national-universities,403,495,NA,12141,7172,582,2023-24,59.1,8.1
+237312,University of Charleston,WV,national-universities,403,870,NA,1635,1055,253,2023-24,64.5,24
+163338,University of Maryland Eastern Shore,MD,national-universities,403,931,NA,8032,7258,728,2023-24,90.4,10
+227331,Our Lady of the Lake University,TX,national-universities,406,784,NA,NA,NA,NA,2023-24,NA,NA
+221838,Tennessee State University,TN,national-universities,406,622,NA,12890,11940,1770,2023-24,92.6,14.8
+128744,University of Bridgeport,CT,national-universities,406,1147,NA,5592,3596,231,2023-24,64.3,6.4
+126580,University of Colorado Colorado Springs,CO,national-universities,406,877,NA,13103,12653,1747,2023-24,96.6,13.8
+156541,University of the Cumberlands,KY,national-universities,406,140,NA,2606,2585,978,2023-24,99.2,37.8
+175421,Belhaven University,MS,national-universities,411,978,NA,2156,1148,251,2023-24,53.2,21.9
+137476,St. Thomas University,FL,national-universities,411,1344,NA,4798,4769,564,2023-24,99.4,11.8
+102614,University of Alaska Fairbanks,AK,national-universities,411,1071,NA,NA,NA,NA,2023-24,NA,NA
+141264,Valdosta State University,GA,national-universities,411,326,NA,4689,3915,1135,2023-24,83.5,29
+164447,American International College,MA,national-universities,415,855,NA,2258,2188,277,2023-24,96.9,12.7
+147536,National Louis University,IL,national-universities,415,105,NA,4145,3860,785,2023-24,93.1,20.3
+148487,Roosevelt University,IL,national-universities,415,889,NA,5987,5644,600,2023-24,94.3,10.6
+224147,Texas A & M University-Corpus Christi,TX,national-universities,415,641,NA,10675,9551,2064,2023-24,89.5,21.6
+206604,Wright State University-Main Campus,OH,national-universities,415,774,NA,8894,8463,1463,2023-24,95.2,17.3
+137032,Saint Leo University,FL,national-universities,420,1208,NA,7788,5615,632,2023-24,72.1,11.3
+137564,Southeastern University,FL,national-universities,421,1361,NA,2800,2080,1034,2023-24,74.3,49.7
+139199,Brenau University,GA,national-universities,422,1011,NA,2761,2401,205,2023-24,87,8.5
+142276,Idaho State University,ID,national-universities,422,600,NA,NA,NA,NA,2023-24,NA,NA
+149514,Trinity International University-Illinois,IL,national-universities,422,NA,NA,264,246,21,2023-24,93.2,8.5
+243601,Universidad Ana G. Mendez-Gurabo Campus,PR,national-universities,425,NA,NA,NA,NA,NA,2023-24,NA,NA
+100724,Alabama State University,AL,national-universities,427,648,NA,5346,5113,951,2023-24,95.6,18.6
+226091,Lamar University,TX,national-universities,427,554,NA,7246,6212,1555,2023-24,85.7,25
+160621,Southern University and A & M College,LA,national-universities,429,850,NA,12221,6095,1711,2023-24,49.9,28.1
+229160,Texas Wesleyan University,TX,national-universities,431,945,NA,4725,2948,493,2023-24,62.4,16.7
+229063,Texas Southern University,TX,national-universities,432,730,NA,7867,7344,1657,2023-24,93.4,22.6
+131113,Wilmington University,DE,national-universities,433,759,NA,NA,NA,NA,2023-24,NA,NA
+204635,Ohio Northern University,OH,regional-colleges-midwest,1,39,310,4537,3328,587,2023-24,73.4,17.6
+145646,Illinois Wesleyan University,IL,regional-colleges-midwest,2,73,329,6128,2768,441,2023-24,45.2,15.9
+178697,College of the Ozarks,MO,regional-colleges-midwest,3,4,NA,2495,371,256,2023-24,14.9,69
+152530,Taylor University,IN,regional-colleges-midwest,4,109,392,2076,1580,564,2023-24,76.1,35.7
+154350,Simpson College,IA,regional-colleges-midwest,5,25,NA,1646,1463,342,2023-24,88.9,23.4
+168591,Alma College,MI,regional-colleges-midwest,6,176,NA,3975,2610,346,2023-24,65.7,13.3
+154712,Benedictine College,KS,regional-colleges-midwest,7,166,NA,3575,2733,627,2023-24,76.4,22.9
+153825,Loras College,IA,regional-colleges-midwest,8,50,473,1652,1517,257,2023-24,91.8,16.9
+177117,Cottey College,MO,regional-colleges-midwest,9,NA,NA,567,376,66,2023-24,66.3,17.6
+203128,Hiram College,OH,regional-colleges-midwest,10,62,NA,1906,1780,231,2023-24,93.4,13
+150668,Goshen College,IN,regional-colleges-midwest,11,15,NA,1175,1045,157,2023-24,88.9,15
+179955,William Jewell College,MO,regional-colleges-midwest,11,60,409,2132,731,229,2023-24,34.3,31.3
+152567,Trine University,IN,regional-colleges-midwest,13,167,NA,4102,3474,683,2023-24,84.7,19.7
+174075,University of Minnesota-Crookston,MN,regional-colleges-midwest,14,26,NA,1886,1101,224,2023-24,58.4,20.3
+203845,Marietta College,OH,regional-colleges-midwest,15,88,NA,2516,1978,314,2023-24,78.6,15.9
+147244,Millikin University,IL,regional-colleges-midwest,15,107,NA,4009,2167,329,2023-24,54.1,15.2
+200572,Valley City State University,ND,regional-colleges-midwest,15,76,NA,492,341,194,2023-24,69.3,56.9
+176947,Central Methodist University-College of Liberal Arts and Sciences,MO,regional-colleges-midwest,18,70,NA,1149,1010,237,2023-24,87.9,23.5
+170639,Lake Superior State University,MI,regional-colleges-midwest,19,52,NA,2473,1682,255,2023-24,68,15.2
+155511,McPherson College,KS,regional-colleges-midwest,19,174,NA,1209,1013,241,2023-24,83.8,23.8
+174437,North Central University,MN,regional-colleges-midwest,19,81,NA,621,564,222,2023-24,90.8,39.4
+240338,Wisconsin Lutheran College,WI,regional-colleges-midwest,19,160,NA,1847,1460,251,2023-24,79,17.2
+143288,Blackburn College,IL,regional-colleges-midwest,23,20,NA,1113,892,86,2023-24,80.1,9.6
+181127,Hastings College,NE,regional-colleges-midwest,24,101,NA,2257,1577,323,2023-24,69.9,20.5
+154749,Bethel College-North Newton,KS,regional-colleges-midwest,25,34,NA,977,935,160,2023-24,95.7,17.1
+149505,Trinity Christian College,IL,regional-colleges-midwest,25,71,NA,652,578,159,2023-24,88.7,27.5
+181738,Union Adventist University,NE,regional-colleges-midwest,25,132,NA,936,935,91,2023-24,99.9,9.7
+177144,Culver-Stockton College,MO,regional-colleges-midwest,28,80,NA,1351,1324,250,2023-24,98,18.9
+219091,Dakota Wesleyan University,SD,regional-colleges-midwest,28,97,NA,1153,839,184,2023-24,72.8,21.9
+168528,Adrian College,MI,regional-colleges-midwest,30,148,NA,3054,2088,484,2023-24,68.4,23.2
+175227,Dunwoody College of Technology,MN,regional-colleges-midwest,30,NA,NA,587,578,380,2023-24,98.5,65.7
+200022,Bismarck State College,ND,regional-colleges-midwest,32,NA,NA,NA,NA,NA,2023-24,NA,NA
+206507,Wilmington College,OH,regional-colleges-midwest,32,114,NA,1877,1588,262,2023-24,84.6,16.5
+171483,Northwestern Michigan College,MI,regional-colleges-midwest,34,NA,NA,NA,NA,NA,2023-24,NA,NA
+148131,Quincy University,IL,regional-colleges-midwest,35,151,NA,2197,1096,327,2023-24,49.9,29.8
+153302,Emmaus Bible College,IA,regional-colleges-midwest,36,NA,NA,87,85,52,2023-24,97.7,61.2
+155414,Kansas Wesleyan University,KS,regional-colleges-midwest,37,119,NA,1831,1556,263,2023-24,85,16.9
+201371,Bluffton University,OH,regional-colleges-midwest,38,129,NA,2873,1757,190,2023-24,61.2,10.8
+155973,Tabor College,KS,regional-colleges-midwest,38,161,NA,585,378,129,2023-24,64.6,34.1
+155627,Ottawa University-Ottawa,KS,regional-colleges-midwest,40,155,NA,3600,2881,293,2023-24,80,10.2
+200059,Dickinson State University,ND,regional-colleges-midwest,41,133,NA,831,499,226,2023-24,60,45.3
+155900,Southwestern College,KS,regional-colleges-midwest,42,116,NA,1333,866,204,2023-24,65,23.6
+144971,Eureka College,IL,regional-colleges-midwest,43,110,NA,1041,921,129,2023-24,88.5,14
+202514,Defiance College,OH,regional-colleges-midwest,44,138,NA,1546,656,134,2023-24,42.4,20.4
+171599,The University of Olivet,MI,regional-colleges-midwest,44,104,NA,1417,1376,334,2023-24,97.1,24.3
+154721,Bethany College,KS,regional-colleges-midwest,46,152,NA,1860,1462,174,2023-24,78.6,11.9
+181853,York University,NE,regional-colleges-midwest,47,41,NA,506,241,114,2023-24,47.6,47.3
+153320,Faith Baptist Bible College and Theological Seminary,IA,regional-colleges-midwest,48,NA,NA,308,153,122,2023-24,49.7,79.7
+200226,Mayville State University,ND,regional-colleges-midwest,48,122,NA,NA,NA,NA,2023-24,NA,NA
+155937,Sterling College,KS,regional-colleges-midwest,48,145,NA,826,438,142,2023-24,53,32.4
+177940,Lincoln University,MO,regional-colleges-midwest,51,90,NA,NA,NA,NA,2023-24,NA,NA
+206491,Wilberforce University,OH,regional-colleges-midwest,51,NA,NA,12661,6676,204,2023-24,52.7,3.1
+155070,Barclay College,KS,regional-colleges-midwest,53,NA,NA,167,91,48,2023-24,54.5,52.7
+170000,Grace Christian University,MI,regional-colleges-midwest,53,115,NA,288,286,89,2023-24,99.3,31.1
+154590,William Penn University,IA,regional-colleges-midwest,53,123,NA,1112,634,296,2023-24,57,46.7
+204015,Miami University-Middletown,OH,regional-colleges-midwest,56,188,NA,NA,NA,NA,2023-24,NA,NA
+204486,University of Northwestern Ohio,OH,regional-colleges-midwest,56,NA,NA,NA,NA,NA,2023-24,NA,NA
+177542,Hannibal-LaGrange University,MO,regional-colleges-midwest,58,47,NA,366,215,66,2023-24,58.7,30.7
+176789,Calvary University,MO,regional-colleges-midwest,60,NA,NA,110,78,27,2023-24,70.9,34.6
+171881,Kuyper College,MI,regional-colleges-midwest,60,NA,NA,195,66,37,2023-24,33.8,56.1
+204006,Miami University-Hamilton,OH,regional-colleges-midwest,62,172,NA,NA,NA,NA,2023-24,NA,NA
+205203,University of Rio Grande,OH,regional-colleges-midwest,63,NA,NA,NA,NA,NA,2023-24,NA,NA
+170967,Rochester University,MI,regional-colleges-midwest,64,130,NA,490,320,142,2023-24,65.3,44.4
+177551,Harris-Stowe State University,MO,regional-colleges-midwest,66,92,NA,NA,NA,NA,2023-24,NA,NA
+148876,St. Augustine College,IL,regional-colleges-midwest,66,NA,NA,NA,NA,NA,2023-24,NA,NA
+170091,Great Lakes Christian College,MI,regional-colleges-midwest,69,NA,NA,NA,NA,NA,2023-24,NA,NA
+152637,Vincennes University,IN,regional-colleges-midwest,70,NA,NA,NA,NA,NA,2023-24,NA,NA
+201690,Central State University,OH,regional-colleges-midwest,71,128,NA,3291,1514,574,2023-24,46,37.9
+178369,Missouri Valley College,MO,regional-colleges-midwest,71,200,NA,1966,971,409,2023-24,49.4,42.1
+154855,Central Christian College of Kansas,KS,regional-colleges-midwest,74,141,NA,NA,NA,NA,2023-24,NA,NA
+130624,United States Coast Guard Academy,CT,regional-colleges-north,1,NA,NA,1789,435,287,2023-24,24.3,66
+190372,The Cooper Union for the Advancement of Science and Art,NY,regional-colleges-north,2,11,148,1790,341,180,2023-24,19.1,52.8
+197027,United States Merchant Marine Academy,NY,regional-colleges-north,3,NA,NA,1392,452,277,2023-24,32.5,61.3
+366252,Pennsylvania College of Technology,PA,regional-colleges-north,4,NA,NA,NA,NA,NA,2023-24,NA,NA
+212805,Grove City College,PA,regional-colleges-north,5,NA,NA,2034,1493,557,2023-24,73.4,37.3
+190983,Elmira College,NY,regional-colleges-north,6,36,NA,2109,1915,163,2023-24,90.8,8.5
+196042,Farmingdale State College,NY,regional-colleges-north,7,10,269,9455,6535,1676,2023-24,69.1,25.6
+161299,Maine Maritime Academy,ME,regional-colleges-north,7,64,366,1145,703,230,2023-24,61.4,32.7
+183062,Keene State College,NH,regional-colleges-north,9,79,NA,4666,4157,728,2023-24,89.1,17.5
+161226,University of Maine at Farmington,ME,regional-colleges-north,9,23,NA,1306,1275,230,2023-24,97.6,18
+193399,University of Mount Saint Vincent,NY,regional-colleges-north,11,49,NA,3775,3195,489,2023-24,84.6,15.3
+182634,Colby-Sawyer College,NH,regional-colleges-north,12,95,NA,1557,1401,174,2023-24,90,12.4
+196015,SUNY College of Technology at Canton,NY,regional-colleges-north,12,28,NA,3439,3313,475,2023-24,96.3,14.3
+215284,University of Pittsburgh-Johnstown,PA,regional-colleges-north,14,121,NA,3246,3113,474,2023-24,95.9,15.2
+196024,SUNY College of Technology at Delhi,NY,regional-colleges-north,15,12,NA,5867,5187,818,2023-24,88.4,15.8
+196006,SUNY College of Technology at Alfred,NY,regional-colleges-north,16,NA,NA,7839,6408,1256,2023-24,81.7,19.6
+215266,University of Pittsburgh-Bradford,PA,regional-colleges-north,17,85,NA,4985,4527,310,2023-24,90.8,6.8
+190655,CUNY New York City College of Technology,NY,regional-colleges-north,18,21,NA,21007,16962,3375,2023-24,80.7,19.9
+188340,Vaughn College of Aeronautics and Technology,NY,regional-colleges-north,18,144,NA,NA,NA,NA,2023-24,NA,NA
+196033,SUNY College of Agriculture and Technology at Cobleskill,NY,regional-colleges-north,20,42,NA,3147,2620,537,2023-24,83.3,20.5
+195173,St. Francis College,NY,regional-colleges-north,21,53,NA,NA,NA,NA,2023-24,NA,NA
+194392,Paul Smiths College of Arts and Science,NY,regional-colleges-north,22,162,NA,939,852,135,2023-24,90.7,15.8
+196051,SUNY Morrisville,NY,regional-colleges-north,24,NA,NA,5122,4673,733,2023-24,91.2,15.7
+216357,Thiel College,PA,regional-colleges-north,26,179,NA,2197,1551,219,2023-24,70.6,14.1
+216542,University of Valley Forge,PA,regional-colleges-north,26,193,NA,403,315,95,2023-24,78.2,30.2
+214166,Mount Aloysius College,PA,regional-colleges-north,28,170,NA,2377,2149,324,2023-24,90.4,15.1
+165574,Dean College,MA,regional-colleges-north,31,208,NA,5382,3967,339,2023-24,73.7,8.5
+191621,Hilbert College,NY,regional-colleges-north,31,147,NA,1310,1284,250,2023-24,98,19.5
+161235,University of Maine at Fort Kent,ME,regional-colleges-north,31,19,NA,539,534,71,2023-24,99.1,13.3
+129774,Mitchell College,CT,regional-colleges-north,34,187,NA,1295,950,83,2023-24,73.4,8.7
+166911,Montserrat College of Art,MA,regional-colleges-north,35,206,NA,NA,NA,NA,2023-24,NA,NA
+189413,Boricua College,NY,regional-colleges-north,38,1,NA,NA,NA,NA,2023-24,NA,NA
+161217,University of Maine at Augusta,ME,regional-colleges-north,45,103,NA,NA,NA,NA,2023-24,NA,NA
+161341,University of Maine at Presque Isle,ME,regional-colleges-north,48,58,NA,755,733,132,2023-24,97.1,18
+165802,Fisher College,MA,regional-colleges-north,52,186,NA,3436,2431,205,2023-24,70.8,8.4
+213303,Keystone College,PA,regional-colleges-north,53,100,NA,1789,1424,191,2023-24,79.6,13.4
+197142,Villa Maria College,NY,regional-colleges-north,55,40,NA,593,514,161,2023-24,86.7,31.3
+198695,High Point University,NC,regional-colleges-south,1,131,491,15625,12004,1468,2023-24,76.8,12.2
+482936,Florida Polytechnic University,FL,regional-colleges-south,2,NA,NA,2600,1449,403,2023-24,55.7,27.8
+133711,Flagler College,FL,regional-colleges-south,3,150,NA,5509,4302,655,2023-24,78.1,15.2
+198215,Catawba College,NC,regional-colleges-south,4,99,NA,2547,1979,308,2023-24,77.7,15.6
+141325,Wesleyan College,GA,regional-colleges-south,5,7,NA,1384,859,100,2023-24,62.1,11.6
+107558,University of the Ozarks,AR,regional-colleges-south,6,126,NA,1916,1114,188,2023-24,58.1,16.9
+218742,University of South Carolina-Upstate,SC,regional-colleges-south,7,14,NA,3557,2476,674,2023-24,69.6,27.2
+101435,Huntingdon College,AL,regional-colleges-south,8,149,NA,2581,1828,309,2023-24,70.8,16.9
+198507,Elizabeth City State University,NC,regional-colleges-south,9,9,NA,5360,3778,347,2023-24,70.5,9.2
+140234,LaGrange College,GA,regional-colleges-south,9,96,NA,1402,901,183,2023-24,64.3,20.3
+221731,Tennessee Wesleyan University,TN,regional-colleges-south,9,29,NA,988,587,168,2023-24,59.4,28.6
+197984,Belmont Abbey College,NC,regional-colleges-south,12,183,NA,2972,2686,400,2023-24,90.4,14.9
+218229,Lander University,SC,regional-colleges-south,12,105,NA,5184,3521,846,2023-24,67.9,24
+198808,Lees-McRae College,NC,regional-colleges-south,12,51,NA,1787,1443,199,2023-24,80.7,13.8
+102234,Spring Hill College,AL,regional-colleges-south,12,137,NA,2279,1347,249,2023-24,59.1,18.5
+175430,Blue Mountain Christian University,MS,regional-colleges-south,16,117,NA,191,191,109,2023-24,100,57.1
+135717,Miami Dade College,FL,regional-colleges-south,16,NA,NA,NA,NA,NA,2023-24,NA,NA
+218414,Newberry College,SC,regional-colleges-south,16,94,NA,4269,3193,470,2023-24,74.8,14.7
+106412,University of Arkansas at Pine Bluff,AR,regional-colleges-south,19,27,NA,3792,2182,411,2023-24,57.5,18.8
+243115,University of Puerto Rico-Arecibo,PR,regional-colleges-south,19,NA,NA,1423,886,688,2023-24,62.3,77.7
+197911,Barton College,NC,regional-colleges-south,21,120,NA,2228,2136,281,2023-24,95.9,13.2
+384254,Beacon College,FL,regional-colleges-south,21,NA,NA,593,358,126,2023-24,60.4,35.2
+157076,Kentucky Wesleyan College,KY,regional-colleges-south,21,171,NA,2009,1346,243,2023-24,67,18.1
+108092,University of Arkansas-Fort Smith,AR,regional-colleges-south,21,30,NA,2677,2181,886,2023-24,81.5,40.6
+243179,University of Puerto Rico-Humacao,PR,regional-colleges-south,21,NA,NA,1296,758,671,2023-24,58.5,88.5
+199272,William Peace University,NC,regional-colleges-south,21,184,NA,1286,1252,159,2023-24,97.4,12.7
+237358,Davis & Elkins College,WV,regional-colleges-south,27,113,NA,929,541,237,2023-24,58.2,43.8
+198899,Mars Hill University,NC,regional-colleges-south,27,78,NA,1393,1085,318,2023-24,77.9,29.3
+237969,West Virginia Wesleyan College,WV,regional-colleges-south,27,93,NA,1413,1343,307,2023-24,95,22.9
+156356,Brescia University,KY,regional-colleges-south,30,194,NA,2534,877,151,2023-24,34.6,17.2
+198066,Brevard College,NC,regional-colleges-south,30,189,NA,2582,1020,239,2023-24,39.5,23.4
+220206,Welch College,TN,regional-colleges-south,32,156,NA,NA,NA,NA,2023-24,NA,NA
+156189,Alice Lloyd College,KY,regional-colleges-south,33,16,NA,1871,1601,189,2023-24,85.6,11.8
+445708,Johnson & Wales University-Charlotte,NC,regional-colleges-south,33,177,NA,4677,3521,432,2023-24,75.3,12.3
+199209,North Carolina Wesleyan University,NC,regional-colleges-south,33,72,NA,2417,1884,250,2023-24,77.9,13.3
+157058,Kentucky State University,KY,regional-colleges-south,36,59,NA,2001,1852,345,2023-24,92.6,18.6
+132408,Baptist University of Florida,FL,regional-colleges-south,38,45,NA,156,100,29,2023-24,64.1,29
+139463,Dalton State College,GA,regional-colleges-south,38,8,NA,NA,NA,NA,2023-24,NA,NA
+140872,Reinhardt University,GA,regional-colleges-south,38,198,NA,1755,968,319,2023-24,55.2,33
+243212,University of Puerto Rico at Ponce,PR,regional-colleges-south,38,NA,NA,1441,809,607,2023-24,56.1,75
+218654,University of South Carolina Beaufort,SC,regional-colleges-south,38,163,NA,2745,1899,503,2023-24,69.2,26.5
+199458,Mid-Atlantic Christian University,NC,regional-colleges-south,43,NA,NA,290,221,46,2023-24,76.2,20.8
+107600,Philander Smith University,AR,regional-colleges-south,43,31,NA,NA,NA,NA,2023-24,NA,NA
+141185,Toccoa Falls College,GA,regional-colleges-south,43,191,NA,1002,635,212,2023-24,63.4,33.4
+133809,Florida College,FL,regional-colleges-south,46,NA,NA,307,204,196,2023-24,66.4,96.1
+159382,Louisiana State University-Alexandria,LA,regional-colleges-south,46,112,NA,706,654,482,2023-24,92.6,73.7
+237950,West Virginia University Institute of Technology,WV,regional-colleges-south,46,196,NA,1005,613,308,2023-24,61,50.2
+107877,Williams Baptist University,AR,regional-colleges-south,46,98,NA,1014,597,128,2023-24,58.9,21.4
+138558,Abraham Baldwin Agricultural College,GA,regional-colleges-south,50,NA,NA,2618,2020,1112,2023-24,77.2,55
+237215,Bluefield State University,WV,regional-colleges-south,50,6,NA,720,628,216,2023-24,87.2,34.4
+217998,Erskine College,SC,regional-colleges-south,50,1395,NA,1037,628,295,2023-24,60.6,47
+243106,University of Puerto Rico-Aguadilla,PR,regional-colleges-south,50,NA,NA,657,537,485,2023-24,81.7,90.3
+447689,Georgia Gwinnett College,GA,regional-colleges-south,54,48,NA,6390,6107,2716,2023-24,95.6,44.5
+199032,Montreat College,NC,regional-colleges-south,54,175,NA,2154,1412,201,2023-24,65.6,14.2
+220701,The University of Tennessee Southern,TN,regional-colleges-south,54,180,NA,613,507,185,2023-24,82.7,36.5
+141237,Truett McConnell University,GA,regional-colleges-south,54,207,NA,730,662,217,2023-24,90.7,32.8
+237385,Glenville State University,WV,regional-colleges-south,59,118,NA,NA,NA,NA,2023-24,NA,NA
+232089,Ferrum College,VA,regional-colleges-south,60,125,NA,1483,1483,242,2023-24,100,16.3
+102298,Talladega College,AL,regional-colleges-south,60,32,NA,8900,8833,204,2023-24,99.2,2.3
+106713,Central Baptist College,AR,regional-colleges-south,62,89,NA,302,140,104,2023-24,46.4,74.3
+139630,Emmanuel University,GA,regional-colleges-south,63,201,NA,461,246,204,2023-24,53.4,82.9
+157100,Kentucky Christian University,KY,regional-colleges-south,63,157,NA,747,466,166,2023-24,62.4,35.6
+138868,Point University,GA,regional-colleges-south,65,197,NA,3250,2194,1084,2023-24,67.5,49.4
+218919,Voorhees University,SC,regional-colleges-south,65,61,NA,NA,NA,NA,2023-24,NA,NA
+198303,Chowan University,NC,regional-colleges-south,67,68,NA,2360,1708,161,2023-24,72.4,9.4
+139250,College of Coastal Georgia,GA,regional-colleges-south,67,77,NA,2548,2510,714,2023-24,98.5,28.4
+133526,Edward Waters University,FL,regional-colleges-south,67,143,NA,9805,8316,316,2023-24,84.8,3.8
+198862,Livingstone College,NC,regional-colleges-south,67,65,NA,4748,3518,269,2023-24,74.1,7.6
+106810,Crowley's Ridge College,AR,regional-colleges-south,71,NA,NA,NA,NA,NA,2023-24,NA,NA
+242699,Inter American University of Puerto Rico-Guayama,PR,regional-colleges-south,72,NA,NA,501,243,242,2023-24,48.5,99.6
+242680,Inter American University of Puerto Rico-Fajardo,PR,regional-colleges-south,73,NA,NA,793,282,256,2023-24,35.6,90.8
+220604,Le Moyne-Owen College,TN,regional-colleges-south,73,24,NA,212,206,159,2023-24,97.2,77.2
+242644,Inter American University of Puerto Rico-Barranquitas,PR,regional-colleges-south,75,NA,NA,518,341,223,2023-24,65.8,65.4
+231420,Averett University,VA,regional-colleges-south,76,75,NA,3322,1588,283,2023-24,47.8,17.8
+133979,Florida Memorial University,FL,regional-colleges-south,76,135,NA,12750,9475,459,2023-24,74.3,4.8
+242705,Inter American University of Puerto Rico-Bayamon,PR,regional-colleges-south,76,NA,NA,2054,748,728,2023-24,36.4,97.3
+102270,Stillman College,AL,regional-colleges-south,76,124,NA,2440,1811,200,2023-24,74.2,11
+243133,University of Puerto Rico-Bayamon,PR,regional-colleges-south,76,NA,NA,941,870,780,2023-24,92.5,89.7
+217721,Benedict College,SC,regional-colleges-south,80,158,NA,8073,5433,338,2023-24,67.3,6.2
+138293,Webber International University,FL,regional-colleges-south,80,91,NA,1907,1479,259,2023-24,77.6,17.5
+242662,Inter American University of Puerto Rico-Ponce,PR,regional-colleges-south,82,NA,NA,1538,1081,465,2023-24,70.3,43
+101675,Miles College,AL,regional-colleges-south,83,182,NA,NA,NA,NA,2023-24,NA,NA
+218399,Morris College,SC,regional-colleges-south,84,54,NA,NA,NA,NA,2023-24,NA,NA
+199643,Shaw University,NC,regional-colleges-south,84,84,NA,10699,3261,186,2023-24,30.5,5.7
+243188,University of Puerto Rico-Utuado,PR,regional-colleges-south,86,NA,NA,326,209,100,2023-24,64.1,47.8
+139205,Brewton-Parker College,GA,regional-colleges-south,87,178,NA,1018,879,244,2023-24,86.3,27.8
+199582,Saint Augustine's University,NC,regional-colleges-south,87,173,NA,3160,1856,162,2023-24,58.7,8.7
+139968,Gordon State College,GA,regional-colleges-south,90,NA,NA,2126,1845,729,2023-24,86.8,39.5
+241720,Colegio Universitario de San Juan,PR,regional-colleges-south,91,NA,NA,68,55,55,2023-24,80.9,100
+243832,EDP University of Puerto Rico Inc-San Juan,PR,regional-colleges-south,91,NA,NA,210,162,144,2023-24,77.1,88.9
+140340,Herzing University-Atlanta,GA,regional-colleges-south,91,33,NA,68,64,44,2023-24,94.1,68.8
+139621,East Georgia State College,GA,regional-colleges-south,95,NA,NA,NA,NA,NA,2023-24,NA,NA
+106306,Arkansas Baptist College,AR,regional-colleges-south,96,NA,NA,NA,NA,NA,2023-24,NA,NA
+104586,Embry-Riddle Aeronautical University-Prescott,AZ,regional-colleges-west,1,108,317,3886,2922,833,2023-24,75.2,28.5
+111188,California State University Maritime Academy,CA,regional-colleges-west,2,2,NA,943,931,143,2023-24,98.7,15.4
+180106,Carroll College,MT,regional-colleges-west,3,102,NA,1787,1298,273,2023-24,72.6,21
+209506,Oregon Institute of Technology,OR,regional-colleges-west,4,46,400,5006,4589,433,2023-24,91.7,9.4
+142294,The College of Idaho,ID,regional-colleges-west,5,154,NA,4553,2150,297,2023-24,47.2,13.8
+210304,Warner Pacific University,OR,regional-colleges-west,6,44,NA,825,483,37,2023-24,58.5,7.7
+462354,John Paul the Great Catholic University,CA,regional-colleges-west,7,NA,NA,280,222,75,2023-24,79.3,33.8
+230047,Brigham Young University-Hawaii,HI,regional-colleges-west,8,43,NA,1270,481,335,2023-24,37.9,69.6
+142522,Brigham Young University-Idaho,ID,regional-colleges-west,8,3,487,10303,9989,4334,2023-24,97,43.4
+228981,Texas Lutheran University,TX,regional-colleges-west,8,127,NA,1554,1473,288,2023-24,94.8,19.6
+141981,University of Hawaii-West Oahu,HI,regional-colleges-west,8,55,NA,750,717,238,2023-24,95.6,33.2
+120865,Pacific Union College,CA,regional-colleges-west,12,165,NA,1323,562,139,2023-24,42.5,24.7
+117104,Life Pacific University,CA,regional-colleges-west,13,NA,NA,281,264,74,2023-24,94,28
+127556,Colorado Mesa University,CO,regional-colleges-west,14,140,NA,10631,8653,1806,2023-24,81.4,20.9
+226587,McMurry University,TX,regional-colleges-west,15,134,NA,4836,2788,318,2023-24,57.7,11.4
+180692,The University of Montana-Western,MT,regional-colleges-west,15,35,NA,793,789,300,2023-24,99.5,38
+127185,Fort Lewis College,CO,regional-colleges-west,17,17,NA,4253,3964,815,2023-24,93.2,20.6
+228468,Southwestern Adventist University,TX,regional-colleges-west,17,192,NA,1468,815,159,2023-24,55.5,19.5
+225575,Huston-Tillotson University,TX,regional-colleges-west,20,86,NA,NA,NA,NA,2023-24,NA,NA
+225548,Howard Payne University,TX,regional-colleges-west,21,168,NA,1269,859,209,2023-24,67.7,24.3
+180522,Montana State University-Northern,MT,regional-colleges-west,22,37,NA,NA,NA,NA,2023-24,NA,NA
+142328,Lewis-Clark State College,ID,regional-colleges-west,24,57,NA,4256,3821,438,2023-24,89.8,11.5
+441900,Nevada State University,NV,regional-colleges-west,25,190,NA,1733,1493,519,2023-24,86.2,34.8
+105899,Arizona Christian University,AZ,regional-colleges-west,26,185,NA,1251,931,376,2023-24,74.4,40.4
+188058,Northern New Mexico College,NM,regional-colleges-west,27,NA,NA,NA,NA,NA,2023-24,NA,NA
+207351,Oklahoma Panhandle State University,OK,regional-colleges-west,27,69,NA,NA,NA,NA,2023-24,NA,NA
+207661,Rogers State University,OK,regional-colleges-west,27,74,NA,NA,NA,NA,2023-24,NA,NA
+230597,Snow College,UT,regional-colleges-west,27,NA,NA,NA,NA,NA,2023-24,NA,NA
+102669,Alaska Pacific University,AK,regional-colleges-west,32,NA,NA,841,725,27,2023-24,86.2,3.7
+229887,Wiley University,TX,regional-colleges-west,33,82,NA,NA,NA,NA,2023-24,NA,NA
+230171,Utah Tech University,UT,regional-colleges-west,34,22,NA,NA,NA,NA,2023-24,NA,NA
+126711,Colorado Mountain College,CO,regional-colleges-west,36,NA,NA,NA,NA,NA,2023-24,NA,NA
+225885,Jarvis Christian University,TX,regional-colleges-west,36,153,NA,NA,NA,NA,2023-24,NA,NA
+409315,South Texas College,TX,regional-colleges-west,38,NA,NA,NA,NA,NA,2023-24,NA,NA
+207856,Southwestern Christian University,OK,regional-colleges-west,39,181,NA,NA,NA,NA,2023-24,NA,NA
+228884,Texas College,TX,regional-colleges-west,40,111,NA,NA,NA,NA,2023-24,NA,NA
+182306,Great Basin College,NV,regional-colleges-west,41,NA,NA,NA,NA,NA,2023-24,NA,NA
+150163,Butler University,IN,regional-universities-midwest,1,224,268,9431,8098,1151,2023-24,85.9,14.2
+203368,John Carroll University,OH,regional-universities-midwest,2,220,343,4238,3437,556,2023-24,81.1,16.2
+239318,Milwaukee School of Engineering,WI,regional-universities-midwest,2,307,284,6032,3643,672,2023-24,60.4,18.4
+169080,Calvin University,MI,regional-universities-midwest,4,289,251,4719,3365,725,2023-24,71.3,21.5
+153250,Dordt University,IA,regional-universities-midwest,5,326,NA,1595,1135,461,2023-24,71.2,40.6
+179043,Rockhurst University,MO,regional-universities-midwest,6,141,344,2627,1814,339,2023-24,69.1,18.7
+219000,Augustana University,SD,regional-universities-midwest,7,331,443,3330,1973,456,2023-24,59.2,23.1
+144962,Elmhurst University,IL,regional-universities-midwest,7,298,403,6254,4737,607,2023-24,75.7,12.8
+178615,Truman State University,MO,regional-universities-midwest,7,192,257,3263,2609,645,2023-24,80,24.7
+154095,University of Northern Iowa,IA,regional-universities-midwest,10,25,395,4913,4638,1552,2023-24,94.4,33.5
+169983,Kettering University,MI,regional-universities-midwest,11,485,218,1951,1543,228,2023-24,79.1,14.8
+201195,Baldwin Wallace University,OH,regional-universities-midwest,12,416,NA,4384,3369,732,2023-24,76.8,21.7
+204936,Otterbein University,OH,regional-universities-midwest,12,137,NA,3498,2914,519,2023-24,83.3,17.8
+151801,Indiana Wesleyan University-Marion,IN,regional-universities-midwest,14,257,NA,3035,2495,500,2023-24,82.2,20
+171137,University of Michigan-Dearborn,MI,regional-universities-midwest,14,67,291,12373,7254,1157,2023-24,58.6,15.9
+201654,Cedarville University,OH,regional-universities-midwest,17,423,478,5382,3381,1017,2023-24,62.8,30.1
+150534,University of Evansville,IN,regional-universities-midwest,18,383,NA,4492,3488,462,2023-24,77.6,13.2
+174233,University of Minnesota-Duluth,MN,regional-universities-midwest,18,138,369,9502,7768,1821,2023-24,81.8,23.4
+147660,North Central College,IL,regional-universities-midwest,20,508,458,5241,3056,516,2023-24,58.3,16.9
+219347,South Dakota School of Mines and Technology,SD,regional-universities-midwest,20,516,363,1539,1312,496,2023-24,85.3,37.8
+173665,Hamline University,MN,regional-universities-midwest,22,89,NA,3185,2861,395,2023-24,89.8,13.8
+175272,Winona State University,MN,regional-universities-midwest,22,118,NA,6159,4220,1162,2023-24,68.5,27.5
+181215,University of Nebraska at Kearney,NE,regional-universities-midwest,24,129,NA,7253,6222,910,2023-24,85.8,14.6
+148496,Dominican University,IL,regional-universities-midwest,25,251,NA,6536,5216,651,2023-24,79.8,12.5
+177214,Drury University,MO,regional-universities-midwest,25,479,NA,2621,1543,336,2023-24,58.9,21.8
+205957,Franciscan University of Steubenville,OH,regional-universities-midwest,25,513,NA,2265,1636,674,2023-24,72.2,41.2
+240268,University of Wisconsin-Eau Claire,WI,regional-universities-midwest,25,305,283,10315,7848,2163,2023-24,76.1,27.6
+146612,Lewis University,IL,regional-universities-midwest,29,217,376,5291,3848,620,2023-24,72.7,16.1
+148654,University of Illinois Springfield,IL,regional-universities-midwest,29,154,387,2495,2105,259,2023-24,84.4,12.3
+240189,University of Wisconsin-Whitewater,WI,regional-universities-midwest,31,216,NA,11190,9261,2217,2023-24,82.8,23.9
+173045,Augsburg University,MN,regional-universities-midwest,32,37,NA,4337,3319,684,2023-24,76.5,20.6
+238458,Carroll University,WI,regional-universities-midwest,32,466,NA,5972,3488,618,2023-24,58.4,17.7
+179894,Webster University,MO,regional-universities-midwest,32,339,NA,3757,3097,452,2023-24,82.4,14.6
+150941,Huntington University,IN,regional-universities-midwest,35,399,NA,1570,1117,268,2023-24,71.1,24
+174491,University of Northwestern-St Paul,MN,regional-universities-midwest,36,454,NA,1194,1097,364,2023-24,91.9,33.2
+152336,University of Saint Francis-Fort Wayne,IN,regional-universities-midwest,36,197,NA,1560,1522,442,2023-24,97.6,29
+181604,College of Saint Mary,NE,regional-universities-midwest,38,262,NA,430,189,89,2023-24,44,47.1
+181446,Nebraska Wesleyan University,NE,regional-universities-midwest,39,381,NA,2295,1922,440,2023-24,83.7,22.9
+147828,Olivet Nazarene University,IL,regional-universities-midwest,39,419,NA,4426,2961,649,2023-24,66.9,21.9
+204185,University of Mount Union,OH,regional-universities-midwest,39,333,NA,3322,2661,536,2023-24,80.1,20.1
+201104,Ashland University,OH,regional-universities-midwest,42,492,NA,3633,2927,519,2023-24,80.6,17.7
+201548,Capital University,OH,regional-universities-midwest,42,309,NA,4365,3194,413,2023-24,73.2,12.9
+154101,Northwestern College,IA,regional-universities-midwest,42,427,NA,1155,1005,283,2023-24,87,28.2
+152381,Saint Mary-of-the-Woods College,IN,regional-universities-midwest,42,256,NA,1182,900,211,2023-24,76.1,23.4
+238476,Carthage College,WI,regional-universities-midwest,46,522,NA,8044,6769,775,2023-24,84.1,11.4
+204264,Muskingum University,OH,regional-universities-midwest,46,389,NA,2623,2142,373,2023-24,81.7,17.4
+148627,Saint Xavier University,IL,regional-universities-midwest,46,199,NA,7216,6188,759,2023-24,85.8,12.3
+153001,Buena Vista University,IA,regional-universities-midwest,49,43,NA,1544,1108,217,2023-24,71.8,19.6
+170675,Lawrence Technological University,MI,regional-universities-midwest,49,556,NA,2121,1702,312,2023-24,80.2,18.3
+174358,Minnesota State University Moorhead,MN,regional-universities-midwest,49,175,NA,4654,2449,606,2023-24,52.6,24.7
+171456,Northern Michigan University,MI,regional-universities-midwest,49,150,NA,6922,4842,1551,2023-24,70,32
+240462,University of Wisconsin-Platteville,WI,regional-universities-midwest,49,426,373,5754,5021,1445,2023-24,87.3,28.8
+144892,Eastern Illinois University,IL,regional-universities-midwest,54,168,NA,11648,7892,819,2023-24,67.8,10.4
+173920,Minnesota State University-Mankato,MN,regional-universities-midwest,54,260,NA,8974,8196,2407,2023-24,91.3,29.4
+147679,North Park University,IL,regional-universities-midwest,54,347,NA,3468,2526,455,2023-24,72.8,18
+240471,University of Wisconsin-River Falls,WI,regional-universities-midwest,54,278,NA,5903,4818,1063,2023-24,81.6,22.1
+240480,University of Wisconsin-Stevens Point,WI,regional-universities-midwest,54,153,NA,8820,7950,1828,2023-24,90.1,23
+239390,Mount Mary University,WI,regional-universities-midwest,59,79,NA,933,871,172,2023-24,93.4,19.7
+176965,University of Central Missouri,MO,regional-universities-midwest,59,360,NA,4966,3407,1061,2023-24,68.6,31.1
+145619,Benedictine University,IL,regional-universities-midwest,61,272,NA,2788,2153,354,2023-24,77.2,16.4
+150145,Bethel University,IN,regional-universities-midwest,61,264,NA,833,822,226,2023-24,98.7,27.5
+219082,Dakota State University,SD,regional-universities-midwest,61,571,NA,988,967,394,2023-24,97.9,40.7
+181020,Doane University,NE,regional-universities-midwest,61,496,NA,1289,1154,246,2023-24,89.5,21.3
+219259,Northern State University,SD,regional-universities-midwest,61,490,NA,1082,1004,319,2023-24,92.8,31.8
+206349,Ursuline College,OH,regional-universities-midwest,61,238,NA,613,515,114,2023-24,84,22.1
+240107,Viterbo University,WI,regional-universities-midwest,61,283,NA,1399,1025,252,2023-24,73.3,24.6
+150677,Grace College and Theological Seminary,IN,regional-universities-midwest,68,334,NA,4111,3321,452,2023-24,80.8,13.6
+154013,Mount Mercy University,IA,regional-universities-midwest,68,191,NA,1436,1131,208,2023-24,78.8,18.4
+179557,Southeast Missouri State University,MO,regional-universities-midwest,68,253,NA,7462,5858,1287,2023-24,78.5,22
+173124,Bemidji State University,MN,regional-universities-midwest,71,370,NA,2860,2021,480,2023-24,70.7,23.8
+203085,Heidelberg University,OH,regional-universities-midwest,71,166,NA,2253,1526,287,2023-24,67.7,18.8
+219383,University of Sioux Falls,SD,regional-universities-midwest,71,359,NA,2478,2034,310,2023-24,82.1,15.2
+170806,Madonna University,MI,regional-universities-midwest,74,177,NA,1655,1538,265,2023-24,92.9,17.2
+240277,University of Wisconsin-Green Bay,WI,regional-universities-midwest,74,96,NA,6373,5598,1258,2023-24,87.8,22.5
+156082,Washburn University,KS,regional-universities-midwest,74,300,NA,NA,NA,NA,2023-24,NA,NA
+149772,Western Illinois University,IL,regional-universities-midwest,74,70,NA,8479,6356,968,2023-24,75,15.2
+150066,Anderson University,IN,regional-universities-midwest,78,463,NA,5661,3024,310,2023-24,53.4,10.3
+170037,Cornerstone University,MI,regional-universities-midwest,78,462,NA,2011,1472,305,2023-24,73.2,20.7
+155025,Emporia State University,KS,regional-universities-midwest,78,174,NA,1592,1556,409,2023-24,97.7,26.3
+155061,Fort Hays State University,KS,regional-universities-midwest,78,188,NA,2174,1995,886,2023-24,91.8,44.4
+153278,University of Dubuque,IA,regional-universities-midwest,78,400,NA,1560,1356,325,2023-24,86.9,24
+151306,University of Southern Indiana,IN,regional-universities-midwest,78,270,NA,4392,4157,1283,2023-24,94.6,30.9
+238193,Alverno College,WI,regional-universities-midwest,84,57,NA,667,621,150,2023-24,93.1,24.2
+153375,Grand View University,IA,regional-universities-midwest,84,214,NA,1665,1638,340,2023-24,98.4,20.8
+151777,Manchester University,IN,regional-universities-midwest,84,299,NA,2470,2255,288,2023-24,91.3,12.8
+204194,Mount Vernon Nazarene University,OH,regional-universities-midwest,84,379,NA,1134,956,272,2023-24,84.3,28.5
+178624,Northwest Missouri State University,MO,regional-universities-midwest,84,239,NA,6834,5871,1035,2023-24,85.9,17.6
+155681,Pittsburg State University,KS,regional-universities-midwest,84,93,NA,2856,2518,877,2023-24,88.2,34.8
+172334,Spring Arbor University,MI,regional-universities-midwest,84,343,NA,3145,1174,206,2023-24,37.3,17.5
+240417,University of Wisconsin-Stout,WI,regional-universities-midwest,84,410,NA,6440,5457,1267,2023-24,84.7,23.2
+177339,Evangel University,MO,regional-universities-midwest,92,350,NA,1166,808,330,2023-24,69.3,40.8
+219198,Mount Marty University,SD,regional-universities-midwest,92,540,NA,1290,621,163,2023-24,48.1,26.2
+155812,University of Saint Mary,KS,regional-universities-midwest,92,235,NA,1201,1079,221,2023-24,89.8,20.5
+155520,MidAmerica Nazarene University,KS,regional-universities-midwest,95,233,NA,1085,797,209,2023-24,73.5,26.2
+174783,Saint Cloud State University,MN,regional-universities-midwest,95,218,NA,5026,4772,897,2023-24,94.9,18.8
+179548,Stephens College,MO,regional-universities-midwest,95,225,NA,414,379,74,2023-24,91.5,19.5
+181783,Wayne State College,NE,regional-universities-midwest,95,97,NA,NA,NA,NA,2023-24,NA,NA
+172051,Saginaw Valley State University,MI,regional-universities-midwest,99,157,NA,10222,7450,1292,2023-24,72.9,17.3
+206695,Youngstown State University,OH,regional-universities-midwest,99,365,NA,5799,4658,1317,2023-24,80.3,28.3
+180984,Concordia University-Nebraska,NE,regional-universities-midwest,101,392,NA,1587,1429,381,2023-24,90,26.7
+203775,Malone University,OH,regional-universities-midwest,101,395,NA,1335,1009,219,2023-24,75.6,21.7
+147013,McKendree University,IL,regional-universities-midwest,101,354,NA,2652,1694,436,2023-24,63.9,25.7
+490805,Purdue University Northwest,IN,regional-universities-midwest,101,393,NA,6394,4516,1192,2023-24,70.6,26.4
+173328,Concordia University-Saint Paul,MN,regional-universities-midwest,105,60,NA,2730,2044,377,2023-24,74.9,18.4
+145372,Greenville University,IL,regional-universities-midwest,105,330,NA,1273,1214,210,2023-24,95.4,17.3
+174020,Metropolitan State University,MN,regional-universities-midwest,107,13,NA,542,523,158,2023-24,96.5,30.2
+179326,Southwest Baptist University,MO,regional-universities-midwest,107,198,NA,1057,1054,270,2023-24,99.7,25.6
+175078,Southwest Minnesota State University,MN,regional-universities-midwest,107,431,NA,2630,1813,368,2023-24,68.9,20.3
+146339,Judson University,IL,regional-universities-midwest,110,527,NA,873,551,178,2023-24,63.1,32.3
+239080,Marian University,WI,regional-universities-midwest,110,363,NA,1596,1067,227,2023-24,66.9,21.3
+151388,Indiana University-East,IN,regional-universities-midwest,112,146,NA,1749,1246,336,2023-24,71.2,27
+238980,Lakeland University,WI,regional-universities-midwest,112,509,NA,1062,967,202,2023-24,91.1,20.9
+200253,Minot State University,ND,regional-universities-midwest,112,355,NA,745,538,365,2023-24,72.2,67.8
+204617,Ohio Dominican University,OH,regional-universities-midwest,112,434,NA,1559,1329,234,2023-24,85.2,17.6
+151102,Purdue University Fort Wayne,IN,regional-universities-midwest,112,489,NA,6466,5539,1378,2023-24,85.7,24.9
+205443,Shawnee State University,OH,regional-universities-midwest,112,268,NA,NA,NA,NA,2023-24,NA,NA
+155335,Newman University,KS,regional-universities-midwest,118,404,NA,985,469,177,2023-24,47.6,37.7
+240374,University of Wisconsin-Parkside,WI,regional-universities-midwest,118,126,NA,3911,2840,565,2023-24,72.6,19.9
+176628,Avila University,MO,regional-universities-midwest,120,254,NA,1862,1704,397,2023-24,91.5,23.3
+151333,Indiana University-Kokomo,IN,regional-universities-midwest,120,113,NA,1953,1654,482,2023-24,84.7,29.1
+239071,Maranatha Baptist University,WI,regional-universities-midwest,120,163,NA,206,146,102,2023-24,70.9,69.9
+154004,Morningside University,IA,regional-universities-midwest,120,385,NA,2756,1945,337,2023-24,70.6,17.3
+169479,Davenport University,MI,regional-universities-midwest,124,486,NA,3869,3755,587,2023-24,97.1,15.6
+155089,Friends University,KS,regional-universities-midwest,124,376,NA,1134,631,248,2023-24,55.6,39.3
+177968,Lindenwood University,MO,regional-universities-midwest,124,386,NA,6743,4441,891,2023-24,65.9,20.1
+203757,Lourdes University,OH,regional-universities-midwest,124,537,NA,1004,744,129,2023-24,74.1,17.3
+200156,University of Jamestown,ND,regional-universities-midwest,124,520,NA,1047,979,251,2023-24,93.5,25.6
+144351,Concordia University-Chicago,IL,regional-universities-midwest,129,202,NA,4607,4301,327,2023-24,93.4,7.6
+148405,Rockford University,IL,regional-universities-midwest,130,450,NA,2979,1705,191,2023-24,57.2,11.2
+153366,Graceland University-Lamoni,IA,regional-universities-midwest,131,161,NA,2259,1880,240,2023-24,83.2,12.8
+151342,Indiana University-South Bend,IN,regional-universities-midwest,131,132,NA,2777,2388,886,2023-24,86,37.1
+144281,Columbia College Chicago,IL,regional-universities-midwest,133,388,NA,7873,7178,1608,2023-24,91.2,22.4
+178387,Missouri Western State University,MO,regional-universities-midwest,133,467,NA,NA,NA,NA,2023-24,NA,NA
+174862,Crown College,MN,regional-universities-midwest,135,547,NA,1054,662,205,2023-24,62.8,31
+151379,Indiana University-Southeast,IN,regional-universities-midwest,135,133,NA,2062,1714,645,2023-24,83.1,37.6
+240426,University of Wisconsin-Superior,WI,regional-universities-midwest,135,90,NA,2310,2163,260,2023-24,93.6,12
+178341,Missouri Southern State University,MO,regional-universities-midwest,138,184,NA,2302,2243,579,2023-24,97.4,25.8
+206048,Tiffin University,OH,regional-universities-midwest,138,562,239,4785,3817,504,2023-24,79.8,13.2
+180948,Chadron State College,NE,regional-universities-midwest,140,213,NA,NA,NA,NA,2023-24,NA,NA
+151290,Indiana Institute of Technology,IN,regional-universities-midwest,141,579,NA,6187,3520,443,2023-24,56.9,12.6
+151360,Indiana University-Northwest,IN,regional-universities-midwest,141,252,NA,2820,2163,470,2023-24,76.7,21.7
+219046,Black Hills State University,SD,regional-universities-midwest,143,526,NA,1617,1527,489,2023-24,94.4,32
+181330,Midland University,NE,regional-universities-midwest,143,564,NA,1436,961,283,2023-24,66.9,29.4
+178244,Missouri Baptist University,MO,regional-universities-midwest,145,555,NA,1195,766,264,2023-24,64.1,34.5
+203580,Lake Erie College,OH,regional-universities-midwest,146,563,NA,1193,765,187,2023-24,64.1,24.4
+177065,Columbia College,MO,regional-universities-midwest,147,401,NA,NA,NA,NA,2023-24,NA,NA
+147776,Northeastern Illinois University,IL,regional-universities-midwest,148,42,NA,8481,5971,553,2023-24,70.4,9.3
+202806,Franklin University,OH,regional-universities-midwest,149,472,NA,NA,NA,NA,2023-24,NA,NA
+181534,Peru State College,NE,regional-universities-midwest,149,172,NA,NA,NA,NA,2023-24,NA,NA
+154493,Upper Iowa University,IA,regional-universities-midwest,151,504,NA,695,649,158,2023-24,93.4,24.3
+180814,Bellevue University,NE,regional-universities-midwest,152,560,NA,NA,NA,NA,2023-24,NA,NA
+201964,Ohio Christian University,OH,regional-universities-midwest,153,578,NA,1223,488,186,2023-24,39.9,38.1
+150172,Calumet College of Saint Joseph,IN,regional-universities-midwest,154,200,NA,NA,NA,NA,2023-24,NA,NA
+145336,Governors State University,IL,regional-universities-midwest,155,45,NA,NA,NA,NA,2023-24,NA,NA
+240392,Herzing University-Madison,WI,regional-universities-midwest,155,203,NA,513,483,330,2023-24,94.2,68.3
+178721,Park University,MO,regional-universities-midwest,157,446,NA,NA,NA,NA,2023-24,NA,NA
+144005,Chicago State University,IL,regional-universities-midwest,158,461,NA,9458,3832,223,2023-24,40.5,5.8
+168847,Baker College,MI,regional-universities-midwest,159,542,NA,864,756,373,2023-24,87.5,49.3
+164739,Bentley University,MA,regional-universities-north,1,297,201,10482,5077,1120,2023-24,48.4,22.1
+217402,Providence College,RI,regional-universities-north,2,424,275,12469,6075,1197,2023-24,48.7,19.7
+217493,Rhode Island School of Design,RI,regional-universities-north,3,459,229,7126,984,504,2023-24,13.8,51.2
+187134,The College of New Jersey,NJ,regional-universities-north,4,82,191,11668,7251,1547,2023-24,62.1,21.3
+217165,Bryant University,RI,regional-universities-north,5,554,347,9506,6241,948,2023-24,65.7,15.2
+215770,Saint Joseph's University - Philadelphia,PA,regional-universities-north,6,312,NA,8751,7560,1196,2023-24,86.4,15.8
+163046,Loyola University Maryland,MD,regional-universities-north,7,103,259,10162,7757,1112,2023-24,76.3,14.3
+215929,University of Scranton,PA,regional-universities-north,8,152,261,9530,8039,1028,2023-24,84.4,12.8
+192819,Marist University,NY,regional-universities-north,9,302,NA,10224,6616,1287,2023-24,64.7,19.5
+190512,CUNY Bernard M Baruch College,NY,regional-universities-north,10,20,NA,24867,12554,2614,2023-24,50.5,20.8
+166692,Massachusetts Maritime Academy,MA,regional-universities-north,11,222,356,1120,1059,399,2023-24,94.6,37.7
+164076,Towson University,MD,regional-universities-north,11,15,196,18948,15689,3014,2023-24,82.8,19.2
+191968,Ithaca College,NY,regional-universities-north,13,349,406,12007,8398,1197,2023-24,69.9,14.3
+192323,Le Moyne College,NY,regional-universities-north,13,206,414,7535,5673,607,2023-24,75.3,10.7
+185572,Monmouth University,NJ,regional-universities-north,13,311,436,8410,7530,975,2023-24,89.5,12.9
+195474,Siena College,NY,regional-universities-north,16,186,327,8992,6346,809,2023-24,70.6,12.7
+190600,CUNY John Jay College of Criminal Justice,NY,regional-universities-north,17,18,241,17921,10255,2033,2023-24,57.2,19.8
+196167,SUNY College at Geneseo,NY,regional-universities-north,17,22,427,13479,8563,982,2023-24,63.5,11.5
+165662,Emerson College,MA,regional-universities-north,19,315,410,11092,5267,997,2023-24,47.5,18.9
+196176,State University of New York at New Paltz,NY,regional-universities-north,20,85,NA,16249,9538,1119,2023-24,58.7,11.7
+190594,CUNY Hunter College,NY,regional-universities-north,21,7,102,31614,17087,3175,2023-24,54,18.6
+186201,Ramapo College of New Jersey,NJ,regional-universities-north,21,156,223,7553,5530,1012,2023-24,73.2,18.3
+196291,SUNY Maritime College,NY,regional-universities-north,21,244,227,1629,1279,277,2023-24,78.5,21.7
+217536,Salve Regina University,RI,regional-universities-north,24,415,474,5697,3983,552,2023-24,69.9,13.9
+194091,New York Institute of Technology,NY,regional-universities-north,25,405,351,11249,8783,886,2023-24,78.1,10.1
+196185,SUNY Oneonta,NY,regional-universities-north,25,35,224,13660,9583,1320,2023-24,70.2,13.8
+195164,St Bonaventure University,NY,regional-universities-north,25,301,NA,4299,3505,574,2023-24,81.5,16.4
+192703,Manhattan University,NY,regional-universities-north,28,139,258,10432,8188,729,2023-24,78.5,8.9
+193973,Niagara University,NY,regional-universities-north,28,119,NA,4148,3540,580,2023-24,85.3,16.4
+196194,State University of New York at Oswego,NY,regional-universities-north,28,51,NA,14465,11629,1191,2023-24,80.4,10.2
+168227,Wentworth Institute of Technology,MA,regional-universities-north,28,428,328,6453,5509,980,2023-24,85.4,17.8
+189705,Canisius University,NY,regional-universities-north,32,258,425,4147,3391,424,2023-24,81.8,12.5
+190637,CUNY Lehman College,NY,regional-universities-north,33,14,326,20954,11615,1390,2023-24,55.4,12
+196149,State University of New York at Cortland,NY,regional-universities-north,33,72,NA,15867,8046,1217,2023-24,50.7,15.1
+217518,Roger Williams University,RI,regional-universities-north,35,523,NA,8238,7231,1022,2023-24,87.8,14.1
+196112,SUNY Polytechnic Institute,NY,regional-universities-north,35,164,360,4936,3872,389,2023-24,78.4,10
+164748,Berklee College of Music,MA,regional-universities-north,38,585,426,7167,3577,1502,2023-24,49.9,42
+190549,CUNY Brooklyn College,NY,regional-universities-north,38,21,183,27112,14548,1519,2023-24,53.7,10.4
+190664,CUNY Queens College,NY,regional-universities-north,38,49,90,20800,14252,2082,2023-24,68.5,14.6
+165699,Endicott College,MA,regional-universities-north,38,566,NA,5562,4021,901,2023-24,72.3,22.4
+166850,Merrimack College,MA,regional-universities-north,38,473,NA,13693,10079,1071,2023-24,73.6,10.6
+214157,Moravian University,PA,regional-universities-north,38,493,NA,5115,2762,515,2023-24,54,18.6
+186432,Saint Peter's University,NJ,regional-universities-north,38,44,385,4381,3966,454,2023-24,90.5,11.4
+212197,Elizabethtown College,PA,regional-universities-north,45,402,479,3551,2726,529,2023-24,76.8,19.4
+213996,Messiah University,PA,regional-universities-north,45,286,NA,2375,1864,596,2023-24,78.5,32
+186283,Rider University,NJ,regional-universities-north,45,329,70,9069,7201,806,2023-24,79.4,11.2
+163851,Salisbury University,MD,regional-universities-north,45,66,277,8090,7170,1376,2023-24,88.6,19.2
+130314,University of Saint Joseph,CT,regional-universities-north,45,452,NA,1778,1416,173,2023-24,79.6,12.2
+164562,Assumption University,MA,regional-universities-north,50,502,455,4694,4062,479,2023-24,86.5,11.8
+193584,Nazareth University,NY,regional-universities-north,50,201,NA,3614,2873,461,2023-24,79.5,16
+163578,Notre Dame of Maryland University,MD,regional-universities-north,50,104,NA,2320,2006,191,2023-24,86.5,9.5
+195544,St. Joseph's University-New York,NY,regional-universities-north,50,282,NA,5003,3572,491,2023-24,71.4,13.7
+196246,State University of New York at Plattsburgh,NY,regional-universities-north,50,83,NA,8410,6323,789,2023-24,75.2,12.5
+167394,College of Our Lady of the Elms,MA,regional-universities-north,55,279,NA,1442,1264,196,2023-24,87.7,15.5
+184603,Fairleigh Dickinson University-Metropolitan Campus,NJ,regional-universities-north,55,494,NA,4259,4085,606,2023-24,95.9,14.8
+162760,Hood College,MD,regional-universities-north,55,130,NA,3287,2568,303,2023-24,78.1,11.8
+167598,Regis College,MA,regional-universities-north,55,519,NA,2490,2223,213,2023-24,89.3,9.6
+215743,Saint Francis University,PA,regional-universities-north,55,292,NA,2259,1737,379,2023-24,76.9,21.8
+216038,Slippery Rock University of Pennsylvania,PA,regional-universities-north,55,74,NA,6119,4566,1537,2023-24,74.6,33.7
+188641,Alfred University,NY,regional-universities-north,61,320,NA,7761,3751,432,2023-24,48.3,11.5
+191931,Iona University,NY,regional-universities-north,61,506,485,7289,6643,803,2023-24,91.1,12.1
+213826,Marywood University,PA,regional-universities-north,61,338,NA,3136,2625,422,2023-24,83.7,16.1
+196121,SUNY Brockport,NY,regional-universities-north,64,78,423,10855,7738,1267,2023-24,71.3,16.4
+130493,Southern Connecticut State University,CT,regional-universities-north,64,98,NA,8303,6735,1227,2023-24,81.1,18.2
+129215,Eastern Connecticut State University,CT,regional-universities-north,66,221,NA,5275,4249,614,2023-24,80.5,14.5
+213987,Mercyhurst University,PA,regional-universities-north,66,407,NA,3500,2913,571,2023-24,83.2,19.6
+193292,Molloy University,NY,regional-universities-north,66,281,NA,5789,4379,608,2023-24,75.6,13.9
+215947,Seton Hill University,PA,regional-universities-north,66,314,NA,2441,1850,319,2023-24,75.8,17.2
+164173,Stevenson University,MD,regional-universities-north,70,512,NA,5233,4354,793,2023-24,83.2,18.2
+197197,Wagner College,NY,regional-universities-north,70,250,334,2328,1943,398,2023-24,83.5,20.5
+165820,Fitchburg State University,MA,regional-universities-north,72,341,NA,4353,3915,611,2023-24,89.9,15.6
+164270,McDaniel College,MD,regional-universities-north,72,125,NA,3856,3223,424,2023-24,83.6,13.2
+193353,Mount Saint Mary College,NY,regional-universities-north,72,324,NA,2229,1838,188,2023-24,82.5,10.2
+163462,Mount St. Mary's University,MD,regional-universities-north,72,357,NA,5422,3896,480,2023-24,71.9,12.3
+211088,Arcadia University,PA,regional-universities-north,76,337,NA,6688,5296,420,2023-24,79.2,7.9
+128771,Central Connecticut State University,CT,regional-universities-north,76,124,NA,8282,6255,1441,2023-24,75.5,23
+213507,Lebanon Valley College,PA,regional-universities-north,76,501,424,3275,2441,480,2023-24,74.5,19.7
+196158,SUNY at Fredonia,NY,regional-universities-north,76,69,NA,5941,4705,644,2023-24,79.2,13.7
+161873,University of Baltimore,MD,regional-universities-north,76,46,NA,173,148,29,2023-24,85.5,19.6
+129941,University of New Haven,CT,regional-universities-north,76,549,NA,13498,10872,1296,2023-24,80.5,11.9
+197045,Utica University,NY,regional-universities-north,76,422,NA,3826,3336,577,2023-24,87.2,17.3
+183910,Caldwell University,NJ,regional-universities-north,84,322,NA,7845,5131,343,2023-24,65.4,6.7
+211431,Carlow University,PA,regional-universities-north,84,167,NA,1326,1155,227,2023-24,87.1,19.7
+217235,Johnson & Wales University-Providence,RI,regional-universities-north,84,561,NA,8841,7400,1056,2023-24,83.7,14.3
+192749,Manhattanville University,NY,regional-universities-north,84,497,NA,3943,3338,333,2023-24,84.7,10
+230995,Norwich University,VT,regional-universities-north,84,306,NA,5157,3796,563,2023-24,73.6,14.8
+217420,Rhode Island College,RI,regional-universities-north,84,73,NA,4988,4045,813,2023-24,81.1,20.1
+194958,Roberts Wesleyan University,NY,regional-universities-north,84,136,NA,1314,1022,211,2023-24,77.8,20.6
+216010,Shippensburg University of Pennsylvania,PA,regional-universities-north,84,353,NA,6545,5599,1097,2023-24,85.5,19.6
+187444,William Paterson University of New Jersey,NJ,regional-universities-north,84,61,NA,7754,7174,883,2023-24,92.5,12.3
+217059,York College of Pennsylvania,PA,regional-universities-north,84,477,NA,4933,4647,805,2023-24,94.2,17.3
+230852,Champlain College,VT,regional-universities-north,94,528,NA,5297,3534,546,2023-24,66.7,15.4
+196200,SUNY College at Potsdam,NY,regional-universities-north,94,160,NA,3905,3338,430,2023-24,85.5,12.9
+161518,Saint Joseph's College of Maine,ME,regional-universities-north,94,535,NA,2216,1811,232,2023-24,81.7,12.8
+167729,Salem State University,MA,regional-universities-north,94,87,NA,4852,4637,810,2023-24,95.6,17.5
+128498,Albertus Magnus College,CT,regional-universities-north,98,521,NA,2338,1505,176,2023-24,64.4,11.7
+165024,Bridgewater State University,MA,regional-universities-north,98,196,NA,8631,7698,1580,2023-24,89.2,20.5
+211468,Cedar Crest College,PA,regional-universities-north,98,290,NA,1152,1142,155,2023-24,99.1,13.6
+183974,Centenary University,NJ,regional-universities-north,98,345,NA,1294,1251,181,2023-24,96.7,14.5
+190558,College of Staten Island CUNY,NY,regional-universities-north,98,143,451,NA,NA,NA,2023-24,NA,NA
+162584,Frostburg State University,MD,regional-universities-north,98,75,NA,4556,4075,614,2023-24,89.4,15.1
+212984,Holy Family University,PA,regional-universities-north,98,159,NA,2653,1969,471,2023-24,74.2,23.9
+214041,Millersville University of Pennsylvania,PA,regional-universities-north,98,94,NA,6989,6249,1175,2023-24,89.4,18.8
+196237,SUNY Old Westbury,NY,regional-universities-north,98,48,NA,6511,5507,720,2023-24,84.6,13.1
+130776,Western Connecticut State University,CT,regional-universities-north,98,445,NA,5457,4440,711,2023-24,81.4,16
+168263,Westfield State University,MA,regional-universities-north,98,237,NA,6273,5065,712,2023-24,80.7,14.1
+168430,Worcester State University,MA,regional-universities-north,98,107,NA,4745,4264,909,2023-24,89.9,21.3
+165866,Framingham State University,MA,regional-universities-north,110,263,NA,4342,3685,499,2023-24,84.9,13.5
+184773,Georgian Court University,NJ,regional-universities-north,110,432,NA,2317,1634,232,2023-24,70.5,14.2
+212656,Geneva College,PA,regional-universities-north,112,447,NA,NA,NA,NA,2023-24,NA,NA
+213321,King's College,PA,regional-universities-north,112,515,NA,3206,2988,396,2023-24,93.2,13.3
+213349,Kutztown University of Pennsylvania,PA,regional-universities-north,112,384,NA,8170,7748,1601,2023-24,94.8,20.7
+162007,Bowie State University,MD,regional-universities-north,116,182,NA,6245,5217,991,2023-24,83.5,19
+213358,La Roche University,PA,regional-universities-north,116,219,NA,2063,1601,172,2023-24,77.6,10.7
+166391,Lasell University,MA,regional-universities-north,116,499,NA,3060,2517,314,2023-24,82.3,12.5
+213598,Lincoln University,PA,regional-universities-north,116,193,NA,5987,4692,551,2023-24,78.4,11.7
+193016,Mercy University,NY,regional-universities-north,116,187,NA,8581,7334,1165,2023-24,85.5,15.9
+130934,Delaware State University,DE,regional-universities-north,121,178,NA,7542,4651,1405,2023-24,61.7,30.2
+184612,Felician University,NJ,regional-universities-north,121,271,NA,2254,2119,350,2023-24,94,16.5
+167260,Nichols College,MA,regional-universities-north,121,570,NA,2117,1866,333,2023-24,88.1,17.8
+186618,Saint Elizabeth University,NJ,regional-universities-north,121,115,NA,1777,1372,136,2023-24,77.2,9.9
+195243,St. Thomas Aquinas College,NY,regional-universities-north,121,442,NA,2251,1851,246,2023-24,82.2,13.3
+216694,Waynesburg University,PA,regional-universities-north,121,245,NA,1806,1656,336,2023-24,91.7,20.3
+211583,Chestnut Hill College,PA,regional-universities-north,128,483,NA,2559,2025,178,2023-24,79.1,8.8
+130989,Goldey-Beacom College,DE,regional-universities-north,128,296,500,1291,988,153,2023-24,76.5,15.5
+192192,Keuka College,NY,regional-universities-north,128,328,NA,1780,1671,229,2023-24,93.9,13.7
+214272,Neumann University,PA,regional-universities-north,128,421,NA,4212,3218,369,2023-24,76.4,11.5
+161554,University of Southern Maine,ME,regional-universities-north,128,121,NA,5823,4618,718,2023-24,79.3,15.5
+164632,Bay Path University,MA,regional-universities-north,133,77,NA,966,710,111,2023-24,73.5,15.6
+196130,SUNY Buffalo State University,NY,regional-universities-north,133,27,NA,15943,12096,1456,2023-24,75.9,12
+211981,Delaware Valley University,PA,regional-universities-north,136,478,NA,2358,2181,485,2023-24,92.5,22.2
+212115,East Stroudsburg University of Pennsylvania,PA,regional-universities-north,136,316,NA,7398,6871,1397,2023-24,92.9,20.3
+183211,Rivier University,NH,regional-universities-north,139,488,NA,1749,1430,292,2023-24,81.8,20.4
+215114,Cairn University-Langhorne,PA,regional-universities-north,140,525,NA,505,422,260,2023-24,83.6,61.6
+165529,Curry College,MA,regional-universities-north,140,553,NA,6903,6354,524,2023-24,92,8.2
+183080,Plymouth State University,NH,regional-universities-north,140,284,NA,7421,6755,985,2023-24,91,14.6
+131876,Trinity Washington University,DC,regional-universities-north,140,366,NA,1114,1105,259,2023-24,99.2,23.4
+190691,CUNY York College,NY,regional-universities-north,144,114,NA,14236,8459,684,2023-24,59.4,8.1
+131399,University of the District of Columbia,DC,regional-universities-north,145,543,NA,NA,NA,NA,2023-24,NA,NA
+212133,Eastern University,PA,regional-universities-north,146,352,NA,2852,2670,503,2023-24,93.6,18.8
+213400,Lancaster Bible College,PA,regional-universities-north,146,NA,NA,395,376,179,2023-24,95.2,47.6
+185129,New Jersey City University,NJ,regional-universities-north,146,54,NA,5757,5134,576,2023-24,89.2,11.2
+231165,Vermont State University,VT,regional-universities-north,146,NA,NA,3130,2605,567,2023-24,83.2,21.8
+183026,Southern New Hampshire University,NH,regional-universities-north,150,52,NA,45127,43377,15345,2023-24,96.1,35.4
+161563,Thomas College,ME,regional-universities-north,150,557,NA,853,828,194,2023-24,97.1,23.4
+182795,Franklin Pierce University,NH,regional-universities-north,152,559,NA,2731,2463,268,2023-24,90.2,10.9
+164492,Anna Maria College,MA,regional-universities-north,153,531,NA,3965,3551,249,2023-24,89.6,7
+217013,Wilson College,PA,regional-universities-north,154,373,NA,1068,961,194,2023-24,90,20.2
+162210,Washington Adventist University,MD,regional-universities-north,156,86,NA,1691,767,106,2023-24,45.4,13.8
+162283,Coppin State University,MD,regional-universities-north,157,110,NA,4703,2331,407,2023-24,49.6,17.5
+446640,Harrisburg University of Science and Technology,PA,regional-universities-north,158,548,NA,1290,1055,145,2023-24,81.8,13.7
+182980,New England College,NH,regional-universities-north,160,576,NA,2841,2720,234,2023-24,95.7,8.6
+190114,Metropolitan College of New York,NY,regional-universities-north,161,321,NA,81,62,23,2023-24,76.5,37.1
+196264,Empire State University,NY,regional-universities-north,162,243,NA,NA,NA,NA,2023-24,NA,NA
+161572,Unity Environmental University,ME,regional-universities-north,163,487,NA,8865,7252,723,2023-24,81.8,10
+217864,Citadel Military College of South Carolina,SC,regional-universities-south,1,34,217,2883,2828,661,2023-24,98.1,23.4
+136950,Rollins College,FL,regional-universities-south,2,176,377,9796,3973,639,2023-24,40.6,16.1
+197869,Appalachian State University,NC,regional-universities-south,3,26,273,24001,21275,4227,2023-24,88.6,19.9
+139144,Berry College,GA,regional-universities-south,4,205,401,6467,4000,577,2023-24,61.9,14.4
+133553,Embry-Riddle Aeronautical University-Daytona Beach,FL,regional-universities-south,4,433,231,10286,6818,1931,2023-24,66.3,28.3
+231712,Christopher Newport University,VA,regional-universities-south,6,414,302,7062,6212,1163,2023-24,88,18.7
+137546,Stetson University,FL,regional-universities-south,7,155,NA,7824,6762,638,2023-24,86.4,9.4
+140951,Savannah College of Art and Design,GA,regional-universities-south,8,574,NA,14931,12495,3651,2023-24,83.7,29.2
+217819,College of Charleston,SC,regional-universities-south,9,364,431,26683,19212,2637,2023-24,72,13.7
+102377,Tuskegee University,AL,regional-universities-south,10,340,NA,11742,3690,859,2023-24,31.4,23.3
+134079,Florida Southern College,FL,regional-universities-south,11,409,NA,10874,6423,640,2023-24,59.1,10
+139861,Georgia College & State University,GA,regional-universities-south,12,242,404,6214,5454,1816,2023-24,87.8,33.3
+137847,The University of Tampa,FL,regional-universities-south,13,567,NA,35353,14469,2505,2023-24,40.9,17.3
+157401,Murray State University,KY,regional-universities-south,14,325,NA,11038,9511,1659,2023-24,86.2,17.4
+138354,University of West Florida,FL,regional-universities-south,14,59,336,9831,5591,1503,2023-24,56.9,26.9
+107141,John Brown University,AR,regional-universities-south,16,165,NA,1545,1045,384,2023-24,67.6,36.7
+232566,Longwood University,VA,regional-universities-south,16,391,NA,6078,5154,793,2023-24,84.8,15.4
+199412,Queens University of Charlotte,NC,regional-universities-south,16,374,NA,4357,2949,399,2023-24,67.7,13.5
+160904,Xavier University of Louisiana,LA,regional-universities-south,16,231,NA,9608,7156,692,2023-24,74.5,9.7
+221768,The University of Tennessee-Martin,TN,regional-universities-south,20,274,180,5199,4540,1118,2023-24,87.3,24.6
+218964,Winthrop University,SC,regional-universities-south,20,102,NA,5858,4397,867,2023-24,75.1,19.7
+101709,University of Montevallo,AL,regional-universities-south,22,288,NA,6210,3347,501,2023-24,53.9,15
+156213,Asbury University,KY,regional-universities-south,23,469,NA,1550,993,358,2023-24,64.1,36.1
+217749,Bob Jones University,SC,regional-universities-south,23,145,NA,NA,NA,NA,2023-24,NA,NA
+220215,Freed-Hardeman University,TN,regional-universities-south,23,436,NA,1077,976,269,2023-24,90.6,27.6
+486901,Milligan University,TN,regional-universities-south,23,435,NA,1164,818,238,2023-24,70.3,29.1
+232025,Emory & Henry University,VA,regional-universities-south,27,142,NA,2349,2262,339,2023-24,96.3,15
+157386,Morehead State University,KY,regional-universities-south,27,228,NA,8818,7241,1227,2023-24,82.1,16.9
+199157,North Carolina Central University,NC,regional-universities-south,27,47,NA,14192,12842,1465,2023-24,90.5,11.4
+101879,University of North Alabama,AL,regional-universities-south,30,418,NA,4398,4243,1106,2023-24,96.5,26.1
+217633,Anderson University,SC,regional-universities-south,31,568,NA,4732,2499,849,2023-24,52.8,34
+220613,Lee University,TN,regional-universities-south,31,448,NA,2150,1552,553,2023-24,72.2,35.6
+218724,Coastal Carolina University,SC,regional-universities-south,33,408,NA,18223,14613,2775,2023-24,80.2,19
+217961,Converse University,SC,regional-universities-south,33,396,NA,2628,1682,225,2023-24,64,13.4
+176035,Mississippi University for Women,MS,regional-universities-south,33,31,NA,553,553,159,2023-24,100,28.8
+199281,University of North Carolina at Pembroke,NC,regional-universities-south,33,28,NA,7635,7052,908,2023-24,92.4,12.9
+219602,Austin Peay State University,TN,regional-universities-south,37,71,NA,5559,5334,1645,2023-24,96,30.8
+219833,Christian Brothers University,TN,regional-universities-south,37,190,456,1105,977,200,2023-24,88.4,20.5
+134945,Jacksonville University,FL,regional-universities-south,37,169,492,8879,5087,755,2023-24,57.3,14.8
+220473,Johnson University,TN,regional-universities-south,37,332,NA,610,328,181,2023-24,53.8,55.2
+243197,University of Puerto Rico-Mayaguez,PR,regional-universities-south,37,NA,276,4382,2286,1865,2023-24,52.2,81.6
+218441,North Greenville University,SC,regional-universities-south,42,503,NA,3243,2036,438,2023-24,62.8,21.5
+221661,Southern Adventist University,TN,regional-universities-south,42,524,NA,2731,1819,758,2023-24,66.6,41.7
+234155,Virginia State University,VA,regional-universities-south,42,144,NA,10577,9424,1448,2023-24,89.1,15.4
+175342,Alcorn State University,MS,regional-universities-south,45,230,NA,7511,1852,505,2023-24,24.7,27.3
+217925,Columbia International University,SC,regional-universities-south,45,362,NA,372,363,116,2023-24,97.6,32
+198835,Lenoir-Rhyne University,NC,regional-universities-south,45,476,NA,6299,5082,377,2023-24,80.7,7.4
+102368,Troy University,AL,regional-universities-south,45,261,NA,7947,7360,1717,2023-24,92.6,23.3
+482680,University of North Georgia,GA,regional-universities-south,49,148,399,11633,8394,3914,2023-24,72.2,46.6
+175616,Delta State University,MS,regional-universities-south,50,210,NA,1242,1238,218,2023-24,99.7,17.6
+139719,Fort Valley State University,GA,regional-universities-south,50,181,NA,5080,3190,742,2023-24,62.8,23.3
+198543,Fayetteville State University,NC,regional-universities-south,52,41,NA,5043,4029,807,2023-24,79.9,20
+101480,Jacksonville State University,AL,regional-universities-south,52,247,NA,12008,9152,1815,2023-24,76.2,19.8
+218061,Francis Marion University,SC,regional-universities-south,54,303,NA,3489,2869,632,2023-24,82.2,22
+157757,Spalding University,KY,regional-universities-south,54,412,NA,807,796,117,2023-24,98.6,14.7
+237932,West Liberty University,WV,regional-universities-south,54,335,NA,2077,1498,419,2023-24,72.1,28
+106467,Arkansas Tech University,AR,regional-universities-south,57,194,NA,4904,4722,1467,2023-24,96.3,31.1
+132657,Lynn University,FL,regional-universities-south,57,558,NA,8333,6162,781,2023-24,73.9,12.7
+217934,Columbia College,SC,regional-universities-south,59,55,NA,2163,2072,204,2023-24,95.8,9.8
+232937,Norfolk State University,VA,regional-universities-south,59,112,NA,10211,8931,1503,2023-24,87.5,16.8
+160038,Northwestern State University of Louisiana,LA,regional-universities-south,59,304,NA,3194,2994,1033,2023-24,93.7,34.5
+232043,Eastern Mennonite University,VA,regional-universities-south,62,158,NA,1179,1176,187,2023-24,99.7,15.9
+140818,Piedmont University,GA,regional-universities-south,62,291,NA,2066,1918,286,2023-24,92.8,14.9
+100830,Auburn University at Montgomery,AL,regional-universities-south,64,295,NA,2213,2050,413,2023-24,92.6,20.1
+139366,Columbus State University,GA,regional-universities-south,64,189,NA,3550,3523,1083,2023-24,99.2,30.7
+159966,Nicholls State University,LA,regional-universities-south,64,277,NA,3320,3188,1169,2023-24,96,36.7
+217776,Southern Wesleyan University,SC,regional-universities-south,64,470,NA,472,472,159,2023-24,100,33.7
+101693,University of Mobile,AL,regional-universities-south,64,480,NA,1735,1258,288,2023-24,72.5,22.9
+218645,University of South Carolina Aiken,SC,regional-universities-south,69,394,197,2905,2316,616,2023-24,79.7,26.6
+217688,Charleston Southern University,SC,regional-universities-south,70,536,NA,6072,4620,725,2023-24,76.1,15.7
+219790,Bryan College-Dayton,TN,regional-universities-south,71,397,NA,NA,NA,NA,2023-24,NA,NA
+157377,Midway University,KY,regional-universities-south,71,269,NA,1120,1066,265,2023-24,95.2,24.9
+241191,Universidad Adventista de las Antillas,PR,regional-universities-south,71,NA,NA,375,375,89,2023-24,100,23.7
+385619,Everglades University,FL,regional-universities-south,74,577,NA,804,695,388,2023-24,86.4,55.8
+160612,Southeastern Louisiana University,LA,regional-universities-south,74,323,NA,5485,5171,2349,2023-24,94.3,45.4
+220516,King University,TN,regional-universities-south,76,227,NA,1195,650,166,2023-24,54.4,25.5
+107983,Southern Arkansas University Main Campus,AR,regional-universities-south,76,276,NA,2936,1955,797,2023-24,66.6,40.8
+199069,University of Mount Olive,NC,regional-universities-south,76,358,NA,1748,1359,277,2023-24,77.7,20.4
+139311,Clayton  State University,GA,regional-universities-south,80,88,NA,1782,1258,504,2023-24,70.6,40.1
+159717,McNeese State University,LA,regional-universities-south,81,482,NA,3294,2225,1063,2023-24,67.5,47.8
+156365,Campbellsville University,KY,regional-universities-south,82,495,NA,1015,998,684,2023-24,98.3,68.5
+199306,Pfeiffer University,NC,regional-universities-south,82,128,NA,1637,1560,195,2023-24,95.3,12.5
+237792,Shepherd University,WV,regional-universities-south,82,319,NA,1793,1715,566,2023-24,95.6,33
+237367,Fairmont State University,WV,regional-universities-south,85,287,NA,1979,1964,673,2023-24,99.2,34.3
+157809,Thomas More University,KY,regional-universities-south,85,545,NA,3030,2940,396,2023-24,97,13.5
+101587,University of West Alabama,AL,regional-universities-south,85,109,NA,2041,1778,315,2023-24,87.1,17.7
+218733,South Carolina State University,SC,regional-universities-south,88,127,NA,9830,8034,1079,2023-24,81.7,13.4
+138716,Albany State University,GA,regional-universities-south,90,116,NA,NA,NA,NA,2023-24,NA,NA
+237330,Concord University,WV,regional-universities-south,90,92,NA,2376,2130,443,2023-24,89.6,20.8
+157216,Lindsey Wilson College,KY,regional-universities-south,90,91,NA,NA,NA,NA,2023-24,NA,NA
+198969,Methodist University,NC,regional-universities-south,90,565,NA,2738,2059,344,2023-24,75.2,16.7
+221953,Tusculum University,TN,regional-universities-south,90,248,NA,758,458,216,2023-24,60.4,47.2
+243443,Universidad del Sagrado Corazon,PR,regional-universities-south,90,NA,NA,3638,1943,977,2023-24,53.4,50.3
+100654,Alabama A & M University,AL,regional-universities-south,96,241,NA,15628,10349,1956,2023-24,66.2,18.9
+139764,Georgia Southwestern State University,GA,regional-universities-south,96,267,NA,2045,1578,533,2023-24,77.2,33.8
+157863,Union Commonwealth University,KY,regional-universities-south,96,180,NA,834,459,198,2023-24,55,43.1
+217907,Coker University,SC,regional-universities-south,99,468,NA,1121,1090,172,2023-24,97.2,15.8
+198598,Greensboro College,NC,regional-universities-south,99,451,NA,3143,2893,208,2023-24,92,7.2
+107071,Henderson State University,AR,regional-universities-south,101,185,NA,1814,1486,306,2023-24,81.9,20.6
+159416,Louisiana State University-Shreveport,LA,regional-universities-south,101,346,NA,949,785,285,2023-24,82.7,36.3
+219949,Cumberland University,TN,regional-universities-south,103,375,NA,2788,1868,673,2023-24,67,36
+159009,Grambling State University,LA,regional-universities-south,103,457,NA,24521,5806,916,2023-24,23.7,15.8
+159568,Louisiana Christian University,LA,regional-universities-south,106,294,NA,549,460,220,2023-24,83.8,47.8
+242617,Inter American University of Puerto Rico-San German,PR,regional-universities-south,107,NA,NA,1275,646,636,2023-24,50.7,98.5
+160065,University of Holy Cross,LA,regional-universities-south,107,573,NA,404,400,33,2023-24,99,8.2
+237899,West Virginia State University,WV,regional-universities-south,107,546,NA,4465,4303,322,2023-24,96.4,7.5
+238078,Wheeling University,WV,regional-universities-south,110,179,NA,2103,1581,170,2023-24,75.2,10.8
+140960,Savannah State University,GA,regional-universities-south,111,265,NA,NA,NA,NA,2023-24,NA,NA
+482158,Middle Georgia State University,GA,regional-universities-south,112,183,NA,3876,3867,1313,2023-24,99.8,34
+141167,Thomas University,GA,regional-universities-south,112,351,NA,526,227,140,2023-24,43.2,61.7
+101189,Faulkner University,AL,regional-universities-south,114,518,NA,1786,1181,240,2023-24,66.1,20.3
+140252,Life University,GA,regional-universities-south,114,368,NA,404,379,205,2023-24,93.8,54.1
+106485,University of Arkansas at Monticello,AR,regional-universities-south,114,259,NA,NA,NA,NA,2023-24,NA,NA
+242653,Inter American University of Puerto Rico-Metro,PR,regional-universities-south,117,NA,NA,1192,792,357,2023-24,66.4,45.1
+176044,Mississippi Valley State University,MS,regional-universities-south,117,387,NA,3411,1745,331,2023-24,51.2,19
+241225,Universidad Central de Bayamon,PR,regional-universities-south,117,NA,NA,110,95,91,2023-24,86.4,95.8
+242626,Inter American University of Puerto Rico-Aguadilla,PR,regional-universities-south,121,NA,NA,1474,689,679,2023-24,46.7,98.5
+242635,Inter American University of Puerto Rico-Arecibo,PR,regional-universities-south,121,NA,NA,1056,399,391,2023-24,37.8,98
+140988,Shorter University,GA,regional-universities-south,123,275,NA,783,759,269,2023-24,96.9,35.4
+241739,Universidad Ana G. Mendez-Cupey Campus,PR,regional-universities-south,123,NA,NA,NA,NA,NA,2023-24,NA,NA
+219718,Bethel University,TN,regional-universities-south,125,534,NA,3318,3224,402,2023-24,97.2,12.5
+243346,Universidad Ana G. Mendez-Carolina Campus,PR,regional-universities-south,125,NA,NA,NA,NA,NA,2023-24,NA,NA
+231554,Bluefield University,VA,regional-universities-south,127,413,NA,1057,663,180,2023-24,62.7,27.1
+138275,Warner University,FL,regional-universities-south,128,464,NA,1628,778,255,2023-24,47.8,32.8
+160630,Southern University at New Orleans,LA,regional-universities-south,130,532,NA,2920,1758,154,2023-24,60.2,8.8
+243577,Universidad Politecnica de Puerto Rico,PR,regional-universities-south,130,NA,NA,NA,NA,NA,2023-24,NA,NA
+241377,Caribbean University-Bayamon,PR,regional-universities-south,133,NA,NA,NA,NA,NA,2023-24,NA,NA
+110422,California Polytechnic State University-San Luis Obispo,CA,regional-universities-west,1,162,55,63736,18964,5278,2023-24,29.8,27.8
+209825,University of Portland,OR,regional-universities-west,2,120,182,9041,8624,729,2023-24,95.4,8.5
+110529,California State Polytechnic University-Pomona,CA,regional-universities-west,3,11,144,45775,33737,4311,2023-24,73.7,12.8
+122755,San Jose State University,CA,regional-universities-west,4,23,125,35780,28708,4520,2023-24,80.2,15.7
+227845,Saint Edward's University,TX,regional-universities-west,5,135,293,5611,4696,659,2023-24,83.7,14
+377555,University of Washington-Bothell Campus,WA,regional-universities-west,6,36,179,4776,4383,1186,2023-24,91.8,27.1
+123554,Saint Mary's College of California,CA,regional-universities-west,7,63,324,4308,3816,503,2023-24,88.6,13.2
+377564,University of Washington-Tacoma Campus,WA,regional-universities-west,7,19,246,3161,2622,666,2023-24,82.9,25.4
+110495,California State University-Stanislaus,CA,regional-universities-west,9,5,301,5334,5199,1046,2023-24,97.5,20.1
+224323,University of Dallas,TX,regional-universities-west,9,371,422,4179,2265,348,2023-24,54.2,15.4
+409698,California State University-Monterey Bay,CA,regional-universities-west,11,9,266,11769,11160,943,2023-24,94.8,8.4
+121691,University of Redlands,CA,regional-universities-west,11,50,216,3622,2931,484,2023-24,80.9,16.5
+110592,California State University-Los Angeles,CA,regional-universities-west,13,2,267,32748,30106,3614,2023-24,91.9,12
+228149,St. Mary's University,TX,regional-universities-west,13,318,NA,5203,4628,530,2023-24,88.9,11.5
+237066,Whitworth University,WA,regional-universities-west,15,140,NA,4740,4113,553,2023-24,86.8,13.4
+110413,California Lutheran University,CA,regional-universities-west,16,123,362,5290,4702,575,2023-24,88.9,12.2
+110538,California State University-Chico,CA,regional-universities-west,16,6,222,22263,20864,2171,2023-24,93.7,10.4
+121309,Point Loma Nazarene University,CA,regional-universities-west,16,481,NA,3065,2506,657,2023-24,81.8,26.2
+230807,Westminster University,UT,regional-universities-west,16,99,NA,2634,1813,228,2023-24,68.8,12.6
+110608,California State University-Northridge,CA,regional-universities-west,20,1,271,29789,27748,5545,2023-24,93.1,20
+187967,New Mexico Institute of Mining and Technology,NM,regional-universities-west,20,122,228,1112,600,222,2023-24,54,37
+110617,California State University-Sacramento,CA,regional-universities-west,22,3,280,25994,24336,3884,2023-24,93.6,16
+115755,California State Polytechnic University-Humboldt,CA,regional-universities-west,23,39,NA,14019,13855,955,2023-24,98.8,6.9
+441937,California State University-Channel Islands,CA,regional-universities-west,23,33,337,10082,9382,568,2023-24,93.1,6.1
+366711,California State University-San Marcos,CA,regional-universities-west,23,16,285,17519,16765,2625,2023-24,95.7,15.7
+123572,Sonoma State University,CA,regional-universities-west,23,84,221,10529,9974,911,2023-24,94.7,9.1
+237011,Western Washington University,WA,regional-universities-west,23,65,289,14243,13005,3184,2023-24,91.3,24.5
+111081,California Institute of the Arts,CA,regional-universities-west,28,572,482,2023,525,177,2023-24,26,33.7
+119173,Mount Saint Mary's University,CA,regional-universities-west,28,117,434,3430,2357,449,2023-24,68.7,19
+236230,Pacific Lutheran University,WA,regional-universities-west,28,81,255,4139,3333,624,2023-24,80.5,18.7
+110486,California State University-Bakersfield,CA,regional-universities-west,31,8,388,13950,12303,1204,2023-24,88.2,9.8
+113698,Dominican University of California,CA,regional-universities-west,31,377,411,2011,1923,250,2023-24,95.6,13
+110361,California Baptist University,CA,regional-universities-west,33,411,NA,7935,5838,1282,2023-24,73.6,22
+109651,Art Center College of Design,CA,regional-universities-west,34,429,370,1339,1004,322,2023-24,75,32.1
+180416,Montana Technological University,MT,regional-universities-west,34,458,NA,1623,1459,294,2023-24,89.9,20.2
+110547,California State University-Dominguez Hills,CA,regional-universities-west,36,4,452,19040,17388,1721,2023-24,91.3,9.9
+226231,LeTourneau University,TX,regional-universities-west,36,551,NA,3518,1431,343,2023-24,40.7,24
+141486,Chaminade University of Honolulu,HI,regional-universities-west,38,280,NA,2034,1884,376,2023-24,92.6,20
+228431,Stephen F Austin State University,TX,regional-universities-west,38,240,NA,12591,11112,2072,2023-24,88.3,18.6
+226152,Texas A & M International University,TX,regional-universities-west,38,17,NA,8309,3819,1382,2023-24,46,36.2
+117627,La Sierra University,CA,regional-universities-west,41,475,NA,2238,2088,258,2023-24,93.3,12.4
+484905,University of North Texas at Dallas,TX,regional-universities-west,41,64,NA,3939,3697,469,2023-24,93.9,12.7
+207403,Oklahoma Baptist University,OK,regional-universities-west,43,382,NA,3730,2077,428,2023-24,55.7,20.6
+123651,Vanguard University of Southern California,CA,regional-universities-west,43,465,NA,3422,2214,502,2023-24,64.7,22.7
+125897,Woodbury University,CA,regional-universities-west,43,215,NA,1312,956,107,2023-24,72.9,11.2
+234827,Central Washington University,WA,regional-universities-west,46,95,NA,6829,6161,1568,2023-24,90.2,25.5
+114813,Fresno Pacific University,CA,regional-universities-west,46,58,NA,1516,872,207,2023-24,57.5,23.7
+243823,Parker University,TX,regional-universities-west,46,NA,NA,NA,NA,NA,2023-24,NA,NA
+236896,Walla Walla University,WA,regional-universities-west,46,510,NA,NA,NA,NA,2023-24,NA,NA
+230782,Weber State University,UT,regional-universities-west,50,101,NA,NA,NA,NA,2023-24,NA,NA
+229814,West Texas A & M University,TX,regional-universities-west,50,151,NA,4784,4657,1266,2023-24,97.3,27.2
+235097,Eastern Washington University,WA,regional-universities-west,52,62,NA,6415,5887,1340,2023-24,91.8,22.8
+236133,Northwest University,WA,regional-universities-west,52,420,NA,586,516,152,2023-24,88.1,29.5
+235422,Heritage University,WA,regional-universities-west,54,30,NA,NA,NA,NA,2023-24,NA,NA
+222831,Angelo State University,TX,regional-universities-west,56,308,NA,4660,3692,1442,2023-24,79.2,39.1
+142461,Northwest Nazarene University,ID,regional-universities-west,56,443,NA,3571,2248,246,2023-24,63,10.9
+236452,Saint Martin's University,WA,regional-universities-west,56,147,NA,3473,2637,263,2023-24,75.9,10
+459949,Texas A&M University-San Antonio,TX,regional-universities-west,56,40,NA,7773,7151,1025,2023-24,92,14.3
+210429,Western Oregon University,OR,regional-universities-west,56,211,NA,2898,2860,649,2023-24,98.7,22.7
+225399,Houston Christian University,TX,regional-universities-west,61,236,NA,9021,7681,729,2023-24,85.1,9.5
+206941,University of Central Oklahoma,OK,regional-universities-west,62,204,NA,4945,4043,1889,2023-24,81.8,46.7
+225432,University of Houston-Downtown,TX,regional-universities-west,62,24,NA,6953,6302,1491,2023-24,90.6,23.7
+230603,Southern Utah University,UT,regional-universities-west,64,56,NA,19190,15443,2269,2023-24,80.5,14.7
+126669,Colorado Christian University,CO,regional-universities-west,65,552,NA,NA,NA,NA,2023-24,NA,NA
+207324,Oklahoma Christian University,OK,regional-universities-west,65,460,NA,1367,1327,323,2023-24,97.1,24.3
+206862,Southern Nazarene University,OK,regional-universities-west,67,195,NA,NA,NA,NA,2023-24,NA,NA
+235167,The Evergreen State College,WA,regional-universities-west,67,32,NA,1443,1403,364,2023-24,97.2,25.9
+207263,Northeastern State University,OK,regional-universities-west,69,12,NA,1386,1375,666,2023-24,99.2,48.4
+229018,The University of Texas Permian Basin,TX,regional-universities-west,69,212,NA,1718,1451,674,2023-24,84.5,46.5
+209409,Bushnell University,OR,regional-universities-west,71,484,NA,755,501,83,2023-24,66.4,16.6
+210331,Corban University,OR,regional-universities-west,72,444,NA,546,490,140,2023-24,89.7,28.6
+102553,University of Alaska Anchorage,AK,regional-universities-west,72,361,NA,4277,2845,1306,2023-24,66.5,45.9
+208646,Eastern Oregon University,OR,regional-universities-west,75,232,NA,1446,1428,267,2023-24,98.8,18.7
+128391,Western Colorado University,CO,regional-universities-west,75,255,NA,3283,3200,423,2023-24,97.5,13.2
+226383,Lubbock Christian University,TX,regional-universities-west,77,514,NA,1764,1291,284,2023-24,73.2,22
+226833,Midwestern State University,TX,regional-universities-west,77,106,NA,5824,5089,804,2023-24,87.4,15.8
+207865,Southwestern Oklahoma State University,OK,regional-universities-west,77,209,NA,1689,1689,736,2023-24,100,43.6
+122728,William Jessup University,CA,regional-universities-west,77,529,NA,699,537,190,2023-24,76.8,35.4
+128106,Colorado State University Pueblo,CO,regional-universities-west,81,249,NA,1834,1831,678,2023-24,99.8,37
+224527,East Texas Baptist University,TX,regional-universities-west,81,533,NA,1639,985,376,2023-24,60.1,38.2
+228325,Nelson University,TX,regional-universities-west,81,406,NA,615,518,286,2023-24,84.2,55.2
+207306,Northwestern Oklahoma State University,OK,regional-universities-west,81,170,NA,1293,859,340,2023-24,66.4,39.6
+141644,Hawaii Pacific University,HI,regional-universities-west,86,541,NA,14538,12282,543,2023-24,84.5,4.4
+127565,Metropolitan State University of Denver,CO,regional-universities-west,86,108,NA,12403,12296,2132,2023-24,99.1,17.3
+180595,Rocky Mountain College,MT,regional-universities-west,86,438,NA,1471,1072,211,2023-24,72.9,19.7
+228042,Schreiner University,TX,regional-universities-west,86,398,NA,2128,1872,282,2023-24,88,15.1
+105589,Prescott College,AZ,regional-universities-west,90,38,NA,140,138,23,2023-24,98.6,16.7
+210146,Southern Oregon University,OR,regional-universities-west,90,348,NA,3564,2946,657,2023-24,82.7,22.3
+224545,Texas A&M University-Texarkana,TX,regional-universities-west,90,76,NA,1802,1445,259,2023-24,80.2,17.9
+187648,Eastern New Mexico University-Main Campus,NM,regional-universities-west,93,441,NA,2085,1145,490,2023-24,54.9,42.8
+230737,Utah Valley University,UT,regional-universities-west,93,29,NA,NA,NA,NA,2023-24,NA,NA
+180179,Montana State University Billings,MT,regional-universities-west,95,342,NA,NA,NA,NA,2023-24,NA,NA
+225502,University of Houston-Victoria,TX,regional-universities-west,95,173,NA,1881,1443,173,2023-24,76.7,12
+187897,New Mexico Highlands University,NM,regional-universities-west,97,100,NA,NA,NA,NA,2023-24,NA,NA
+206914,Cameron University,OK,regional-universities-west,98,310,NA,NA,NA,NA,2023-24,NA,NA
+207847,Southeastern Oklahoma State University,OK,regional-universities-west,98,105,NA,1221,981,530,2023-24,80.3,54
+207041,East Central University,OK,regional-universities-west,100,149,NA,1161,761,370,2023-24,65.5,48.6
+228501,Sul Ross State University,TX,regional-universities-west,100,234,NA,1073,1026,223,2023-24,95.6,21.7
+126182,Adams State University,CO,regional-universities-west,102,456,NA,NA,NA,NA,2023-24,NA,NA
+224004,Concordia University Texas,TX,regional-universities-west,103,530,NA,2170,1976,238,2023-24,91.1,12
+119605,National University,CA,regional-universities-west,103,575,NA,NA,NA,NA,2023-24,NA,NA
+120537,Hope International University,CA,regional-universities-west,105,544,NA,828,293,88,2023-24,35.4,30
+180258,University of Providence,MT,regional-universities-west,106,372,NA,324,208,116,2023-24,64.2,55.8
+102632,University of Alaska Southeast,AK,regional-universities-west,107,417,NA,320,200,148,2023-24,62.5,74
+206835,Oklahoma Wesleyan University,OK,regional-universities-west,108,500,NA,688,530,195,2023-24,77,36.8
+188304,Western New Mexico University,NM,regional-universities-west,109,369,NA,NA,NA,NA,2023-24,NA,NA
+207209,Langston University,OK,regional-universities-west,110,80,NA,NA,NA,NA,2023-24,NA,NA
+245953,Mid-America Christian University,OK,regional-universities-west,111,367,NA,NA,NA,NA,2023-24,NA,NA
+127653,Naropa University,CO,regional-universities-west,113,208,NA,100,94,24,2023-24,94,25.5
+229780,Wayland Baptist University,TX,regional-universities-west,114,491,NA,1974,1067,289,2023-24,54.1,27.1
+188182,University of the Southwest,NM,regional-universities-west,115,430,NA,NA,NA,NA,2023-24,NA,NA
+214652,Pennsylvania State University-Penn State Scranton,PA,NA,22,NA,NA,2240,2125,237,2023-24,94.9,11.2
+214801,Pennsylvania State University-Penn State Abington,PA,NA,24,NA,NA,6575,6051,909,2023-24,92,15
+214786,Pennsylvania State University-Penn State Greater Allegheny,PA,NA,29,NA,NA,581,550,124,2023-24,94.7,22.5
+214759,Pennsylvania State University-Penn State Fayette- Eberly,PA,NA,30,NA,NA,731,670,117,2023-24,91.7,17.5
+184694,Fairleigh Dickinson University-Florham Campus,NJ,NA,35,474,NA,4457,4246,512,2023-24,95.3,12.1
+240790,Northern Marianas College,MP,NA,35,NA,NA,NA,NA,NA,2023-24,NA,NA
+214698,Pennsylvania State University-Penn State Beaver,PA,NA,35,NA,NA,1603,1478,165,2023-24,92.2,11.2
+214810,Pennsylvania State University-Penn State Schuylkill,PA,NA,35,NA,NA,816,743,157,2023-24,91.1,21.1
+243586,Pontifical Catholic University of Puerto Rico-Mayaguez,PR,NA,36,NA,NA,556,541,100,2023-24,97.3,18.5
+164580,Babson College,MA,NA,37,NA,95,7995,1578,626,2023-24,19.7,39.7
+214643,Pennsylvania State University-Penn State Wilkes-Barre,PA,NA,38,NA,NA,640,605,90,2023-24,94.5,14.9
+214740,Pennsylvania State University-Penn State DuBois,PA,NA,40,NA,NA,481,445,98,2023-24,92.5,22
+214689,Pennsylvania State University-Penn State Altoona,PA,NA,41,NA,NA,7134,6942,859,2023-24,97.3,12.4
+214625,Pennsylvania State University-Penn State New Kensington,PA,NA,41,NA,NA,643,600,125,2023-24,93.3,20.8
+214670,Pennsylvania State University-Penn State Lehigh Valley,PA,NA,43,NA,NA,1848,1741,283,2023-24,94.2,16.3
+214795,Pennsylvania State University-Penn State Mont Alto,PA,NA,43,NA,NA,608,549,133,2023-24,90.3,24.2
+214768,Pennsylvania State University-Penn State Hazleton,PA,NA,48,NA,NA,714,650,200,2023-24,91,30.8
+214829,Pennsylvania State University-Penn State York,PA,NA,50,NA,NA,2012,1855,185,2023-24,92.2,10
+214634,Pennsylvania State University-Penn State Shenango,PA,NA,51,NA,NA,209,190,73,2023-24,90.9,38.4
+214704,Pennsylvania State University-Penn State Berks,PA,NA,54,NA,NA,5844,5676,591,2023-24,97.1,10.4
+243142,University of Puerto Rico-Carolina,PR,NA,54,NA,NA,1779,938,712,2023-24,52.7,75.9
+240754,University of Guam,GU,NA,55,NA,NA,NA,NA,NA,2023-24,NA,NA
+206613,Wright State University-Lake Campus,OH,NA,58,195,NA,NA,NA,NA,2023-24,NA,NA
+204671,Ohio State University-Lima Campus,OH,NA,65,139,NA,NA,NA,NA,2023-24,NA,NA
+204699,Ohio State University-Marion Campus,OH,NA,66,NA,NA,NA,NA,NA,2023-24,NA,NA
+204680,Ohio State University-Mansfield Campus,OH,NA,73,NA,NA,NA,NA,NA,2023-24,NA,NA
+203465,Kent State University at Stark,OH,NA,75,NA,NA,NA,NA,NA,2023-24,NA,NA
+203483,Kent State University at Tuscarawas,OH,NA,76,NA,NA,NA,NA,NA,2023-24,NA,NA
+204705,Ohio State University-Newark Campus,OH,NA,77,NA,NA,NA,NA,NA,2023-24,NA,NA
+203492,Kent State University at Salem,OH,NA,78,NA,NA,NA,NA,NA,2023-24,NA,NA
+203474,Kent State University at Trumbull,OH,NA,79,NA,NA,NA,NA,NA,2023-24,NA,NA
+203447,Kent State University at Ashtabula,OH,NA,80,NA,NA,NA,NA,NA,2023-24,NA,NA
+363907,Caribbean University-Ponce,PR,NA,87,NA,NA,NA,NA,NA,2023-24,NA,NA
+243665,University of the Virgin Islands,VI,NA,88,NA,NA,860,838,342,2023-24,97.4,40.8
+241386,Caribbean University-Carolina,PR,NA,91,NA,NA,NA,NA,NA,2023-24,NA,NA
+451927,Patrick Henry College,VA,NA,107,NA,NA,222,182,98,2023-24,82,53.8
+498562,Commonwealth University of Pennsylvania,PA,NA,121,NA,NA,7733,7327,2434,2023-24,94.7,33.2
+160959,College of the Atlantic,ME,NA,126,NA,488,446,290,81,2023-24,65,27.9
+214591,Pennsylvania State University-Penn State Erie-Behrend College,PA,NA,133,NA,NA,4827,4620,866,2023-24,95.7,18.7
+183071,University of New Hampshire at Manchester,NH,NA,135,99,407,505,441,72,2023-24,87.3,16.3
+498571,Pennsylvania Western University,PA,NA,136,NA,NA,6189,5796,1617,2023-24,93.7,27.9
+440396,New Saint Andrews College,ID,NA,146,NA,NA,126,108,80,2023-24,85.7,74.1
+214713,Pennsylvania State University-Penn State Harrisburg,PA,NA,159,NA,NA,10296,9924,1210,2023-24,96.4,12.2
+214731,Pennsylvania State University-Penn State Brandywine,PA,NA,198,NA,NA,2461,2346,442,2023-24,95.3,18.8
+227368,The University of Texas Rio Grande Valley,TX,NA,213,7,449,13542,11486,5634,2023-24,84.8,49.1
+164368,Hult International Business School,MA,NA,254,NA,NA,2268,1210,177,2023-24,53.4,14.6
+192448,Long Island University,NY,NA,373,1324,NA,12398,11130,1120,2023-24,89.8,10.1
+118693,Menlo College,CA,NA,414,NA,405,3041,2062,178,2023-24,67.8,8.6

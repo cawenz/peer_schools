@@ -68,3 +68,4 @@ __pycache__/
 
 # Scraper audit snapshots (regenerated on each run)
 data/forbes_page_*.html
+scratchpad/

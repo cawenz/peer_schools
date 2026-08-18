@@ -69,42 +69,63 @@ if (!exists(".THEMES", envir = globalenv(), inherits = FALSE)) {
                      lapply(.THEMES, .theme_default_weight),
                      .THEMES),
 
-  # ---- Single-theme emphasis (boost one theme to 2.5x) ------------------
-  outcomes_heavy    = list(size = 1.0, selectivity = 1.0, resources = 1.0,
-                           finance = 1.0, outcomes = 2.5, aid = 1.0,
+  # ---- Single-theme emphasis (3 / 1 / 1 / 0 pattern) --------------------
+  # Dominant theme = 3.0, two contextual themes at 1.0, everything else
+  # zeroed. Pattern matches Athletics-active (blessed elsewhere as the one
+  # that visibly moves the peer list). A flat 2.5x-one-theme pattern was
+  # tried first but got swamped by the remaining themes each at 1.0 -
+  # the peer list overlapped 16-19/20 with Balanced regardless of which
+  # theme was boosted. Zeroing 5-6 themes lets the dominant theme actually
+  # bind the peer set, while the 1-2 context themes prevent absurd
+  # matches (e.g. selectivity=3 alone would surface tiny specialty
+  # schools with similar admit rates but no mission overlap).
+  outcomes_heavy    = list(size = 1.0, selectivity = 1.0, resources = 0,
+                           finance = 0, outcomes = 3.0, aid = 0,
+                           student_body = 0, athletics = 0),
+  resources_heavy   = list(size = 1.0, selectivity = 0, resources = 3.0,
+                           finance = 1.0, outcomes = 0, aid = 0,
+                           student_body = 0, athletics = 0),
+  selectivity_heavy = list(size = 0, selectivity = 3.0, resources = 0,
+                           finance = 0, outcomes = 1.0, aid = 0,
                            student_body = 1.0, athletics = 0),
-  resources_heavy   = list(size = 1.0, selectivity = 1.0, resources = 2.0,
-                           finance = 1.5, outcomes = 1.0, aid = 1.0,
-                           student_body = 1.0, athletics = 0),
-  selectivity_heavy = list(size = 1.0, selectivity = 2.5, resources = 1.0,
-                           finance = 1.0, outcomes = 1.0, aid = 1.0,
-                           student_body = 1.0, athletics = 0),
-  aid_heavy         = list(size = 1.0, selectivity = 1.0, resources = 1.0,
-                           finance = 1.0, outcomes = 1.0, aid = 2.5,
-                           student_body = 1.0, athletics = 0),
-  size_heavy        = list(size = 2.5, selectivity = 1.0, resources = 1.0,
-                           finance = 1.0, outcomes = 1.0, aid = 1.0,
-                           student_body = 1.0, athletics = 0),
-  student_body_heavy = list(size = 1.0, selectivity = 1.0, resources = 1.0,
-                             finance = 1.0, outcomes = 1.0, aid = 1.0,
-                             student_body = 2.5, athletics = 0),
+  aid_heavy         = list(size = 1.0, selectivity = 0, resources = 0,
+                           finance = 1.0, outcomes = 0, aid = 3.0,
+                           student_body = 0, athletics = 0),
+  size_heavy        = list(size = 3.0, selectivity = 1.0, resources = 1.0,
+                           finance = 0, outcomes = 0, aid = 0,
+                           student_body = 0, athletics = 0),
+  student_body_heavy = list(size = 1.0, selectivity = 0, resources = 0,
+                             finance = 0, outcomes = 0, aid = 1.0,
+                             student_body = 3.0, athletics = 0),
 
   # ---- Multi-theme presets (themes that often matter together) ----------
-  affordability     = list(size = 1.0, selectivity = 1.0, resources = 1.0,
-                           finance = 1.5, outcomes = 1.0, aid = 2.0,
-                           student_body = 1.0, athletics = 0),
-  # Athletics-active: dominant athletics weight + light context from
-  # student body + outcomes. Zeroing the other themes means D1 / D2 /
-  # D3 division is the primary similarity signal, with mission-fit and
-  # success-trajectory as the tiebreakers. Result: peer set spans
-  # institution sizes (a small D-I LAC and a large D-I research uni can
-  # both surface) but all share the athletics tier the user cares about.
+  # Affordability = the "cost + fiscal capacity for the student" story:
+  # institutional grant aid (aid) plus published price and endowment
+  # coverage (finance), with size as light context. Distinct from
+  # aid_heavy, which is more narrowly about grant reach + discount rate.
+  affordability     = list(size = 1.0, selectivity = 0, resources = 0,
+                           finance = 2.0, outcomes = 0, aid = 2.0,
+                           student_body = 0, athletics = 0),
+  # Athletics-active: dominant athletics weight (3.0) with two light
+  # context themes at 1.0. Outcomes provides performance-tier gravity;
+  # student_body provides demographic-composition gravity (now purely
+  # demographic - same_religious_tradition was removed from that theme
+  # so this preset no longer conflates athletics fit with mission fit).
+  # Zeroing the other 5 themes means the athletics variables bind the
+  # peer set while the two context themes prevent institutionally-
+  # incoherent matches (e.g. large publics or specialty schools that
+  # happen to share HC's athletics numbers). To layer in mission fit,
+  # combine this preset with the Religious Tradition filter.
   athletics_active  = list(size = 0, selectivity = 0, resources = 0,
                            finance = 0, outcomes = 1.0, aid = 0,
                            student_body = 1.0, athletics = 3.0),
-  research_focused  = list(size = 1.5, selectivity = 1.0, resources = 1.0,
-                           finance = 1.5, outcomes = 2.0, aid = 1.0,
-                           student_body = 1.0, athletics = 0)
+  # Research-focused: outcomes + finance dominant (post-grad success and
+  # institutional resources), with resources and size as scale context.
+  # Surfaces well-endowed LACs with research capacity alongside similar-
+  # tier universities.
+  research_focused  = list(size = 1.5, selectivity = 0, resources = 1.5,
+                           finance = 2.0, outcomes = 2.0, aid = 0,
+                           student_body = 0, athletics = 0)
 )
 
 # Display labels for the preset dropdown. Descriptions inline so the
