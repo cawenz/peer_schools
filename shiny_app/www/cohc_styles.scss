@@ -761,32 +761,9 @@ a {
   }
 }
 
-/* "More analysis below" indicator — sits between the stats grid and
- * the table so users discover the tab strip without scrolling. Clicks
- * smooth-scroll to the analysis tab section. */
-/* Compact anchor + counts summary chip. Replaces the 3-card stats grid
- * so the peer table appears higher on the page. */
-.peer-summary-chip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin: 0.75rem 0 1rem 0;
-  padding: 0.5rem 0.9rem;
-  background: #F4EDEC;
-  border-left: 3px solid #602D89;
-  border-radius: 3px;
-  font-size: 0.9rem;
-
-  .peer-summary-anchor {
-    font-weight: 700;
-    color: #251230;
-    font-size: 1rem;
-  }
-  .peer-summary-dot { color: #AC9E94; }
-  .peer-summary-meta { color: #4A3B32; }
-}
-
+/* "More analysis below" indicator — sits directly under the page title
+ * so users discover the tab strip without scrolling past the peer
+ * table. Clicks smooth-scroll to the analysis tab section. */
 .peer-analysis-indicator {
   display: flex;
   align-items: center;

@@ -295,8 +295,24 @@ a:hover {
 /* Section dividers inside the sidebar */
 .sidebar hr {
   border-top: 1px solid #AC9E94;
-  margin: 1.25rem 0;
+  /* 0.5rem each side + tightened neighbor margins below ≈ 1rem total
+   * combined whitespace around the rule, instead of the ~50px chunk we
+   * were leaving when 1.25rem collapsed with the surrounding h6/h2
+   * margins. */
+  margin: 0.5rem 0;
   opacity: 0.6;
+}
+
+/* CSS vertical margins collapse to the larger value, so even after
+ * tightening the <hr>'s own margin, an adjacent <h6> with its own top
+ * margin would still leave the divider floating in space. Squeeze the
+ * elements that immediately neighbour an <hr> inside the sidebar. */
+.sidebar hr + * {
+  margin-top: 0.5rem;
+}
+
+.sidebar *:has(+ hr) {
+  margin-bottom: 0.5rem;
 }
 
 /* ---------- Stat cards (helper component, used in diagnostics later) ---------- */
@@ -305,6 +321,249 @@ a:hover {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin: 1.5rem 0;
+}
+
+/* Compact diagnostic grid used by the Mahalanobis panel in the
+ * Diagnostics tab. Smaller cards than .stat-card because we have 6 of
+ * them and they hold a number + tiny annotation, not headline stats. */
+/* "Which distance metric should I use?" guide in the Advanced
+ * accordion. First thing the user sees when they expand Advanced. */
+.distance-metric-guide {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.55rem 0.75rem 0.4rem 0.75rem;
+  margin-bottom: 0.7rem;
+  border-radius: 3px;
+}
+
+.distance-metric-guide .distance-metric-guide-headline {
+  margin: 0 0 0.3rem 0;
+  color: #251230;
+  font-size: 0.85rem;
+}
+
+.distance-metric-guide .distance-metric-guide-list {
+  margin: 0 0 0.4rem 0;
+  padding-left: 1.1rem;
+  font-size: 0.78rem;
+  color: #251230;
+  line-height: 1.4;
+}
+
+.distance-metric-guide .distance-metric-guide-list li {
+  margin-bottom: 0.35rem;
+}
+
+.distance-metric-guide .distance-metric-guide-cta {
+  margin: 0;
+  color: #7A6E66;
+}
+
+/* Color-coded verdict band at the top of the Mahalanobis diagnostics
+ * section. Translates the condition-number band into an action-
+ * oriented sentence the user can act on without parsing the math. */
+.mah-verdict {
+  padding: 0.55rem 0.75rem;
+  border-radius: 3px;
+  margin: 0.5rem 0 0.7rem 0;
+  border-left: 3px solid;
+  font-size: 0.85rem;
+}
+
+.mah-verdict.mah-verdict-ok {
+  background: #DCFCE7;
+  border-left-color: #16A34A;
+  color: #14532D;
+}
+
+.mah-verdict.mah-verdict-caution {
+  background: #FEF3C7;
+  border-left-color: #D9A437;
+  color: #78350F;
+}
+
+.mah-verdict.mah-verdict-danger {
+  background: #FEE2E2;
+  border-left-color: #C44;
+  color: #7F1D1D;
+}
+
+.mah-verdict .mah-verdict-text {
+  margin: 0;
+}
+
+/* Compare Metrics tab: side-by-side top-K under each metric */
+.cmp-summary {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.4rem 0.65rem;
+  margin: 0.6rem 0;
+  border-radius: 3px;
+}
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin: 0.6rem 0 0.8rem 0;
+}
+
+.cmp-col h6 {
+  color: #602D89;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  margin: 0 0 0.2rem 0;
+}
+
+.cmp-col-sub {
+  margin: 0 0 0.5rem 0;
+  color: #7A6E66;
+}
+
+.cmp-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.cmp-school {
+  display: grid;
+  grid-template-columns: 1.8rem 1fr 2rem 4.5rem;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  margin-bottom: 0.15rem;
+}
+
+.cmp-school:hover {
+  background: #F8F5F9;
+}
+
+.cmp-school.cmp-school-overlap {
+  background: #F4EDEC;
+  border-color: #602D89;
+  font-weight: 600;
+}
+
+.cmp-school.cmp-school-overlap:hover {
+  background: #ECE2EE;
+}
+
+.cmp-school .cmp-rank {
+  color: #7A6E66;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-school .cmp-name {
+  color: #251230;
+}
+
+.cmp-school .cmp-state {
+  color: #7A6E66;
+  text-align: center;
+  font-size: 0.78rem;
+}
+
+.cmp-school .cmp-dist {
+  color: #7A6E66;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+}
+
+.cmp-reading-note {
+  background: #FFFCEF;
+  border-left: 3px solid #D9A437;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
+/* Mahalanobis "variable set: …" callout. Sits between the intro
+ * paragraph and the diagnostic-card grid in the Diagnostics tab. */
+.mah-diag-varset-note {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.45rem 0.65rem;
+  margin: 0.4rem 0 0.6rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
+/* Sub-option indent for the "Use compact variable set" checkbox under
+ * the Mahalanobis checkbox in Advanced. */
+.mah-suboption {
+  margin-left: 1.3rem;
+  padding-left: 0.7rem;
+  border-left: 2px solid #E8DAEA;
+  margin-bottom: 0.5rem;
+}
+
+.mah-diag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.65rem;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.mah-diag-card {
+  background: #FFFFFF;
+  border: 1px solid #F4EDEC;
+  border-left: 3px solid #AC9E94;
+  border-radius: 4px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.mah-diag-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #251230;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.mah-diag-value {
+  font-family: 'Gelasio', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #602D89;
+  line-height: 1.2;
+}
+
+.mah-diag-band {
+  font-size: 0.7rem;
+  color: #7A6E66;
+  margin-top: 0.1rem;
+}
+
+.mah-diag-alert {
+  background: #F4EDEC;
+  border-left: 3px solid #C44;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
+}
+
+.mah-diag-note {
+  background: #FFFCEF;
+  border-left: 3px solid #D9A437;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  color: #251230;
 }
 
 .stat-card {
@@ -471,10 +730,21 @@ a:hover {
 
 /* ---------- Peer results table wrapper ---------- */
 .peer-results-table {
-  margin-bottom: 1.5rem;
+  /* Tight margin below the table — the next section (refine divider +
+   * analysis tabs) carries its own breathing room. */
+  margin-bottom: 0.25rem;
   /* DT's auto-width plus our scrollable card body can render odd cropping
    * if we don't normalize overflow. Let the table size itself naturally. */
   overflow-x: auto;
+  /* DataTables wraps the rendered table in .dataTables_wrapper which
+   * ships with margin-bottom: 1em by default — pile that on top of our
+   * own margin and the divider's margin-top, and the gap to the
+   * analysis tabs balloons to ~100px. Zero it out and let our wrapper
+   * own the spacing budget. */
+}
+
+.peer-results-table .dataTables_wrapper {
+  margin-bottom: 0;
 }
 
 /* Header row: "Top N peers..." title on the left, "About this table"
@@ -544,43 +814,39 @@ a:hover {
   font-style: normal;
 }
 
-/* "More analysis below" indicator — sits between the stats grid and
- * the table so users discover the tab strip without scrolling. Clicks
- * smooth-scroll to the analysis tab section. */
+/* "More analysis below" indicator — sits directly under the page title
+ * so users discover the tab strip without scrolling past the peer
+ * table. Clicks smooth-scroll to the analysis tab section. */
 .peer-analysis-indicator {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  margin: 0.5rem 0 1rem 0;
-  padding: 0.65rem 1rem;
-  background: #FFFFFF;
-  border: 1px solid #602D89;
-  border-left: 4px solid #602D89;
-  border-radius: 6px;
+  gap: 0.5rem;
+  margin: 0.35rem 0 0.75rem 0;
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed #C8B4C0;
+  border-radius: 0;
   color: #602D89;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   cursor: pointer;
   user-select: none;
-  /* Subtle drop shadow + transform on hover reads as "this is a button" */
-  box-shadow: 0 1px 2px rgba(96, 45, 137, 0.08);
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+  transition: background 0.15s ease;
   /* Trailing chevron telegraphs "this scrolls / navigates". Pure CSS,
    * positioned after the text via flex auto-margin. */
 }
 
 .peer-analysis-indicator:hover {
   background: #F4EDEC;
-  border-color: #602D89;
-  box-shadow: 0 2px 8px rgba(96, 45, 137, 0.18);
-  transform: translateY(-1px);
+  color: #251230;
 }
 
 .peer-analysis-indicator:active {
-  transform: translateY(0);
+  opacity: 0.85;
 }
 
 .peer-analysis-indicator:focus-visible {
-  outline: 3px solid rgba(96, 45, 137, 0.35);
+  outline: 2px solid rgba(96, 45, 137, 0.35);
   outline-offset: 1px;
 }
 
@@ -588,13 +854,13 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.1rem;
+  height: 1.1rem;
   background: #602D89;
   color: #FFFFFF;
   border-radius: 50%;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
   flex-shrink: 0;
 }
 
@@ -860,6 +1126,132 @@ a:hover {
 
 /* ---------- Sidebar: info button + label hints ---------- */
 /* "Ranked universe only" + a small info icon to its right. */
+/* Static banner that replaces the retired "Ranked universe only"
+ * checkbox + info modal. Shows the fixed universe scope and primes
+ * the user that the filters below narrow within it. */
+/* Theme-weight preset dropdown row: a selectizeInput plus a small
+ * info trigger that opens an explanatory modal. */
+.theme-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+  /* Override Shiny's default form-group bottom margin since we're
+   * inside a tight row of controls. */
+}
+
+.theme-preset-row .theme-preset-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.theme-preset-row .theme-preset-select .form-group {
+  margin-bottom: 0;
+}
+
+.theme-preset-help {
+  margin-top: 0.15rem;
+  margin-bottom: 0.7rem;
+  color: #7A6E66;
+}
+
+.preset-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid #AC9E94;
+  color: #602D89;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.preset-info-btn:hover, .preset-info-btn:focus {
+  background: #F4EDEC;
+  border-color: #602D89;
+  color: #251230;
+  text-decoration: none;
+}
+
+.preset-info-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.18);
+  outline: none;
+}
+
+/* Preset-explanation modal body */
+.preset-modal-body h6 {
+  color: #602D89;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.preset-modal-body ul li {
+  margin-bottom: 0.25rem;
+}
+
+.preset-modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.4rem 0 0.7rem 0;
+}
+
+.preset-modal-table td {
+  padding: 0.4rem 0.55rem;
+  border-bottom: 1px solid #F4EDEC;
+  vertical-align: top;
+}
+
+.preset-modal-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.preset-modal-table .preset-modal-name {
+  font-weight: 600;
+  color: #251230;
+  width: 14em;
+  white-space: nowrap;
+}
+
+.preset-modal-table .preset-modal-desc {
+  color: #475569;
+  line-height: 1.35;
+}
+
+.preset-modal-table .preset-modal-weights {
+  color: #7A6E66;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.preset-modal-table .preset-modal-weights code {
+  background: transparent;
+  color: #602D89;
+  padding: 0;
+}
+
+.pool-universe-banner {
+  background: #F4EDEC;
+  border-left: 3px solid #602D89;
+  padding: 0.45rem 0.65rem;
+  margin-bottom: 0.6rem;
+  border-radius: 3px;
+}
+
+.pool-universe-banner .pool-universe-label {
+  color: #251230;
+  line-height: 1.35;
+  display: block;
+}
+
 .pool-checkbox-row {
   display: flex;
   align-items: center;
@@ -951,11 +1343,12 @@ a:hover {
 
 .peer-comp-grid {
   display: grid;
-  /* 5 dimensions, wider cards. minmax 420 fits ~2 columns at common
-   * widths and 3 at very wide; both layouts give the long category
-   * names ("National Liberal Arts Colleges", "NCAA Division I", etc.)
-   * enough room without ellipsis-truncation. */
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  /* Rows are now label-on-top + full-width-bar-below, so each card
+   * can be narrower (no inner column eating label width). 340px lets
+   * 2 cards fit at ~720px viewport, 3 at ~1080px, 4 on very wide
+   * monitors. Long category names get the entire card width minus
+   * the stats they share their row with. */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -1007,19 +1400,30 @@ a:hover {
 }
 
 .peer-comp-row {
-  display: grid;
-  /* Wider cards give the label column more room; bar column gets the
-   * same fixed footprint, stats stay compact on the right. */
-  grid-template-columns: minmax(0, 1fr) 110px minmax(0, 80px);
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0.2rem 0.4rem;
+  /* Two-line layout per row: label + stats on top, full-width bar
+   * below. Labels can't get pinched by an adjacent fixed-width column
+   * anymore — they always get the full card width minus the stats. */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.35rem 0.4rem 0.5rem 0.4rem;
   border-radius: 3px;
   transition: background 0.15s ease;
 }
 
 .peer-comp-row:hover {
   background: #f8f5f9;
+}
+
+.peer-comp-row-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  /* Label hugs left, stats hug right via auto margin */
+}
+
+.peer-comp-row-header .peer-comp-row-stats {
+  margin-left: auto;
 }
 
 .peer-comp-row-anchor {
@@ -1097,7 +1501,7 @@ a:hover {
  * tabsetPanel rather than a bslib navset for max portability across
  * bslib versions; styled here to read like the rest of the app. */
 .peer-analysis-tabs {
-  margin-top: 1rem;
+  margin-top: 0.25rem;
   /* Tab row */
   /* Active tab body */
 }
@@ -3257,6 +3661,12 @@ ul li, ol li {
   max-width: 880px;
   margin: 0 auto;
   padding: 1.5rem 1.5rem 4rem 1.5rem;
+  /* CSS margins between adjacent block elements collapse to the
+   * larger value, so an <hr> sitting between content and an <h2>
+   * (margin-top: 2rem) shows 2rem below it regardless of the <hr>'s
+   * own margin. Tighten headings + first-line elements that
+   * immediately follow a divider so the divider actually looks
+   * tight to its section. */
 }
 
 .help-doc h1 {
@@ -3335,7 +3745,18 @@ ul li, ol li {
 .help-doc hr {
   border: none;
   border-top: 1px solid #AC9E94;
-  margin: 2rem 0;
+  /* 0.5rem above + 0.5rem below = ~1rem combined breathing room.
+     * Keeps the rule legible as a divider without floating in space. */
+  margin: 0.5rem 0;
+}
+
+.help-doc hr + h2,
+.help-doc hr + h3,
+.help-doc hr + h4,
+.help-doc hr + p,
+.help-doc hr + ul,
+.help-doc hr + ol {
+  margin-top: 0.5rem;
 }
 
 .help-doc ul, .help-doc ol {
@@ -3521,12 +3942,58 @@ ul li, ol li {
 }
 
 /* ---------- Peer Search follow-up sections ---------- */
+/* Action cluster on the right side of the peer-results-header: two
+ * download buttons (Excel + PDF) followed by the About-this-table
+ * modal trigger. Wraps to a new line on narrow viewports. */
+.peer-results-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Compact outline buttons for the Excel + PDF downloads. Less
+ * prominent than the purple "About this table" CTA so the eye still
+ * lands on the explainer button first. */
+.peer-download-btn {
+  background: #FFFFFF;
+  color: #602D89;
+  border: 1px solid #602D89;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  /* Tighten icon spacing inside the button */
+}
+
+.peer-download-btn .fa, .peer-download-btn .fas, .peer-download-btn .far {
+  margin-right: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.peer-download-btn:hover, .peer-download-btn:focus {
+  background: #F4EDEC;
+  color: #251230;
+  border-color: #251230;
+  text-decoration: none;
+}
+
+.peer-download-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(96, 45, 137, 0.18);
+  outline: none;
+}
+
 /* Heavy divider between the main result and the follow-up sections, so
- * it's clear they're "after the search" tools. */
+ * it's clear they're "after the search" tools. Tight margins — the
+ * peer-results-table and peer-analysis-tabs neighbors already zero
+ * out their adjacent edges. */
 .peer-refine-divider {
   border: none;
   border-top: 2px solid #AC9E94;
-  margin: 2rem 0 1.25rem 0;
+  margin: 0.75rem 0 0.5rem 0;
 }
 
 .peer-refine-controls {
@@ -3725,3 +4192,4 @@ ul li, ol li {
 .ssc-working-as input[type="text"] {
   font-family: 'Manrope', sans-serif;
 }
+

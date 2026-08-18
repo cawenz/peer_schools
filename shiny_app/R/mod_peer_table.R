@@ -135,8 +135,10 @@ peerTableUI <- function(id) {
       .peer_empty_hero(ns)
     ),
 
-    # Stats grid (rendered server-side ONLY after first search).
-    uiOutput(ns("header_or_empty")),
+    # Analysis-tabs jump indicator (rendered server-side ONLY after
+    # first search). The anchor + count summary chip that used to live
+    # above this is retired — the sidebar already shows the anchor and
+    # the candidate-pool context, so a top-of-results echo was chrome.
     uiOutput(ns("analysis_indicator")),
 
     # Results section with a clear label above the table so the table reads
@@ -300,35 +302,8 @@ peerTableServer <- function(id, sidebar_state) {
     output$has_results <- reactive({ !is.null(peer_result()) })
     outputOptions(output, "has_results", suspendWhenHidden = FALSE)
 
-    output$header_or_empty <- renderUI({
-      res <- peer_result()
-      if (is.null(res)) return(NULL)   # static hero covers this case
-
-      anchor_name <- res$meta$anchor_name
-      pool_n      <- res$meta$candidate_pool_size
-      k_actual    <- nrow(res$peers)
-      dist_label  <- switch(res$meta$distance_metric,
-                            euclidean   = "Euclidean",
-                            mahalanobis = "Mahalanobis",
-                            res$meta$distance_metric)
-      n_vars      <- length(res$meta$variables_used)
-      n_dropped_c <- nrow(res$meta$variables_dropped_coverage)
-      n_dropped_a <- length(res$meta$variables_dropped_anchor_na)
-
-      # Compact single-line summary chip. Replaces the earlier 3-card
-      # grid so the peer table appears higher on the page. Anchor name
-      # is emphasized; the two count facts are secondary text.
-      div(class = "peer-summary-chip",
-          tags$span(class = "peer-summary-anchor", anchor_name),
-          tags$span(class = "peer-summary-dot", "·"),
-          tags$span(class = "peer-summary-meta",
-                    sprintf("%s candidates in pool",
-                            format(pool_n, big.mark = ","))),
-          tags$span(class = "peer-summary-dot", "·"),
-          tags$span(class = "peer-summary-meta",
-                    sprintf("top %d peers", k_actual))
-      )
-    })
+    # (retired: output$header_or_empty summary chip - the anchor and
+    # candidate-pool context are already surfaced by the sidebar.)
 
     # ---- More-analysis-below indicator ---------------------------------
     # Sits between the stats grid and the results table, so the user
